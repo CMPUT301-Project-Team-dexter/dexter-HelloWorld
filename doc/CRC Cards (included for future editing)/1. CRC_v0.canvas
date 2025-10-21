@@ -1,0 +1,19 @@
+{
+	"nodes":[
+		{"id":"9d296c3d583e950e","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/Organizer.md","x":980,"y":-3120,"width":500,"height":620},
+		{"id":"ecd01de33f9cd59f","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/Entrant.md","x":440,"y":-3120,"width":480,"height":540},
+		{"id":"6d9de4aa7a7eacde","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/Administrator.md","x":1540,"y":-3120,"width":400,"height":400},
+		{"id":"723a820561249454","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/NotificationService.md","x":1780,"y":-2150,"width":400,"height":300},
+		{"id":"027637faea7870e5","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/waitingList.md","x":900,"y":-2420,"width":400,"height":400},
+		{"id":"0959774ae1f87d2e","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/GeolocationService.md","x":1340,"y":-2420,"width":400,"height":240},
+		{"id":"b069dcff843a108f","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/Notification.md","x":1340,"y":-2150,"width":400,"height":340},
+		{"id":"7454660f52d7e1f6","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/LotterySystem.md","x":440,"y":-2420,"width":400,"height":435},
+		{"id":"1b60ffe157d4a1fb","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/Event.md","x":-80,"y":-2150,"width":400,"height":440},
+		{"id":"6d7f16edd73051bc","x":-80,"y":-3110,"width":400,"height":260,"type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/User.md"},
+		{"id":"aa7ee3ef20975426","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/ImageService.md","x":1340,"y":-1780,"width":400,"height":280},
+		{"id":"bffaf9a1bc0000b7","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/attendeeList.md","x":900,"y":-1985,"width":400,"height":400},
+		{"id":"3dd88ee18ff8522b","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/QRService.md","x":2240,"y":-2420,"width":400,"height":240},
+		{"id":"69673810651dac8a","type":"file","file":"Current University Courses/CMPUT 301/CMPUT 301 - Group Project/CRC Cards/FirebaseService.md","x":440,"y":-1950,"width":400,"height":450}
+	],
+	"edges":[]
+}
