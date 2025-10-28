@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_filter"
+        android:id="@+id/filter_button"
         android:icon="@drawable/outline_filter_alt_128"
         android:title="filter"
         app:showAsAction="always"/>
