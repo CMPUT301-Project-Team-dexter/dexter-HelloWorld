@@ -7,7 +7,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
@@ -68,7 +67,7 @@ public class RegisterHistoryFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.register_history_fragment, container, false);
+        View view = inflater.inflate(R.layout.filter_menu_list_base, container, false);
         listView = view.findViewById(R.id.listview);
 
         return view;
