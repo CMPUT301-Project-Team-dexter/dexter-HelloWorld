@@ -38,5 +38,13 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, EventDetailActivity.class)
                     .putExtra(EventDetailActivity.EXTRA_EVENT_ID, eventId));
         });
+
+        // This is the fragment to be displayed upon opening the app.
+        // If you want to try other fragments, replace the corresponding keywords.
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new RegisterHistoryFragment())
+                    .commit();
+        }
     }
 }
