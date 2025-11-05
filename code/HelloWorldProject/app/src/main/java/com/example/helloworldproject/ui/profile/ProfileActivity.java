@@ -3,9 +3,11 @@ package com.example.helloworldproject.ui.profile;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -14,12 +16,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.ProfileRepository;
 import com.example.helloworldproject.model.Profile;
+import com.example.helloworldproject.model.UserGroup;
 import com.example.helloworldproject.util.DeviceId;
 
 /** Create/Update profile in a single screen. */
 public class ProfileActivity extends AppCompatActivity {
 
     private EditText etName, etEmail, etPhone;
+    private Spinner userGroupSpinner;
     private Button btnSave;
     private ProgressBar progress;
 
@@ -34,6 +38,12 @@ public class ProfileActivity extends AppCompatActivity {
         etName = findViewById(R.id.et_name);
         etEmail = findViewById(R.id.et_email);
         etPhone = findViewById(R.id.et_phone);
+        userGroupSpinner = findViewById(R.id.user_group_spinner);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+            this, R.layout.spinner_text_item, UserGroup.getNameList()
+        );
+        spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_text_item);
+        userGroupSpinner.setAdapter(spinnerAdapter);
         btnSave = findViewById(R.id.btn_save);
         progress = findViewById(R.id.progress);
 
@@ -51,6 +61,7 @@ public class ProfileActivity extends AppCompatActivity {
                             etName.setText(p.getName());
                             etEmail.setText(p.getEmail());
                             etPhone.setText(p.getPhone());
+                            userGroupSpinner.setSelection(p.getUserGroup().ordinal());
                         }
                     }
 
@@ -87,7 +98,15 @@ public class ProfileActivity extends AppCompatActivity {
                 }
 
                 setLoading(true);
-                Profile p = new Profile(deviceId, deviceId, name, email, TextUtils.isEmpty(phone) ? null : phone);
+                Profile p = new Profile(
+                    deviceId, deviceId, name, email,
+                    TextUtils.isEmpty(phone) ? null : phone,
+                    UserGroup.valueOf(
+                        spinnerAdapter.getItem(
+                            userGroupSpinner.getSelectedItemPosition()
+                        )
+                    )
+                );
                 repo.saveOrUpdate(p, new ProfileRepository.CompleteCallback() {
                     @Override public void onComplete() {
                         setLoading(false);
