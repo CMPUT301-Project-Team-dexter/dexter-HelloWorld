@@ -1,4 +1,4 @@
-package com.example.helloworldproject;
+package com.example.helloworldproject.ui.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,8 +7,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -16,15 +14,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.helloworldproject.ui.utils.AllImagesFragmentAdapter;
+import com.example.helloworldproject.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class AllUsersFragment extends Fragment {
+public class AllImagesFragment extends Fragment {
 
-    private ListView listView;
+    private RecyclerView recyclerView;
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -38,7 +39,7 @@ public class AllUsersFragment extends Fragment {
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.filter_menu, menu);
+                menuInflater.inflate(R.menu.all_images_fragment_menu, menu);
             }
 
             @Override
@@ -55,25 +56,25 @@ public class AllUsersFragment extends Fragment {
         }
 
 
-        listView = view.findViewById(R.id.listview);
-        ArrayList<String> userNames = new ArrayList<>();
-        userNames.add("AlphaBravo");
-        userNames.add("TestName2");
-        userNames.add("Chill");
+        recyclerView = view.findViewById(R.id.recyclerview);
+        ArrayList<Integer> items = new ArrayList<>();
+        items.add(R.drawable.debug_card_image);
+        items.add(R.drawable.debug_card_image2);
+        items.add(R.drawable.debug_card_image);
+        items.add(R.drawable.debug_card_image2);
 
-        ArrayList<String> userIds = new ArrayList<>();
-        userIds.add("id1");
-        userIds.add("id2");
-        userIds.add("id3");
+        AllImagesFragmentAdapter adapter = new AllImagesFragmentAdapter(requireContext(), items);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 3));
 
-        UserItemAdapter adapter = new UserItemAdapter(requireContext(), userNames, userIds);
-        listView.setAdapter(adapter);
+        recyclerView.setClipToPadding(false);
+        recyclerView.setPadding(0, 0, 0, 0);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.filter_menu_list_base, container, false);
-        listView = view.findViewById(R.id.listview);
+        View view = inflater.inflate(R.layout.all_images_fragment, container, false);
+        recyclerView = view.findViewById(R.id.recyclerview);
 
         return view;
     }

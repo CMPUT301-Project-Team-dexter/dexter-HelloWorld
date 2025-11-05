@@ -1,4 +1,4 @@
-package com.example.helloworldproject;
+package com.example.helloworldproject.ui.utils;
 
 /**
  * This class contains the information needed for each card in the register history fragment.

@@ -1,4 +1,4 @@
-package com.example.helloworldproject;
+package com.example.helloworldproject.ui.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,21 +12,21 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.helper.widget.Grid;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.helloworldproject.ui.utils.EventCardAdapter;
+import com.example.helloworldproject.ui.utils.EventCardView;
+import com.example.helloworldproject.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AllImagesFragment extends Fragment {
+public class EventCardListFragment extends Fragment {
 
-    private RecyclerView recyclerView;
+    private ListView listView;
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -40,7 +40,7 @@ public class AllImagesFragment extends Fragment {
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.all_images_fragment_menu, menu);
+                menuInflater.inflate(R.menu.filter_menu, menu);
             }
 
             @Override
@@ -57,25 +57,21 @@ public class AllImagesFragment extends Fragment {
         }
 
 
-        recyclerView = view.findViewById(R.id.recyclerview);
-        ArrayList<Integer> items = new ArrayList<>();
-        items.add(R.drawable.debug_card_image);
-        items.add(R.drawable.debug_card_image2);
-        items.add(R.drawable.debug_card_image);
-        items.add(R.drawable.debug_card_image2);
+        listView = view.findViewById(R.id.listview);
+        List<EventCardView> items = new ArrayList<>();
+        items.add(new EventCardView("Event 1", "Archive", R.drawable.debug_card_image));
+        items.add(new EventCardView("Event 2", "In Progress\n Archive", R.drawable.debug_card_image2));
+        items.add(new EventCardView("Event 3", "Jover", R.drawable.debug_card_image2));
+        items.add(new EventCardView("Event 67", "123", R.drawable.debug_card_image));
 
-        AllImagesFragmentAdapter adapter = new AllImagesFragmentAdapter(requireContext(), items);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 3));
-
-        recyclerView.setClipToPadding(false);
-        recyclerView.setPadding(0, 0, 0, 0);
+        EventCardAdapter adapter = new EventCardAdapter(requireContext(), items);
+        listView.setAdapter(adapter);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.all_images_fragment, container, false);
-        recyclerView = view.findViewById(R.id.recyclerview);
+        View view = inflater.inflate(R.layout.filter_menu_list_base, container, false);
+        listView = view.findViewById(R.id.listview);
 
         return view;
     }

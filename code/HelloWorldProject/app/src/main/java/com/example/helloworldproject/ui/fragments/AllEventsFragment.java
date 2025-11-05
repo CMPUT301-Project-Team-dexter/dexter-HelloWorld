@@ -1,4 +1,4 @@
-package com.example.helloworldproject;
+package com.example.helloworldproject.ui.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,7 +7,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
@@ -17,10 +16,11 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 
+import com.example.helloworldproject.ui.utils.EventItemAdapter;
+import com.example.helloworldproject.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class AllEventsFragment extends Fragment {
 

@@ -1,4 +1,4 @@
-package com.example.helloworldproject;
+package com.example.helloworldproject.ui.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,12 +16,13 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 
+import com.example.helloworldproject.R;
+import com.example.helloworldproject.ui.utils.UserItemAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class RegisterHistoryFragment extends Fragment {
+public class AllUsersFragment extends Fragment {
 
     private ListView listView;
 
@@ -55,13 +56,17 @@ public class RegisterHistoryFragment extends Fragment {
 
 
         listView = view.findViewById(R.id.listview);
-        List<EventCardView> items = new ArrayList<>();
-        items.add(new EventCardView("Event 1", "Archive", R.drawable.debug_card_image));
-        items.add(new EventCardView("Event 2", "In Progress\n Archive", R.drawable.debug_card_image2));
-        items.add(new EventCardView("Event 3", "Jover", R.drawable.debug_card_image2));
-        items.add(new EventCardView("Event 67", "123", R.drawable.debug_card_image));
+        ArrayList<String> userNames = new ArrayList<>();
+        userNames.add("AlphaBravo");
+        userNames.add("TestName2");
+        userNames.add("Chill");
 
-        EventCardAdapter adapter = new EventCardAdapter(requireContext(), items);
+        ArrayList<String> userIds = new ArrayList<>();
+        userIds.add("id1");
+        userIds.add("id2");
+        userIds.add("id3");
+
+        UserItemAdapter adapter = new UserItemAdapter(requireContext(), userNames, userIds);
         listView.setAdapter(adapter);
     }
 
