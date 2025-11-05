@@ -19,15 +19,13 @@ public class DeviceId {
 
     public static void getOrFetch(Context context, final DeviceIdCallback callback) {
         FirebaseInstallations.getInstance().getId()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override public void onComplete(@NonNull Task<String> task) {
-                        if (task.isSuccessful()) {
-                            callback.onSuccess(task.getResult());
-                        } else {
-                            Exception e = task.getException();
-                            Log.e("DeviceId", "Failed to get installation id", e);
-                            callback.onError(e);
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        callback.onSuccess(task.getResult());
+                    } else {
+                        Exception e = task.getException();
+                        Log.e("DeviceId", "Failed to get installation id", e);
+                        callback.onError(e);
                     }
                 });
     }

@@ -1,4 +1,4 @@
-package com.example.helloworldproject.ui.profile;
+package com.example.helloworldproject.ui.activities;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -17,10 +17,11 @@ import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.ProfileRepository;
 import com.example.helloworldproject.model.Profile;
 import com.example.helloworldproject.model.UserGroup;
+import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.DeviceId;
 
 /** Create/Update profile in a single screen. */
-public class ProfileActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private EditText etName, etEmail, etPhone;
     private Spinner userGroupSpinner;
@@ -45,6 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_text_item);
         userGroupSpinner.setAdapter(spinnerAdapter);
         btnSave = findViewById(R.id.btn_save);
+        btnSave.setText("Log in");
         progress = findViewById(R.id.progress);
 
         repo = new ProfileRepository();
@@ -62,64 +64,69 @@ public class ProfileActivity extends AppCompatActivity {
                             etEmail.setText(p.getEmail());
                             etPhone.setText(p.getPhone());
                             userGroupSpinner.setSelection(p.getUserGroup().ordinal());
+                            CurrentProfile.init(p);
+                            startActivity(HomeActivity.newIntent(LoginActivity.this));
+                            finish();
+                            return;
                         }
+                        Toast.makeText(LoginActivity.this, "Failed to load: profile is null", Toast.LENGTH_LONG).show();
                     }
 
                     @Override public void onNotFound() {
+                        btnSave.setText("Register");
                         setLoading(false); // new user: keep fields empty
                     }
 
                     @Override public void onError(Exception e) {
                         setLoading(false);
-                        Toast.makeText(ProfileActivity.this, "Failed to load: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this, "Failed to load: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
             }
 
             @Override public void onError(Exception e) {
                 setLoading(false);
-                Toast.makeText(ProfileActivity.this, "Failed to get device ID: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, "Failed to get device ID: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                String name = etName.getText().toString().trim();
-                String email = etEmail.getText().toString().trim();
-                String phone = etPhone.getText().toString().trim();
+        btnSave.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            String email = etEmail.getText().toString().trim();
+            String phone = etPhone.getText().toString().trim();
 
-                if (TextUtils.isEmpty(name)) {
-                    etName.setError("Please enter your name");
-                    return;
-                }
-                if (TextUtils.isEmpty(email)) {
-                    etEmail.setError("Please enter your email");
-                    return;
-                }
-
-                setLoading(true);
-                Profile p = new Profile(
-                    deviceId, deviceId, name, email,
-                    TextUtils.isEmpty(phone) ? null : phone,
-                    UserGroup.valueOf(
-                        spinnerAdapter.getItem(
-                            userGroupSpinner.getSelectedItemPosition()
-                        )
-                    )
-                );
-                repo.saveOrUpdate(p, new ProfileRepository.CompleteCallback() {
-                    @Override public void onComplete() {
-                        setLoading(false);
-                        Toast.makeText(ProfileActivity.this, "Saved", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-
-                    @Override public void onError(Exception e) {
-                        setLoading(false);
-                        Toast.makeText(ProfileActivity.this, "Save failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
+            if (TextUtils.isEmpty(name)) {
+                etName.setError("Please enter your name");
+                return;
             }
+            if (TextUtils.isEmpty(email)) {
+                etEmail.setError("Please enter your email");
+                return;
+            }
+
+            setLoading(true);
+            Profile p = new Profile(
+                deviceId, deviceId, name, email,
+                TextUtils.isEmpty(phone) ? null : phone,
+                UserGroup.valueOf(
+                    spinnerAdapter.getItem(
+                        userGroupSpinner.getSelectedItemPosition()
+                    )
+                )
+            );
+            repo.saveOrUpdate(p, new ProfileRepository.CompleteCallback() {
+                @Override public void onComplete() {
+                    setLoading(false);
+                    CurrentProfile.init(p);
+                    startActivity(HomeActivity.newIntent(LoginActivity.this));
+                    finish();
+                }
+
+                @Override public void onError(Exception e) {
+                    setLoading(false);
+                    Toast.makeText(LoginActivity.this, "Save failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
         });
     }
 
@@ -129,5 +136,6 @@ public class ProfileActivity extends AppCompatActivity {
         etName.setEnabled(!loading);
         etEmail.setEnabled(!loading);
         etPhone.setEnabled(!loading);
+        userGroupSpinner.setEnabled(!loading);
     }
 }
