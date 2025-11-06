@@ -1,4 +1,4 @@
-package com.example.helloworldproject;
+package com.example.helloworldproject.ui.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,12 +16,15 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 
+import com.example.helloworldproject.ui.utils.EventCardAdapter;
+import com.example.helloworldproject.ui.utils.EventCardView;
+import com.example.helloworldproject.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RegisterHistoryFragment extends Fragment {
+public class EventCardListFragment extends Fragment {
 
     private ListView listView;
 
