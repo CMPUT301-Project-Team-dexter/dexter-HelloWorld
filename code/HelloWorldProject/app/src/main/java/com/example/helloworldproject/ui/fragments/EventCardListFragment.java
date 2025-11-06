@@ -59,6 +59,9 @@ public class EventCardListFragment extends Fragment {
 
         listView = view.findViewById(R.id.listview);
         List<EventCardView> items = new ArrayList<>();
+        // TODO: update event list according to user group of the current logged-in user
+        // TODO: e.g. for an ORGANIZER, show the list of events that are created by the organizer
+
         items.add(new EventCardView("Event 1", "Archive", R.drawable.debug_card_image));
         items.add(new EventCardView("Event 2", "In Progress\n Archive", R.drawable.debug_card_image2));
         items.add(new EventCardView("Event 3", "Jover", R.drawable.debug_card_image2));

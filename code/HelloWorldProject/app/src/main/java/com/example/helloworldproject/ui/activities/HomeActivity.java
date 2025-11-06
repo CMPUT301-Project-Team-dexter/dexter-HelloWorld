@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.model.Profile;
+import com.example.helloworldproject.ui.fragments.EventCardListFragment;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -32,10 +33,10 @@ public class HomeActivity extends AppCompatActivity {
 
         // This is the fragment to be displayed upon opening the app.
         // If you want to try other fragments, replace the corresponding keywords.
-//        if (savedInstanceState == null) {
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.fragment_container, new EventCardListFragment())
-//                    .commit();
-//        }
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new EventCardListFragment())
+                    .commit();
+        }
     }
 }
