@@ -36,6 +36,18 @@
             android:exported="false"
             android:label="Event Detail" />
 
+        <activity
+            android:name=".ui.activities.SettingsActivity"
+            android:exported="false"
+            android:label="Settings" />
+
+        <activity
+            android:name=".ui.activities.ProfileEditActivity"
+            android:exported="false"
+            android:label="Edit Profile" />
+
+
+
     </application>
 
 </manifest>
