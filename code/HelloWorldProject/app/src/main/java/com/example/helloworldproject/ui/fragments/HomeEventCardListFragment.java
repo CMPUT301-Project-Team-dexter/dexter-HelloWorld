@@ -16,6 +16,7 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 
+import com.example.helloworldproject.ui.activities.EventEditingActivity;
 import com.example.helloworldproject.ui.utils.EventCardAdapter;
 import com.example.helloworldproject.ui.utils.EventCardView;
 import com.example.helloworldproject.R;
@@ -75,7 +76,7 @@ public class HomeEventCardListFragment extends Fragment {
         if (CurrentProfile.isOrganizer()) {
             addEventBtn.setVisibility(View.VISIBLE);
             addEventBtn.setOnClickListener(v -> {
-
+                startActivity(EventEditingActivity.newIntent(getContext(), null));
             });
         } else {
             addEventBtn.setVisibility(View.GONE);
