@@ -1,4 +1,42 @@
 package com.example.helloworldproject.model;
 
-public class AttendeeList {
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+public class AttendeeList implements Serializable {
+    Map<Profile, AttendeeState> attendeeList;
+
+    public AttendeeList() {
+        this.attendeeList = new HashMap<>();
+    }
+
+    public boolean addAttendee(Profile entrant, AttendeeState state) {
+        if (!attendeeList.containsKey(entrant)) {
+            attendeeList.put(entrant, state);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateAttendee(Profile entrant, AttendeeState state) {
+        if (attendeeList.containsKey(entrant)) {
+            attendeeList.put(entrant, state);
+            return true;
+        }
+        return false;
+    }
+
+    public List<Profile> getAcceptedEntrants() {
+        List<Profile> acceptedEntrants = new LinkedList<>();
+
+        for (Map.Entry<Profile, AttendeeState> entry : attendeeList.entrySet()) {
+            if (entry.getValue().equals(AttendeeState.ACCEPTED)) {
+                acceptedEntrants.add(entry.getKey());
+            }
+        }
+        return acceptedEntrants;
+    }
 }
