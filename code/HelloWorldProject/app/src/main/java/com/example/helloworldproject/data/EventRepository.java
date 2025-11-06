@@ -21,21 +21,15 @@ public class EventRepository {
 
     public void loadById(String eventId, final LoadCallback cb) {
         db.collection("events").document(eventId).get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override public void onSuccess(DocumentSnapshot ds) {
-                        if (ds.exists()) {
-                            Event e = ds.toObject(Event.class);
-                            if (e != null) e.setId(ds.getId());
-                            cb.onLoaded(e);
-                        } else {
-                            cb.onNotFound();
-                        }
+                .addOnSuccessListener(ds -> {
+                    if (ds.exists()) {
+                        Event e = ds.toObject(Event.class);
+                        if (e != null) e.setId(ds.getId());
+                        cb.onLoaded(e);
+                    } else {
+                        cb.onNotFound();
                     }
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override public void onFailure(@NonNull Exception e) {
-                        cb.onError(e);
-                    }
-                });
+                .addOnFailureListener(cb::onError);
     }
 }
