@@ -62,4 +62,8 @@ public class WaitingList implements Serializable {
         this.limit = limit;
         return true;
     }
+
+    public boolean constains(Profile profile) {
+        return waitingList.contains(profile);
+    }
 }
