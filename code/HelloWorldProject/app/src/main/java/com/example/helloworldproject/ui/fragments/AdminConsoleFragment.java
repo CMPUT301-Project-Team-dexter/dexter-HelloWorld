@@ -1,4 +1,4 @@
-package com.example.helloworldproject;
+package com.example.helloworldproject.ui.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,10 +7,14 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
-public class ImageDetailFragment extends Fragment {
+import com.example.helloworldproject.R;
+
+public class AdminConsoleFragment extends Fragment {
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.image_detail_fragment, container, false);
+        View view = inflater.inflate(R.layout.admin_console_fragment, container, false);
 
         return view;
     }
