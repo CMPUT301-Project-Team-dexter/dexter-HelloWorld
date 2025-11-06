@@ -15,7 +15,6 @@ import com.example.helloworldproject.ui.activities.SettingsActivity;
 
 public class AccountFragment extends Fragment {
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.account_fragment, container, false);
