@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">HelloWorldProject</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="events">Events</string>
+    <string name="filter_events">Filter Events</string>
+    <string name="sample_event">Sample Event</string>
+
+    <string name="scan_qr" />
+    <string name="events_title" />
+    <string name="sample_period">Available: May 12 – May 20</string>
+
+    <string name="delete_event" />
+    <string name="add_event" />
+    <string name="tap_to_update_poster" />
+    <string name="registration_period" />
+    <string name="sample_reg_period" />
+    <string name="event_period" />
+    <string name="sample_event_period" />
+    <string name="geolocation_requirement" />
 </resources>
