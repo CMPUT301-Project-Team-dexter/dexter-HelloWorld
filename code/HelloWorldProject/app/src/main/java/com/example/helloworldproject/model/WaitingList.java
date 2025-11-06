@@ -63,7 +63,7 @@ public class WaitingList implements Serializable {
         return true;
     }
 
-    public boolean constains(Profile profile) {
+    public boolean contains(Profile profile) {
         return waitingList.contains(profile);
     }
 }
