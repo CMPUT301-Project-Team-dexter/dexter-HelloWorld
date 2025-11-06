@@ -12,6 +12,9 @@ public class Event {
     private Timestamp registrationCloseAt;
     private Integer capacity;
 
+    public AttendeeList attendeeList;
+    public WaitingList waitingList;
+
     // Fields for US 01.05.05 (lottery explanation)
     private String selectionMethod;    // e.g., "FISHER_YATES"
     private String seedPolicy;         // e.g., "RANDOM_LOGGED"
