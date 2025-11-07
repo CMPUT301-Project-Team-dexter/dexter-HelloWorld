@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 /** Firestore repository for Event. */
 public class EventRepository {
@@ -17,25 +18,33 @@ public class EventRepository {
         void onError(Exception e);
     }
 
+    public interface CompleteCallback {
+        void onComplete();
+        void onError(Exception e);
+    }
+
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public void loadById(String eventId, final LoadCallback cb) {
         db.collection("events").document(eventId).get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override public void onSuccess(DocumentSnapshot ds) {
-                        if (ds.exists()) {
-                            Event e = ds.toObject(Event.class);
-                            if (e != null) e.setId(ds.getId());
-                            cb.onLoaded(e);
-                        } else {
-                            cb.onNotFound();
-                        }
+                .addOnSuccessListener(ds -> {
+                    if (ds.exists()) {
+                        Event e = ds.toObject(Event.class);
+                        if (e != null) e.setId(ds.getId());
+                        cb.onLoaded(e);
+                    } else {
+                        cb.onNotFound();
                     }
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override public void onFailure(@NonNull Exception e) {
-                        cb.onError(e);
-                    }
-                });
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void saveOrUpdate(Event e, final CompleteCallback cb) {
+        String eventId = e.getId();
+        db.collection("events")
+            .document(eventId)
+            .set(e, SetOptions.merge())
+            .addOnSuccessListener(unused -> cb.onComplete())
+            .addOnFailureListener(cb::onError);
     }
 }

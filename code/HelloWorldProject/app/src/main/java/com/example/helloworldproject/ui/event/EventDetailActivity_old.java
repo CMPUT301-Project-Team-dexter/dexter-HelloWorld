@@ -15,7 +15,7 @@ import com.example.helloworldproject.model.Event;
 import com.google.firebase.firestore.ListenerRegistration;
 
 /** Event details screen showing waitlist size and lottery rules. */
-public class EventDetailActivity extends AppCompatActivity {
+public class EventDetailActivity_old extends AppCompatActivity {
 
     public static final String EXTRA_EVENT_ID = "extra_event_id";
 
@@ -58,11 +58,11 @@ public class EventDetailActivity extends AppCompatActivity {
                 tvVenue.setText(e.getVenue());
             }
             @Override public void onNotFound() {
-                Toast.makeText(EventDetailActivity.this, "Event not found", Toast.LENGTH_LONG).show();
+                Toast.makeText(EventDetailActivity_old.this, "Event not found", Toast.LENGTH_LONG).show();
                 finish();
             }
             @Override public void onError(Exception e) {
-                Toast.makeText(EventDetailActivity.this, "Failed to load event: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(EventDetailActivity_old.this, "Failed to load event: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -73,7 +73,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 tvWaitlistCount.setText("Waitlist size: " + total);
             }
             @Override public void onError(Exception e) {
-                Toast.makeText(EventDetailActivity.this, "Failed to read waitlist size: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(EventDetailActivity_old.this, "Failed to read waitlist size: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -81,7 +81,7 @@ public class EventDetailActivity extends AppCompatActivity {
         btnLotteryRules.setOnClickListener(v -> {
             if (currentEvent == null) return;
             String msg = LotteryTextBuilder.build(currentEvent, currentWaitlistCount);
-            LotteryTextBuilder.showDialog(EventDetailActivity.this, msg);
+            LotteryTextBuilder.showDialog(EventDetailActivity_old.this, msg);
         });
     }
 

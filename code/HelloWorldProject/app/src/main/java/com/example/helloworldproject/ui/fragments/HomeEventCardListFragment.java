@@ -16,16 +16,18 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 
+import com.example.helloworldproject.ui.activities.EventEditingActivity;
 import com.example.helloworldproject.ui.utils.EventCardAdapter;
 import com.example.helloworldproject.ui.utils.EventCardView;
 import com.example.helloworldproject.R;
+import com.example.helloworldproject.util.CurrentProfile;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventCardListFragment extends Fragment {
-
+public class HomeEventCardListFragment extends Fragment {
     private ListView listView;
 
     @Override
@@ -59,6 +61,9 @@ public class EventCardListFragment extends Fragment {
 
         listView = view.findViewById(R.id.listview);
         List<EventCardView> items = new ArrayList<>();
+        // TODO: update event list according to user group of the current logged-in user
+        // TODO: e.g. for an ORGANIZER, show the list of events that are created by the organizer
+
         items.add(new EventCardView("Event 1", "Archive", R.drawable.debug_card_image));
         items.add(new EventCardView("Event 2", "In Progress\n Archive", R.drawable.debug_card_image2));
         items.add(new EventCardView("Event 3", "Jover", R.drawable.debug_card_image2));
@@ -66,11 +71,21 @@ public class EventCardListFragment extends Fragment {
 
         EventCardAdapter adapter = new EventCardAdapter(requireContext(), items);
         listView.setAdapter(adapter);
+
+        FloatingActionButton addEventBtn = view.findViewById(R.id.add_event_fab);
+        if (CurrentProfile.isOrganizer()) {
+            addEventBtn.setVisibility(View.VISIBLE);
+            addEventBtn.setOnClickListener(v -> {
+                startActivity(EventEditingActivity.newIntent(getContext(), null));
+            });
+        } else {
+            addEventBtn.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.filter_menu_list_base, container, false);
+        View view = inflater.inflate(R.layout.home_event_list, container, false);
         listView = view.findViewById(R.id.listview);
 
         return view;
