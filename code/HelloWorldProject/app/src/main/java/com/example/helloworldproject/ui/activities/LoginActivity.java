@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.et_phone);
         userGroupSpinner = findViewById(R.id.user_group_spinner);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
-                this, R.layout.spinner_text_item, UserGroup.getNameList()
+            this, R.layout.spinner_text_item, UserGroup.getNameList()
         );
         spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_text_item);
         userGroupSpinner.setAdapter(spinnerAdapter);
@@ -106,13 +106,13 @@ public class LoginActivity extends AppCompatActivity {
 
             setLoading(true);
             Profile p = new Profile(
-                    deviceId, deviceId, name, email,
-                    TextUtils.isEmpty(phone) ? null : phone,
-                    UserGroup.valueOf(
-                            spinnerAdapter.getItem(
-                                    userGroupSpinner.getSelectedItemPosition()
-                            )
+                deviceId, deviceId, name, email,
+                TextUtils.isEmpty(phone) ? null : phone,
+                UserGroup.valueOf(
+                    spinnerAdapter.getItem(
+                        userGroupSpinner.getSelectedItemPosition()
                     )
+                )
             );
             repo.saveOrUpdate(p, new ProfileRepository.CompleteCallback() {
                 @Override public void onComplete() {
