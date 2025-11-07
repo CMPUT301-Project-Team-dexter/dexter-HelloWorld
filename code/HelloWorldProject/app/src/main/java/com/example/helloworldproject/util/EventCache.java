@@ -15,6 +15,11 @@ public class EventCache {
     private static final EventRepository repo = new EventRepository();
     private static final HashMap<String, Event> internalCache = new HashMap<>(64);
 
+    /**
+     * To cache an event in the HashMap by event's id.
+     * If it already exists then this function does nothing.
+     * @param e: The event that is going to be cached
+     */
     public static void cache(@NonNull Event e) {
         if (!internalCache.containsKey(e.getId())) {
             internalCache.put(e.getId(), e);
