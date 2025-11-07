@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.activities.HomeActivity">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:title="Register History"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:id="@+id/poster"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/debug_card_image"
+
+        app:layout_constraintTop_toBottomOf="@id/toolbar"/>
+
+    <TextView
+        android:id="@+id/reg_period_title_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register Period"
+
+        app:layout_constraintTop_toBottomOf="@id/poster"/>
+
+    <TextView
+        android:id="@+id/event_period_title_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Event Period"
+
+        app:layout_constraintTop_toBottomOf="@id/reg_period_title_view"/>
+
+    <TextView
+        android:id="@+id/location_title_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Location/No requirements"
+
+        app:layout_constraintTop_toBottomOf="@id/event_period_title_view"/>
+
+    <TextView
+        android:id="@+id/capacity_title_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="capacity"
+
+        app:layout_constraintTop_toBottomOf="@id/location_title_view"/>
+
+    <TextView
+        android:id="@+id/desc_title_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Description"
+
+        app:layout_constraintTop_toBottomOf="@id/capacity_title_view"/>
+
+    <TextView
+        android:id="@+id/wl_limit_title_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Number of waiting"
+
+        app:layout_constraintBottom_toTopOf="@id/number_of_waiting"
+        />
+
+    <TextView
+        android:id="@+id/number_of_waiting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="20/30"
+
+        app:layout_constraintBottom_toTopOf="@id/button"
+        />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="(button_text)"
+
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
