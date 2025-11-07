@@ -396,7 +396,7 @@
                     android:layout_weight="1"
                     android:text="@string/decline"
                     android:textColor="@android:color/white"
-                    app:backgroundTint="@color/red_600"
+                    app:backgroundTint="@android:color/holo_red_dark"
                     app:cornerRadius="12dp" />
             </LinearLayout>
 

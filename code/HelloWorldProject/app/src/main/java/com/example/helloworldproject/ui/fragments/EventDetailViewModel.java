@@ -10,7 +10,7 @@ public class EventDetailViewModel extends ViewModel {
 
     public EventDetailViewModel() {
         entrantState.setValue(EntrantState.UNRELATED);
-        updateButtonText(entrantState.getValue());
+        updatePrimayButtonText(entrantState.getValue());
     }
 
     private final MutableLiveData<EntrantState> entrantState = new MutableLiveData<>();
@@ -33,7 +33,7 @@ public class EventDetailViewModel extends ViewModel {
 
     public void loadState(EntrantState initialState) {
         entrantState.setValue(initialState);
-        updateButtonText(initialState);
+        updatePrimayButtonText(initialState);
     }
 
     public void setEvent(Event event) {
@@ -53,7 +53,7 @@ public class EventDetailViewModel extends ViewModel {
     }
 
     // Logic to map state to button text (removed from Fragment!)
-    private void updateButtonText(EntrantState status) {
+    private void updatePrimayButtonText(EntrantState status) {
         switch(status) {
             case CANCELLED:
                 buttonText.setValue("WAIT FOR NEXT TIME");
@@ -75,13 +75,18 @@ public class EventDetailViewModel extends ViewModel {
         EntrantState currentStatus = entrantState.getValue();
         switch (currentStatus) {
             case UNRELATED:
-                updateButtonText(EntrantState.WAITLISTED);
+                updatePrimayButtonText(EntrantState.WAITLISTED);
                 requestJoinWaitlist();
                 entrantState.setValue(EntrantState.WAITLISTED);
+                break;
+            case WAITLISTED:
+                updatePrimayButtonText(EntrantState.UNRELATED);
+                entrantState.setValue(EntrantState.UNRELATED);
+                break;
             default:
                 ;
         }
-        this.updateButtonText(entrantState.getValue());
+        this.updatePrimayButtonText(entrantState.getValue());
     }
 
     public void onButton2Clicked() {

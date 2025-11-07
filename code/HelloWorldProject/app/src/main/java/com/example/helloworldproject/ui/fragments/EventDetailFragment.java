@@ -102,7 +102,6 @@
             if (status == EntrantState.INVITED) {
                 btnPrimary.setVisibility(View.GONE);
                 progressGroup.setVisibility(View.VISIBLE);
-                btnSecondaryAccept.setText(viewModel.getButtonText().getValue());
             } else {
                 btnPrimary.setVisibility(View.VISIBLE);
                 progressGroup.setVisibility(View.GONE);
