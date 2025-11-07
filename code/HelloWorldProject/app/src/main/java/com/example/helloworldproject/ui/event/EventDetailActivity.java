@@ -1,6 +1,5 @@
 package com.example.helloworldproject.ui.event;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -8,7 +7,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.helloworldproject.R;
@@ -18,7 +16,6 @@ import com.example.helloworldproject.model.Event;
 import com.example.helloworldproject.ui.fragments.EntrantState;
 import com.example.helloworldproject.ui.fragments.EventDetailFragment;
 import com.example.helloworldproject.ui.fragments.EventDetailViewModel;
-import com.example.helloworldproject.util.CurrentProfile;
 import com.google.firebase.firestore.ListenerRegistration;
 
 /** Event details screen showing waitlist size and lottery rules. */
@@ -69,6 +66,7 @@ public class EventDetailActivity extends AppCompatActivity {
         eventRepo.loadById(eventId, new EventRepository.LoadCallback() {
             @Override public void onLoaded(Event e) {
                 currentEvent = e;
+                viewModel.setEvent(e);
 //                tvTitle.setText(e.getTitle());
 //                tvDesc.setText(e.getDescription());
 //                tvVenue.setText(e.getVenue());
@@ -86,6 +84,7 @@ public class EventDetailActivity extends AppCompatActivity {
         countReg = waitlistRepo.observeCount(eventId, new WaitlistRepository.CountListener() {
             @Override public void onCount(int total) {
                 currentWaitlistCount = total;
+                viewModel.setCurrentWaitlistCount(currentWaitlistCount);
 //                tvWaitlistCount.setText("Waitlist size: " + total);
             }
             @Override public void onError(Exception e) {
@@ -93,7 +92,7 @@ public class EventDetailActivity extends AppCompatActivity {
             }
         });
 
-        // Show lottery rules (US 01.05.05).
+//        // Show lottery rules (US 01.05.05).
 //        btnLotteryRules.setOnClickListener(v -> {
 //            if (currentEvent == null) return;
 //            String msg = LotteryTextBuilder.build(currentEvent, currentWaitlistCount);

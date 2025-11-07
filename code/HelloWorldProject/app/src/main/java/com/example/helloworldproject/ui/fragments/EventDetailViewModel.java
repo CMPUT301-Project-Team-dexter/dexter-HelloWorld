@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.helloworldproject.ui.fragments.EntrantState;
+import com.example.helloworldproject.model.Event;
 
 public class EventDetailViewModel extends ViewModel {
 
@@ -19,6 +19,10 @@ public class EventDetailViewModel extends ViewModel {
 
     private final MutableLiveData<Boolean> joinWaitlistFlag = new MutableLiveData<>(false);
 
+    private final MutableLiveData<Event> event = new MutableLiveData<>();
+
+    private final MutableLiveData<Integer> currentWaitlistCount = new MutableLiveData<>();
+
     public LiveData<EntrantState> getEntrantState() {
         return entrantState;
     }
@@ -30,6 +34,22 @@ public class EventDetailViewModel extends ViewModel {
     public void loadState(EntrantState initialState) {
         entrantState.setValue(initialState);
         updateButtonText(initialState);
+    }
+
+    public void setEvent(Event event) {
+        this.event.setValue(event);
+    }
+
+    public MutableLiveData<Event> getEvent() {
+        return event;
+    }
+
+    public void setCurrentWaitlistCount(int currentWaitlistCount) {
+        this.currentWaitlistCount.setValue(currentWaitlistCount);
+    }
+
+    public MutableLiveData<Integer> getCurrentWaitlistCount() {
+        return currentWaitlistCount;
     }
 
     // Logic to map state to button text (removed from Fragment!)
