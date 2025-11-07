@@ -22,6 +22,8 @@
         private Button doubleButton1;
         private Button doubleButton2 = null;
 
+        private View progressGroup;
+
         @Override
         public void onCreate(Bundle savedInstances) {
             super.onCreate(savedInstances);
@@ -30,11 +32,12 @@
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View view = inflater.inflate(R.layout.event_detail_fragment, container, false);
+            View view = inflater.inflate(R.layout.event_detail, container, false);
 
             singleButton = view.findViewById(R.id.button); // Assuming ID 'button' in single layout
             doubleButton1 = view.findViewById(R.id.button1);
             doubleButton2 = view.findViewById(R.id.button2);
+            progressGroup = view.findViewById(R.id.progressGroup);
 
             // 2. SET LISTENERS ONCE
             singleButton.setOnClickListener(v -> viewModel.onButtonClicked());
@@ -59,13 +62,11 @@
         private void setPage(EntrantState status) {
             if (status == EntrantState.INVITED) {
                 singleButton.setVisibility(View.GONE);
-                doubleButton1.setVisibility(View.VISIBLE);
-                doubleButton2.setVisibility(View.VISIBLE);
+                progressGroup.setVisibility(View.VISIBLE);
                 doubleButton1.setText(viewModel.getButtonText().getValue());
             } else {
                 singleButton.setVisibility(View.VISIBLE);
-                doubleButton1.setVisibility(View.GONE);
-                doubleButton2.setVisibility(View.GONE);
+                progressGroup.setVisibility(View.GONE);
                 singleButton.setText(viewModel.getButtonText().getValue());
             }
         }

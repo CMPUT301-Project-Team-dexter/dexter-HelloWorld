@@ -316,7 +316,7 @@
 
         <!-- JOIN -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnJoin"
+            android:id="@+id/button"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="match_parent"
             android:layout_height="48dp"
@@ -328,18 +328,18 @@
             tools:visibility="visible" />
 
         <!-- LEAVE -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLeave"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:contentDescription="@string/leave"
-            android:text="@string/leave"
-            android:textColor="@android:color/white"
-            android:visibility="gone"
-            app:backgroundTint="@color/red_600"
-            app:cornerRadius="12dp" />
+<!--        <com.google.android.material.button.MaterialButton-->
+<!--            android:id="@+id/btnLeave"-->
+<!--            style="@style/Widget.MaterialComponents.Button"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:contentDescription="@string/leave"-->
+<!--            android:text="@string/leave"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            android:visibility="gone"-->
+<!--            app:backgroundTint="@color/red_600"-->
+<!--            app:cornerRadius="12dp" />-->
 
         <!-- Progress group -->
         <LinearLayout
@@ -349,13 +349,13 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPending"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:enabled="false"
-                android:text="@string/pending"
-                app:cornerRadius="12dp" />
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/btnPending"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:enabled="false"-->
+<!--                android:text="@string/pending"-->
+<!--                app:cornerRadius="12dp" />-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -364,7 +364,7 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAccept"
+                    android:id="@+id/button1"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
@@ -376,7 +376,7 @@
                     android:layout_height="0dp" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnDecline"
+                    android:id="@+id/button2"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
@@ -386,23 +386,23 @@
                     app:cornerRadius="12dp" />
             </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCancelInvitation"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/cancel_invitation"
-                android:textColor="@android:color/white"
-                app:backgroundTint="@color/red_600"
-                app:cornerRadius="12dp" />
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/btnCancelInvitation"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:text="@string/cancel_invitation"-->
+<!--                android:textColor="@android:color/white"-->
+<!--                app:backgroundTint="@color/red_600"-->
+<!--                app:cornerRadius="12dp" />-->
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnWaitNext"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/wait_for_next_time"
-                app:cornerRadius="12dp" />
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/btnWaitNext"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:text="@string/wait_for_next_time"-->
+<!--                app:cornerRadius="12dp" />-->
         </LinearLayout>
     </LinearLayout>
 
