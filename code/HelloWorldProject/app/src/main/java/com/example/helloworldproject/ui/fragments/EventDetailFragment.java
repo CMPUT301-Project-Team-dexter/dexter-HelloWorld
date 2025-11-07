@@ -9,6 +9,7 @@
     import android.widget.TextView;
 
     import androidx.annotation.NonNull;
+    import androidx.appcompat.app.AppCompatActivity;
     import androidx.fragment.app.Fragment;
     import androidx.lifecycle.ViewModelProvider;
 
@@ -16,6 +17,7 @@
     import com.example.helloworldproject.model.Event;
     import com.example.helloworldproject.ui.event.EventDetailActivity;
     import com.example.helloworldproject.ui.event.LotteryTextBuilder;
+    import com.google.android.material.appbar.MaterialToolbar;
 
     public class EventDetailFragment extends Fragment {
 
@@ -49,6 +51,9 @@
             tvDesc = view.findViewById(R.id.descriptionValue);
             tvWaitlistCount = view.findViewById(R.id.waitingValue);
 
+            MaterialToolbar appBar = view.findViewById(R.id.topAppBar);
+
+
             // 2. SET LISTENERS ONCE
             singleButton.setOnClickListener(v -> viewModel.onButtonClicked());
             doubleButton1.setOnClickListener(v -> viewModel.onButtonClicked());
@@ -67,6 +72,14 @@
                     tvDesc.setText("No description available.");
                 } else {
                     tvDesc.setText(e.getDescription());
+                }
+                if (appBar != null) {
+                    String title = currentEvent.getTitle();
+                    if (title != null) {
+                        appBar.setTitle(title);
+                    } else {
+                        appBar.setTitle("Untitled");
+                    }
                 }
 
             });
