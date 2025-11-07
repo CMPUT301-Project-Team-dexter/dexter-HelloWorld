@@ -10,7 +10,6 @@ import com.example.helloworldproject.R;
 import com.example.helloworldproject.model.Profile;
 import com.example.helloworldproject.ui.fragments.HomeEventCardListFragment;
 import com.example.helloworldproject.util.CurrentProfile;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 public class HomeActivity extends AppCompatActivity {
