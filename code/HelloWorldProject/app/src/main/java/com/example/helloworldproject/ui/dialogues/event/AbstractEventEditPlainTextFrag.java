@@ -2,47 +2,47 @@ package com.example.helloworldproject.ui.dialogues.event;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import androidx.annotation.IdRes;
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 
-import com.example.helloworldproject.R;
+public abstract class AbstractEventEditPlainTextFrag extends AbstractEventEditFrag {
+    @LayoutRes
+    private final int resId;
 
-public abstract class EventEditPlainTextFrag extends DialogFragment {
-    private final String title;
+    @IdRes
+    private final int viewId;
+
     private final String hint;
-    protected EventEditListener listener;
 
-    public EventEditPlainTextFrag(String title, String hint) {
-        this.title = title;
+    public AbstractEventEditPlainTextFrag(
+        String dialogTitle,
+        @LayoutRes int resId,
+        @IdRes int viewId,
+        String hint
+    ) {
+        super(dialogTitle);
+        this.resId = resId;
+        this.viewId = viewId;
         this.hint = hint;
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof EventEditListener) {
-            listener = (EventEditListener) context;
-        } else {
-            throw new RuntimeException(context + " must implements EventEditListener!");
-        }
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        View view = getLayoutInflater().inflate(R.layout.event_edit_text_frag, null);
-        EditText inputField = view.findViewById(R.id.edit_text_input);
+        View view = getLayoutInflater().inflate(resId, null);
+        EditText inputField = view.findViewById(viewId);
         inputField.setHint(hint);
+        inputField.requestFocus();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder.setView(view)
-            .setTitle(title)
+            .setTitle(dialogTitle)
             .setNegativeButton("Cancel", null)
             .setPositiveButton(
                 "OK",

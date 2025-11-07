@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 /** Firestore repository for Event. */
 public class EventRepository {
@@ -14,6 +15,11 @@ public class EventRepository {
     public interface LoadCallback {
         void onLoaded(Event e);
         void onNotFound();
+        void onError(Exception e);
+    }
+
+    public interface CompleteCallback {
+        void onComplete();
         void onError(Exception e);
     }
 
@@ -31,5 +37,14 @@ public class EventRepository {
                     }
                 })
                 .addOnFailureListener(cb::onError);
+    }
+
+    public void saveOrUpdate(Event e, final CompleteCallback cb) {
+        String eventId = e.getId();
+        db.collection("events")
+            .document(eventId)
+            .set(e, SetOptions.merge())
+            .addOnSuccessListener(unused -> cb.onComplete())
+            .addOnFailureListener(cb::onError);
     }
 }

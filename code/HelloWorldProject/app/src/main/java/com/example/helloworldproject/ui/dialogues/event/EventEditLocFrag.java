@@ -4,9 +4,16 @@ import android.content.DialogInterface;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class EventEditLocFrag extends EventEditPlainTextFrag {
+import com.example.helloworldproject.R;
+
+public class EventEditLocFrag extends AbstractEventEditPlainTextFrag {
     public EventEditLocFrag() {
-        super("Location", "Location text");
+        super(
+            "Location",
+            R.layout.event_edit_text_frag,
+            R.id.edit_text_input,
+            "Location text"
+        );
     }
 
     @Override

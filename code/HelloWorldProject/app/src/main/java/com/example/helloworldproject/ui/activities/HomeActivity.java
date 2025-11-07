@@ -22,15 +22,6 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Profile currentUser = CurrentProfile.get();
-        Snackbar.make(
-            findViewById(R.id.home_nav_view),
-            "Log in as " +
-                currentUser.getUserGroup().name() + " " +
-                currentUser.getName(),
-            Snackbar.LENGTH_LONG
-        ).show();
-
         // This is the fragment to be displayed upon opening the app.
         // If you want to try other fragments, replace the corresponding keywords.
         if (savedInstanceState == null) {

@@ -4,9 +4,16 @@ import android.content.DialogInterface;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class EventEditTitleFrag extends EventEditPlainTextFrag {
+import com.example.helloworldproject.R;
+
+public class EventEditTitleFrag extends AbstractEventEditPlainTextFrag {
     public EventEditTitleFrag() {
-        super("Title", "Title text");
+        super(
+            "Title",
+            R.layout.event_edit_text_frag,
+            R.id.edit_text_input,
+            "Title text"
+        );
     }
 
     @Override
