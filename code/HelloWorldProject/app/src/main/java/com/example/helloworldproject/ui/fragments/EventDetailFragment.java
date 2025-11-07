@@ -1,19 +1,72 @@
-package com.example.helloworldproject.ui.fragments;
+    package com.example.helloworldproject.ui.fragments;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+    import android.content.Context;
+    import android.os.Bundle;
+    import android.view.LayoutInflater;
+    import android.view.View;
+    import android.view.ViewGroup;
+    import android.widget.Button;
 
-import androidx.fragment.app.Fragment;
+    import androidx.annotation.NonNull;
+    import androidx.fragment.app.Fragment;
+    import androidx.lifecycle.ViewModelProvider;
 
-import com.example.helloworldproject.R;
+    import com.example.helloworldproject.R;
 
-public class EventDetailFragment extends Fragment {
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.event_detail_fragment, container, false);
+    public class EventDetailFragment extends Fragment {
 
-        return view;
+        protected EventDetailViewModel viewModel;
+
+        private Button singleButton;
+
+        private Button doubleButton1;
+        private Button doubleButton2 = null;
+
+        @Override
+        public void onCreate(Bundle savedInstances) {
+            super.onCreate(savedInstances);
+            viewModel = new ViewModelProvider(requireActivity()).get(EventDetailViewModel.class);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View view = inflater.inflate(R.layout.event_detail_fragment, container, false);
+
+            singleButton = view.findViewById(R.id.button); // Assuming ID 'button' in single layout
+            doubleButton1 = view.findViewById(R.id.button1);
+            doubleButton2 = view.findViewById(R.id.button2);
+
+            // 2. SET LISTENERS ONCE
+            singleButton.setOnClickListener(v -> viewModel.onButtonClicked());
+            doubleButton1.setOnClickListener(v -> viewModel.onButtonClicked());
+            doubleButton2.setOnClickListener(v -> viewModel.onButton2Clicked());
+
+            viewModel.getEntrantState().observe(getViewLifecycleOwner(), this::setPage );
+
+            EntrantState state = viewModel.getEntrantState().getValue();
+            this.setPage(state);
+
+            return view;
+        }
+
+        @Override
+        public void onViewCreated(View view, Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+
+
+        }
+
+        private void setPage(EntrantState status) {
+            if (status == EntrantState.INVITED) {
+                singleButton.setVisibility(View.GONE);
+                doubleButton1.setVisibility(View.VISIBLE);
+                doubleButton2.setVisibility(View.VISIBLE);
+                doubleButton1.setText(viewModel.getButtonText().getValue());
+            } else {
+                singleButton.setVisibility(View.VISIBLE);
+                doubleButton1.setVisibility(View.GONE);
+                doubleButton2.setVisibility(View.GONE);
+                singleButton.setText(viewModel.getButtonText().getValue());
+            }
+        }
     }
-}
