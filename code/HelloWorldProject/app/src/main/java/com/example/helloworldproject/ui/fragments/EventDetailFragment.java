@@ -1,6 +1,5 @@
     package com.example.helloworldproject.ui.fragments;
 
-    import android.content.Context;
     import android.os.Bundle;
     import android.view.LayoutInflater;
     import android.view.View;
@@ -8,14 +7,11 @@
     import android.widget.Button;
     import android.widget.TextView;
 
-    import androidx.annotation.NonNull;
-    import androidx.appcompat.app.AppCompatActivity;
     import androidx.fragment.app.Fragment;
     import androidx.lifecycle.ViewModelProvider;
 
     import com.example.helloworldproject.R;
     import com.example.helloworldproject.model.Event;
-    import com.example.helloworldproject.ui.event.EventDetailActivity;
     import com.example.helloworldproject.ui.event.LotteryTextBuilder;
     import com.google.android.material.appbar.MaterialToolbar;
 
@@ -23,10 +19,10 @@
 
         protected EventDetailViewModel viewModel;
 
-        private Button singleButton, doubleButton1, btnLotteryRules;
-        private Button doubleButton2 = null;
+        private Button btnPrimary, btnSecondaryAccept, btnLotteryRules;
+        private Button btnSecondaryDecline = null;
         private View progressGroup;
-        private TextView tvTitle, tvDesc, tvVenue, tvWaitlistCount;
+        private TextView tvDesc, tvVenue, tvWaitlistCount;
 
         private Event currentEvent;
 
@@ -43,21 +39,22 @@
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.event_detail, container, false);
 
-            singleButton = view.findViewById(R.id.button); // Assuming ID 'button' in single layout
-            doubleButton1 = view.findViewById(R.id.button1);
-            doubleButton2 = view.findViewById(R.id.button2);
+            btnPrimary = view.findViewById(R.id.button); // Assuming ID 'button' in single layout
+            btnSecondaryAccept = view.findViewById(R.id.button1);
+            btnSecondaryDecline = view.findViewById(R.id.button2);
             progressGroup = view.findViewById(R.id.progressGroup);
             btnLotteryRules = view.findViewById(R.id.btn_lottery_rules);
             tvDesc = view.findViewById(R.id.descriptionValue);
             tvWaitlistCount = view.findViewById(R.id.waitingValue);
+            tvVenue = view.findViewById(R.id.venue_value);
 
             MaterialToolbar appBar = view.findViewById(R.id.topAppBar);
 
 
             // 2. SET LISTENERS ONCE
-            singleButton.setOnClickListener(v -> viewModel.onButtonClicked());
-            doubleButton1.setOnClickListener(v -> viewModel.onButtonClicked());
-            doubleButton2.setOnClickListener(v -> viewModel.onButton2Clicked());
+            btnPrimary.setOnClickListener(v -> viewModel.onButtonClicked());
+            btnSecondaryAccept.setOnClickListener(v -> viewModel.onButtonClicked());
+            btnSecondaryDecline.setOnClickListener(v -> viewModel.onButton2Clicked());
 
             // Show lottery rules (US 01.05.05).
             btnLotteryRules.setOnClickListener(v -> {
@@ -81,6 +78,7 @@
                         appBar.setTitle("Untitled");
                     }
                 }
+                tvVenue.setText(e.getVenue());
 
             });
             viewModel.getEntrantState().observe(getViewLifecycleOwner(), this::setPage );
@@ -102,13 +100,13 @@
 
         private void setPage(EntrantState status) {
             if (status == EntrantState.INVITED) {
-                singleButton.setVisibility(View.GONE);
+                btnPrimary.setVisibility(View.GONE);
                 progressGroup.setVisibility(View.VISIBLE);
-                doubleButton1.setText(viewModel.getButtonText().getValue());
+                btnSecondaryAccept.setText(viewModel.getButtonText().getValue());
             } else {
-                singleButton.setVisibility(View.VISIBLE);
+                btnPrimary.setVisibility(View.VISIBLE);
                 progressGroup.setVisibility(View.GONE);
-                singleButton.setText(viewModel.getButtonText().getValue());
+                btnPrimary.setText(viewModel.getButtonText().getValue());
             }
         }
     }

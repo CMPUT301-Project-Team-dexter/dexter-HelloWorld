@@ -207,6 +207,12 @@
                             android:contentDescription="@string/geolocation_requirement" />
                     </LinearLayout>
 
+                    <TextView
+                        android:id="@+id/venue_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#444444" />
+
                     <!-- Capacity -->
                     <LinearLayout
                         android:layout_width="match_parent"
