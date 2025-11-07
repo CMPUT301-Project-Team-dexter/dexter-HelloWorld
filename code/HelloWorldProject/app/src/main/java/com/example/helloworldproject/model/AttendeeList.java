@@ -43,4 +43,8 @@ public class AttendeeList implements Serializable {
     public boolean contains(Profile profile) {
         return map.containsKey(profile);
     }
+
+    public AttendeeState getState(Profile profile) {
+        return map.get(profile);
+    }
 }
