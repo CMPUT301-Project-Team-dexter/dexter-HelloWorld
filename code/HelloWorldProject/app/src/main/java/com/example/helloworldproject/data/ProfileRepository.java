@@ -51,7 +51,15 @@ public class ProfileRepository {
         db.collection("profiles")
                 .document(docId)
                 .set(profile, SetOptions.merge())
-                .addOnSuccessListener(unused -> cb.onComplete())
-                .addOnFailureListener(cb::onError);
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override public void onSuccess(Void unused) {
+                        cb.onComplete();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override public void onFailure(@NonNull Exception e) {
+                        cb.onError(e);
+                    }
+                });
     }
 }
