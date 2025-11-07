@@ -18,10 +18,8 @@ import com.example.helloworldproject.data.ProfileRepository;
 import com.example.helloworldproject.model.Profile;
 import com.example.helloworldproject.model.UserGroup;
 import com.example.helloworldproject.util.CurrentProfile;
-import com.example.helloworldproject.util.DeviceId;
 
-/** Create/Update profile in a single screen. */
-public class LoginActivity extends AppCompatActivity {
+public class ProfileEditActivity extends AppCompatActivity {
 
     private EditText etName, etEmail, etPhone;
     private Spinner userGroupSpinner;
@@ -29,7 +27,9 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar progress;
 
     private ProfileRepository repo;
-    private String deviceId; // document ID
+    private ArrayAdapter<String> spinnerAdapter;
+    private Profile workingProfile;
+    private String deviceId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,53 +40,48 @@ public class LoginActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.et_email);
         etPhone = findViewById(R.id.et_phone);
         userGroupSpinner = findViewById(R.id.user_group_spinner);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
-                this, R.layout.spinner_text_item, UserGroup.getNameList()
-        );
+        spinnerAdapter = new ArrayAdapter<>(this, R.layout.spinner_text_item, UserGroup.getNameList());
         spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_text_item);
         userGroupSpinner.setAdapter(spinnerAdapter);
         btnSave = findViewById(R.id.btn_save);
-        btnSave.setText("Log in");
+        btnSave.setText("Save");
         progress = findViewById(R.id.progress);
 
         repo = new ProfileRepository();
 
+        try {
+            deviceId = CurrentProfile.get().getDeviceId();
+        } catch (Exception e) {
+            Toast.makeText(this, "No current profile. Please log in first.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         setLoading(true);
-        DeviceId.getOrFetch(this, new DeviceId.DeviceIdCallback() {
-            @Override public void onSuccess(String id) {
-                deviceId = id;
-                // Try to load existing profile (for update).
-                repo.loadByDeviceId(deviceId, new ProfileRepository.LoadCallback() {
-                    @Override public void onLoaded(Profile p) {
-                        setLoading(false);
-                        if (p != null) {
-                            etName.setText(p.getName());
-                            etEmail.setText(p.getEmail());
-                            etPhone.setText(p.getPhone());
-                            userGroupSpinner.setSelection(p.getUserGroup().ordinal());
-                            CurrentProfile.init(p);
-                            startActivity(HomeActivity.newIntent(LoginActivity.this));
-                            finish();
-                            return;
-                        }
-                        Toast.makeText(LoginActivity.this, "Failed to load: profile is null", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override public void onNotFound() {
-                        btnSave.setText("Register");
-                        setLoading(false); // new user: keep fields empty
-                    }
-
-                    @Override public void onError(Exception e) {
-                        setLoading(false);
-                        Toast.makeText(LoginActivity.this, "Failed to load: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
+        repo.loadByDeviceId(deviceId, new ProfileRepository.LoadCallback() {
+            @Override public void onLoaded(Profile p) {
+                setLoading(false);
+                if (p == null) {
+                    Toast.makeText(ProfileEditActivity.this, "Profile is null.", Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
+                workingProfile = p;
+                etName.setText(p.getName());
+                etEmail.setText(p.getEmail());
+                etPhone.setText(p.getPhone());
+                if (p.getUserGroup() != null) {
+                    userGroupSpinner.setSelection(p.getUserGroup().ordinal());
+                }
             }
-
+            @Override public void onNotFound() {
+                setLoading(false);
+                workingProfile = new Profile(deviceId, deviceId, "", "", null, UserGroup.ENTRANT);
+            }
             @Override public void onError(Exception e) {
                 setLoading(false);
-                Toast.makeText(LoginActivity.this, "Failed to get device ID: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(ProfileEditActivity.this, "Failed to load: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                finish();
             }
         });
 
@@ -94,7 +89,6 @@ public class LoginActivity extends AppCompatActivity {
             String name = etName.getText().toString().trim();
             String email = etEmail.getText().toString().trim();
             String phone = etPhone.getText().toString().trim();
-
             if (TextUtils.isEmpty(name)) {
                 etName.setError("Please enter your name");
                 return;
@@ -103,28 +97,27 @@ public class LoginActivity extends AppCompatActivity {
                 etEmail.setError("Please enter your email");
                 return;
             }
-
+            if (workingProfile == null) {
+                Toast.makeText(this, "Profile not loaded.", Toast.LENGTH_LONG).show();
+                return;
+            }
             setLoading(true);
-            Profile p = new Profile(
-                    deviceId, deviceId, name, email,
-                    TextUtils.isEmpty(phone) ? null : phone,
-                    UserGroup.valueOf(
-                            spinnerAdapter.getItem(
-                                    userGroupSpinner.getSelectedItemPosition()
-                            )
-                    )
-            );
-            repo.saveOrUpdate(p, new ProfileRepository.CompleteCallback() {
+            workingProfile.setId(deviceId);
+            workingProfile.setDeviceId(deviceId);
+            workingProfile.setName(name);
+            workingProfile.setEmail(email);
+            workingProfile.setPhone(TextUtils.isEmpty(phone) ? null : phone);
+            workingProfile.setUserGroup(UserGroup.valueOf(spinnerAdapter.getItem(userGroupSpinner.getSelectedItemPosition())));
+            repo.saveOrUpdate(workingProfile, new ProfileRepository.CompleteCallback() {
                 @Override public void onComplete() {
                     setLoading(false);
-                    CurrentProfile.init(p);
-                    startActivity(HomeActivity.newIntent(LoginActivity.this));
+                    CurrentProfile.init(workingProfile);
+                    Toast.makeText(ProfileEditActivity.this, "Saved", Toast.LENGTH_SHORT).show();
                     finish();
                 }
-
                 @Override public void onError(Exception e) {
                     setLoading(false);
-                    Toast.makeText(LoginActivity.this, "Save failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileEditActivity.this, "Save failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
         });
