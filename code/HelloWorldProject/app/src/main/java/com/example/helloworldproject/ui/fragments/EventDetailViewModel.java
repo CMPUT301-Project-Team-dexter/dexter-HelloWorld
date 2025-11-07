@@ -17,6 +17,8 @@ public class EventDetailViewModel extends ViewModel {
 
     private final MutableLiveData<String> buttonText = new MutableLiveData<>();
 
+    private final MutableLiveData<Boolean> joinWaitlistFlag = new MutableLiveData<>(false);
+
     public LiveData<EntrantState> getEntrantState() {
         return entrantState;
     }
@@ -53,14 +55,28 @@ public class EventDetailViewModel extends ViewModel {
         EntrantState currentStatus = entrantState.getValue();
         switch (currentStatus) {
             case UNRELATED:
+                updateButtonText(EntrantState.WAITLISTED);
+                requestJoinWaitlist();
                 entrantState.setValue(EntrantState.WAITLISTED);
             default:
                 ;
         }
-        // ...
+        this.updateButtonText(entrantState.getValue());
     }
 
     public void onButton2Clicked() {
         ;
+    }
+
+    public LiveData<Boolean> getJoinWaitlistFlag() {
+        return joinWaitlistFlag;
+    }
+
+    public void requestJoinWaitlist() {
+        joinWaitlistFlag.setValue(true); // signal Activity to act
+    }
+
+    public void resetFlag() {
+        joinWaitlistFlag.setValue(false); // reset after handling
     }
 }

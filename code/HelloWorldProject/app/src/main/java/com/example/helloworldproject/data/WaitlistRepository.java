@@ -3,10 +3,14 @@ package com.example.helloworldproject.data;
 import androidx.annotation.Nullable;
 
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /** Firestore repository for event waitlist counts. */
 public class WaitlistRepository {
@@ -34,4 +38,27 @@ public class WaitlistRepository {
                     }
                 });
     }
+
+    public void addToWaitlist(String eventId, String userId, CountListener listener) {
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("userId", userId);
+
+        // Use userId as document ID to prevent duplicates
+        db.collection("events")
+                .document(eventId)
+                .collection("waitlist")
+                .document(userId)
+                .set(entry)
+                .addOnSuccessListener(aVoid -> {
+                    // Fetch new count after adding
+                    db.collection("events")
+                            .document(eventId)
+                            .collection("waitlist")
+                            .get()
+                            .addOnSuccessListener(snapshot -> listener.onCount(snapshot.size()))
+                            .addOnFailureListener(listener::onError);
+                })
+                .addOnFailureListener(listener::onError);
+    }
+
 }
