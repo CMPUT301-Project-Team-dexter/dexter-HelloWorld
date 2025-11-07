@@ -1,20 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App -->
     <string name="app_name">HelloWorldProject</string>
-    <string name="scan_qr_code">Scan QR Code</string>
-    <string name="events">Events</string>
-    <string name="filter_events">Filter Events</string>
+
+    <!-- Titles & toolbar -->
+    <string name="events_title">Events</string>
     <string name="sample_event">Sample Event</string>
 
-    <string name="scan_qr" />
-    <string name="events_title" />
-    <string name="sample_period">Available: May 12 – May 20</string>
+    <!-- Actions / buttons -->
+    <string name="scan_qr">Scan QR Code</string>
+    <string name="filter_events">Filter Events</string>
+    <string name="add_event">Add Event</string>
+    <string name="delete_event">Delete Event</string>
 
-    <string name="delete_event" />
-    <string name="add_event" />
-    <string name="tap_to_update_poster" />
-    <string name="registration_period" />
-    <string name="sample_reg_period" />
-    <string name="event_period" />
-    <string name="sample_event_period" />
-    <string name="geolocation_requirement" />
+    <!-- Poster / hints -->
+    <string name="tap_to_update_poster">Tap to upload/update poster</string>
+
+    <!-- Detail labels -->
+    <string name="registration_period">Registration period</string>
+    <string name="event_period">Event period</string>
+    <string name="geolocation_requirement">Geolocation required</string>
+    <string name="capacity">Capacity</string>
+    <string name="description">Description</string>
+    <string name="waiting_list">Waiting list</string>
+    <string name="organizer_can_edit">You are the organizer. You can edit this event.</string>
+
+    <!-- Sample values for preview -->
+    <string name="sample_period">Available: May 12 – May 20</string>
+    <string name="sample_reg_period">Apr 10 – Apr 20</string>
+    <string name="sample_event_period">Apr 25 – Apr 27</string>
+    <string name="sample_description">This is a sample event description used for design preview.</string>
+
+    <!-- Bottom actions / states -->
+    <string name="join">JOIN</string>
+    <string name="leave">LEAVE</string>
+    <string name="pending">PENDING</string>
+    <string name="accept">ACCEPT</string>
+    <string name="decline">DECLINE</string>
+    <string name="cancel_invitation">CANCEL INVITATION</string>
+    <string name="wait_for_next_time">WAIT FOR NEXT TIME</string>
+    <string name="_100">100</string>
+    <string name="_12_50">12/50</string>
+    <string name="event_management_title" />
+    <string name="cd_registered_entrants" />
+    <string name="registered_entrants" />
+    <string name="cd_go_to_details" />
+    <string name="entrants_map" />
+    <string name="cd_map_placeholder" />
+    <string name="cd_chosen_entrants" />
+    <string name="chosen_entrants" />
+    <string name="cd_invitation_history" />
+    <string name="invitation_history" />
+    <string name="registered_entrants_title" />
+    <string name="send_notification">Send Notification</string>
+    <string name="invitation_history_title" />
+    <string name="entrants_map_title" />
+    <string name="map_placeholder_desc" />
+    <string name="map_placeholder_label" />
+    <string name="chosen_entrants_title" />
+    <string name="export_csv" />
+    <string name="button_region" />
 </resources>
