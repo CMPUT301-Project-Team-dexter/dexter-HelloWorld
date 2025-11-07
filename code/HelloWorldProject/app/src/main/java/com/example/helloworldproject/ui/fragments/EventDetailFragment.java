@@ -6,6 +6,7 @@
     import android.view.View;
     import android.view.ViewGroup;
     import android.widget.Button;
+    import android.widget.TextView;
 
     import androidx.annotation.NonNull;
     import androidx.fragment.app.Fragment;
@@ -20,15 +21,13 @@
 
         protected EventDetailViewModel viewModel;
 
-        private Button singleButton;
-
-        private Button doubleButton1;
+        private Button singleButton, doubleButton1, btnLotteryRules;
         private Button doubleButton2 = null;
+        private View progressGroup;
+        private TextView tvTitle, tvDesc, tvVenue, tvWaitlistCount;
 
         private Event currentEvent;
-        private Button btnLotteryRules;
 
-        private View progressGroup;
 
         private int currentWaitlistCount;
 
@@ -47,6 +46,8 @@
             doubleButton2 = view.findViewById(R.id.button2);
             progressGroup = view.findViewById(R.id.progressGroup);
             btnLotteryRules = view.findViewById(R.id.btn_lottery_rules);
+            tvDesc = view.findViewById(R.id.descriptionValue);
+            tvWaitlistCount = view.findViewById(R.id.waitingValue);
 
             // 2. SET LISTENERS ONCE
             singleButton.setOnClickListener(v -> viewModel.onButtonClicked());
@@ -62,10 +63,17 @@
 
             viewModel.getEvent().observe(getViewLifecycleOwner(), e -> {
                 currentEvent = e;
+                if (e.getDescription() == null) {
+                    tvDesc.setText("No description available.");
+                } else {
+                    tvDesc.setText(e.getDescription());
+                }
+
             });
             viewModel.getEntrantState().observe(getViewLifecycleOwner(), this::setPage );
             viewModel.getCurrentWaitlistCount().observe(getViewLifecycleOwner(), count -> {
                 currentWaitlistCount = count;
+                tvWaitlistCount.setText(String.valueOf(currentWaitlistCount) + "/50");
             });
 
             EntrantState state = viewModel.getEntrantState().getValue();

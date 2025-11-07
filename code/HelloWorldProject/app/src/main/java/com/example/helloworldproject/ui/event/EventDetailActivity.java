@@ -45,12 +45,6 @@ public class EventDetailActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(EventDetailViewModel.class);
         viewModel.loadState(EntrantState.UNRELATED);
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new EventDetailFragment())
-                    .commit();
-        }
-
 
         eventRepo = new EventRepository();
         waitlistRepo = new WaitlistRepository();
@@ -70,6 +64,12 @@ public class EventDetailActivity extends AppCompatActivity {
 //                tvTitle.setText(e.getTitle());
 //                tvDesc.setText(e.getDescription());
 //                tvVenue.setText(e.getVenue());
+
+                if (savedInstanceState == null) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, new EventDetailFragment())
+                            .commit();
+                }
             }
             @Override public void onNotFound() {
                 Toast.makeText(EventDetailActivity.this, "Event not found", Toast.LENGTH_LONG).show();
