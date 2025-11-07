@@ -38,7 +38,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-installations")
-    implementation("com.github.f4b6a3:ulid-creator:5.2.3")
 
     implementation(libs.appcompat)
     implementation(libs.material)

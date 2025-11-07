@@ -3,7 +3,6 @@ package com.example.helloworldproject.util;
 import androidx.annotation.NonNull;
 
 import com.example.helloworldproject.model.Profile;
-import com.example.helloworldproject.model.UserGroup;
 
 public class CurrentProfile {
     private CurrentProfile() {  }
@@ -17,13 +16,5 @@ public class CurrentProfile {
     @NonNull
     public static Profile get() {
         return currentUser;
-    }
-
-    public static boolean isOrganizer() {
-        return currentUser.getUserGroup() == UserGroup.ORGANIZER;
-    }
-
-    public static boolean isAdmin() {
-        return currentUser.getUserGroup() == UserGroup.ADMIN;
     }
 }
