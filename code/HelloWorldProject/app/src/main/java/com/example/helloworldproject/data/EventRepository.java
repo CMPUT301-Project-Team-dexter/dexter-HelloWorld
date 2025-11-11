@@ -13,6 +13,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -61,7 +62,6 @@ public class EventRepository {
             .addOnFailureListener(cb::onError);
     }
 
-    /** Joinable events time for entrants: open <= now < close (soonest closing first). */
     /** Joinable events: (openAt <= now) AND (closeAt > now)
      *  No custom index needed; we sort client-side.
      */
@@ -74,7 +74,6 @@ public class EventRepository {
                     List<Event> out = new ArrayList<>();
                     for (QueryDocumentSnapshot d : snap) {
                         Event e = d.toObject(Event.class);
-                        if (e == null) continue;
                         e.setId(d.getId());
                         if (e.getRegistrationOpenAt() == null || e.getRegistrationCloseAt() == null) continue;
                         // client-side second predicate: openAt <= now
@@ -83,13 +82,9 @@ public class EventRepository {
                         }
                     }
                     // client-side sort by closeAt ascending
-                    out.sort((a, b) -> a.getRegistrationCloseAt().compareTo(b.getRegistrationCloseAt()));
+                    out.sort(Comparator.comparing(Event::getRegistrationCloseAt));
                     cb.onLoaded(out);
                 })
                 .addOnFailureListener(cb::onError);
     }
-
-
-
-
 }
