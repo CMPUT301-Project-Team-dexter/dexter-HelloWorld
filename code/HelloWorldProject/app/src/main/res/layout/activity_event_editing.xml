@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout>
+    <data>
+        <variable
+            name="eventModel"
+            type="com.example.helloworldproject.model.Event" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -49,12 +55,12 @@
                 android:paddingRight="16sp">
 
                 <TextView
-                    android:id="@+id/event_title_view"
+                    android:id="@+id/event_edit_title_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
                     android:drawablePadding="4sp"
-                    android:text="Title"
+                    android:text="@{eventModel.title}"
                     android:textSize="34sp"
                     android:textStyle="bold"
                     app:drawableStartCompat="@drawable/ic_pen" />
@@ -304,3 +310,4 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

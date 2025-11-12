@@ -1,5 +1,9 @@
 package com.example.helloworldproject.model;
 
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+
+import com.example.helloworldproject.BR;
 import com.google.firebase.Timestamp;
 
 import java.text.SimpleDateFormat;
@@ -8,7 +12,7 @@ import java.util.Locale;
 /**
  * Event model displayed in details screen.
  */
-public class Event {
+public class Event extends BaseObservable {
     public static final SimpleDateFormat DATE_FORMATTER =
         new SimpleDateFormat("MMM. dd, yyyy", Locale.ENGLISH);
 
@@ -41,6 +45,7 @@ public class Event {
         return createdAt;
     }
 
+    @Bindable
     public String getTitle() {
         return title;
     }
@@ -105,6 +110,7 @@ public class Event {
 
     public void setTitle(String title) {
         this.title = title;
+        notifyPropertyChanged(BR.title);
     }
 
     public void setDescription(String description) {
