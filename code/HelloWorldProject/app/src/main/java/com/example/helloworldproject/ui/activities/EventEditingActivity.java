@@ -19,15 +19,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.model.Event;
-import com.example.helloworldproject.ui.dialogues.event.EventEditDetailFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditEventBeginFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditEventCapacityFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditEventEndFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditLocFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditRegBeginFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditRegEndFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditTitleFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditWaitingListCapFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.DetailFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.EventBeginFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.EventCapacityFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.EventEndFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.LocationFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.RegistrationBeginFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.RegistrationEndFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.TitleFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.WaitingListCapacityFrag;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
 import com.google.firebase.Timestamp;
@@ -90,7 +90,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             event.setTitle("Not given");
         }
         titleView.setOnClickListener(
-            v -> new EventEditTitleFrag().show(
+            v -> new TitleFrag().show(
                 getSupportFragmentManager(), "EditTitle"
             )
         );
@@ -103,7 +103,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             event.setVenue("N/A");
         }
         locView.setOnClickListener(
-            v -> new EventEditLocFrag().show(
+            v -> new LocationFrag().show(
                 getSupportFragmentManager(), "EditLoc"
             )
         );
@@ -123,7 +123,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             );
         }
         regPeriodBeginDateView.setOnClickListener(
-            v -> new EventEditRegBeginFrag(
+            v -> new RegistrationBeginFrag(
                 regPeriodBeginDateView.getText().toString()
             ).show(getSupportFragmentManager(), "RegDateBegin")
         );
@@ -143,7 +143,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             );
         }
         regPeriodEndDateView.setOnClickListener(
-            v -> new EventEditRegEndFrag(
+            v -> new RegistrationEndFrag(
                 regPeriodEndDateView.getText().toString()
             ).show(getSupportFragmentManager(), "RegDateEnd")
         );
@@ -163,7 +163,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             );
         }
         eventBeginDateView.setOnClickListener(
-            v -> new EventEditEventBeginFrag(
+            v -> new EventBeginFrag(
                 eventBeginDateView.getText().toString()
             ).show(getSupportFragmentManager(), "EventDateBegin")
         );
@@ -183,7 +183,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             );
         }
         eventEndDateView.setOnClickListener(
-            v -> new EventEditEventEndFrag(
+            v -> new EventEndFrag(
                 eventEndDateView.getText().toString()
             ).show(getSupportFragmentManager(), "EventDateEnd")
         );
@@ -214,7 +214,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             event.setCapacity(20);
         }
         eventCapacityView.setOnClickListener(
-            v -> new EventEditEventCapacityFrag()
+            v -> new EventCapacityFrag()
                 .show(getSupportFragmentManager(), "EventCap")
         );
         // endregion
@@ -227,7 +227,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             event.setPlannedSampleSize(30);
         }
         waitingListCapacityView.setOnClickListener(
-            v -> new EventEditWaitingListCapFrag()
+            v -> new WaitingListCapacityFrag()
                 .show(getSupportFragmentManager(), "WaitingListCap")
         );
         // endregion
@@ -241,7 +241,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             event.setDescription("N/A");
         }
         View.OnClickListener descClickCallback = v -> {
-            new EventEditDetailFrag()
+            new DetailFrag()
                 .show(getSupportFragmentManager(), "EventDetails");
         };
         descTitleView.setOnClickListener(descClickCallback);

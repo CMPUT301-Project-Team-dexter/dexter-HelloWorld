@@ -1,4 +1,4 @@
-package com.example.helloworldproject.ui.dialogues.event;
+package com.example.helloworldproject.ui.dialogues.event.editing;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -16,9 +16,9 @@ import com.example.helloworldproject.model.Event;
 import java.util.Calendar;
 import java.util.Objects;
 
-public abstract class AbstractEventEditDateFrag extends AbstractEventEditFrag {
+public abstract class AbstractDateFrag extends AbstractEditFrag {
     private final String preSetTimestamp;
-    public AbstractEventEditDateFrag(String title, String preSetTimestamp) {
+    public AbstractDateFrag(String title, String preSetTimestamp) {
         super(title);
         this.preSetTimestamp = preSetTimestamp;
     }

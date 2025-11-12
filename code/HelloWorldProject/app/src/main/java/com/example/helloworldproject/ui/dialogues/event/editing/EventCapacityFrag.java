@@ -1,4 +1,4 @@
-package com.example.helloworldproject.ui.dialogues.event;
+package com.example.helloworldproject.ui.dialogues.event.editing;
 
 import android.content.DialogInterface;
 import android.widget.EditText;
@@ -6,13 +6,13 @@ import android.widget.Toast;
 
 import com.example.helloworldproject.R;
 
-public class EventEditWaitingListCapFrag extends AbstractEventEditPlainTextFrag {
-    public EventEditWaitingListCapFrag() {
+public class EventCapacityFrag extends AbstractPlainTextFrag {
+    public EventCapacityFrag() {
         super(
             "Event Capacity",
             R.layout.event_edit_num_frag,
             R.id.edit_num_input,
-            "waiting list capacity number"
+            "capacity number"
         );
     }
 
@@ -22,7 +22,7 @@ public class EventEditWaitingListCapFrag extends AbstractEventEditPlainTextFrag 
         if (value.isEmpty()) {
             Toast.makeText(getContext(), "Number can not be empty", Toast.LENGTH_SHORT).show();
         } else {
-            listener.updateWaitingListCapacity(Integer.parseInt(value));
+            listener.updateEventCapacity(Integer.parseInt(value));
         }
     }
 }
