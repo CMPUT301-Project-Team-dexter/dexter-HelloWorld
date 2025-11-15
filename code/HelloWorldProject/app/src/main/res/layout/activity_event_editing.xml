@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout>
+    <data>
+        <variable
+            name="eventModel"
+            type="com.example.helloworldproject.model.Event" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -49,12 +55,12 @@
                 android:paddingRight="16sp">
 
                 <TextView
-                    android:id="@+id/event_title_view"
+                    android:id="@+id/event_edit_title_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
                     android:drawablePadding="4sp"
-                    android:text="Title"
+                    android:text="@{eventModel.title}"
                     android:textSize="34sp"
                     android:textStyle="bold"
                     app:drawableStartCompat="@drawable/ic_pen" />
@@ -90,7 +96,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="4sp"
-                            android:text="Nov. 01, 2025"
+                            android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.registrationOpenAt)}"
                             android:textSize="20sp"
                             app:drawableStartCompat="@drawable/ic_calender" />
 
@@ -113,7 +119,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="4sp"
-                            android:text="Nov. 02, 2025"
+                            android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.registrationCloseAt)}"
                             android:textSize="20sp"
                             app:drawableStartCompat="@drawable/ic_calender" />
                     </TableRow>
@@ -151,7 +157,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="4sp"
-                            android:text="Nov. 01, 2025"
+                            android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.eventStartAt)}"
                             android:textSize="20sp"
                             app:drawableStartCompat="@drawable/ic_calender" />
                     </TableRow>
@@ -172,7 +178,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="4sp"
-                            android:text="Nov. 02, 2025"
+                            android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.eventEndAt)}"
                             android:textSize="20sp"
                             app:drawableStartCompat="@drawable/ic_calender" />
                     </TableRow>
@@ -200,7 +206,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:drawablePadding="4sp"
-                        android:text="N/A"
+                        android:text="@{eventModel.venue}"
                         android:textSize="20sp"
                         app:drawableStartCompat="@drawable/ic_pen" />
                 </LinearLayout>
@@ -223,7 +229,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="0"
-                        android:text="Required"
+                        android:checked="@{eventModel.geoRequired}"
+                        android:text="@{eventModel.geoRequired ? `ON` : `OFF`}"
                         android:textSize="20sp" />
 
                 </LinearLayout>
@@ -249,7 +256,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:drawablePadding="4sp"
-                        android:text="20"
+                        android:text="@{String.valueOf(eventModel.capacity)}"
                         android:textSize="20sp"
                         app:drawableStartCompat="@drawable/ic_pen" />
                 </LinearLayout>
@@ -274,7 +281,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="30"
+                        android:text="@{String.valueOf(eventModel.plannedSampleSize)}"
                         android:textSize="20sp"
                         app:drawableStartCompat="@drawable/ic_pen" />
                 </LinearLayout>
@@ -294,7 +301,7 @@
                     android:id="@+id/desc_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="lorem_ipsum"
+                    android:text="@{eventModel.description}"
                     android:textSize="20sp" />
 
             </LinearLayout>
@@ -304,3 +311,4 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,18 +14,20 @@ import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 
 import com.example.helloworldproject.R;
+import com.example.helloworldproject.databinding.ActivityEventEditingBinding;
 import com.example.helloworldproject.model.Event;
-import com.example.helloworldproject.ui.dialogues.event.EventEditDetailFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditEventBeginFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditEventCapacityFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditEventEndFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditLocFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditRegBeginFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditRegEndFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditTitleFrag;
-import com.example.helloworldproject.ui.dialogues.event.EventEditWaitingListCapFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.DetailFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.EventBeginFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.EventCapacityFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.EventEndFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.LocationFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.RegistrationBeginFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.RegistrationEndFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.TitleFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.WaitingListCapacityFrag;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
 import com.google.firebase.Timestamp;
@@ -43,25 +43,14 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
         return i;
     }
 
-    Event event = null;
+    ActivityEventEditingBinding binding;
     String givenEventId = null;
-
-    TextView titleView;
-    TextView regPeriodBeginDateView;
-    TextView regPeriodEndDateView;
-    TextView eventBeginDateView;
-    TextView eventEndDateView;
-    TextView locView;
-    CheckBox geolocationRequiredBox;
-    TextView eventCapacityView;
-    TextView waitingListCapacityView;
-    TextView descTitleView;
-    TextView descTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.event_editing_activity);
+        setContentView(R.layout.activity_event_editing);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_event_editing);
         Toolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
@@ -73,179 +62,104 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
         // givenEventId being null means that we are creating new event
         givenEventId = getIntent().getStringExtra(KEY_EVENT_ID);
         if (givenEventId != null) {
-            event = EventCache.tryGet(givenEventId, this);
+            Event event = EventCache.tryGet(givenEventId, this);
             if (event == null) {
                 Toast.makeText(this, "Event is null", Toast.LENGTH_SHORT).show();
                 finish();
                 return;
+            } else {
+                binding.setEventModel(event);
             }
         } else {
-            event = CurrentProfile.get().createBlankEvent();
+            binding.setEventModel(CurrentProfile.get().createBlankEvent());
         }
         // region Title
-        titleView = findViewById(R.id.event_title_view);
-        if (givenEventId != null) {
-            titleView.setText(event.getTitle());
-        } else {
-            event.setTitle("Not given");
+        if (givenEventId == null) {
+            binding.getEventModel().setTitle("N/A");
         }
-        titleView.setOnClickListener(
-            v -> new EventEditTitleFrag().show(
+        binding.eventEditTitleView.setOnClickListener(
+            v -> new TitleFrag().show(
                 getSupportFragmentManager(), "EditTitle"
             )
         );
         // endregion
         // region Location
-        locView = findViewById(R.id.location_view);
-        if (givenEventId != null) {
-            locView.setText(event.getVenue());
-        } else {
-            event.setVenue("N/A");
+        if (givenEventId == null) {
+            binding.getEventModel().setVenue("N/A");
         }
-        locView.setOnClickListener(
-            v -> new EventEditLocFrag().show(
+        binding.locationView.setOnClickListener(
+            v -> new LocationFrag().show(
                 getSupportFragmentManager(), "EditLoc"
             )
         );
         // endregion
-        // region regPeriodBeginDateView
-        regPeriodBeginDateView = findViewById(R.id.reg_period_from_date_view);
+        // region dates
         if (givenEventId == null) {
             Date now = new Date();
+            Event event = binding.getEventModel();
             event.setRegistrationOpenAt(new Timestamp(now));
-            String currentTimestamp = Event.DATE_FORMATTER.format(now);
-            regPeriodBeginDateView.setText(currentTimestamp);
-        } else {
-            regPeriodBeginDateView.setText(
-                Event.DATE_FORMATTER.format(
-                    event.getRegistrationOpenAt().toDate()
-                )
-            );
+            event.setRegistrationCloseAt(new Timestamp(now));
+            event.setEventStartAt(new Timestamp(now));
+            event.setEventEndAt(new Timestamp(now));
         }
-        regPeriodBeginDateView.setOnClickListener(
-            v -> new EventEditRegBeginFrag(
-                regPeriodBeginDateView.getText().toString()
+        binding.regPeriodFromDateView.setOnClickListener(
+            v -> new RegistrationBeginFrag(
+                binding.regPeriodFromDateView.getText().toString()
             ).show(getSupportFragmentManager(), "RegDateBegin")
         );
-        // endregion
-        // region regPeriodEndDateView
-        regPeriodEndDateView = findViewById(R.id.reg_period_to_date_view);
-        if (givenEventId == null) {
-            Date now = new Date();
-            event.setRegistrationCloseAt(new Timestamp(now));
-            String currentTimestamp = Event.DATE_FORMATTER.format(now);
-            regPeriodEndDateView.setText(currentTimestamp);
-        } else {
-            regPeriodEndDateView.setText(
-                Event.DATE_FORMATTER.format(
-                    event.getRegistrationCloseAt().toDate()
-                )
-            );
-        }
-        regPeriodEndDateView.setOnClickListener(
-            v -> new EventEditRegEndFrag(
-                regPeriodEndDateView.getText().toString()
+        binding.regPeriodToDateView.setOnClickListener(
+            v -> new RegistrationEndFrag(
+                binding.regPeriodToDateView.getText().toString()
             ).show(getSupportFragmentManager(), "RegDateEnd")
         );
-        // endregion
-        // region eventBeginDateView
-        eventBeginDateView = findViewById(R.id.event_period_from_date_view);
-        if (givenEventId == null) {
-            Date now = new Date();
-            event.setEventStartAt(new Timestamp(now));
-            String currentTimestamp = Event.DATE_FORMATTER.format(now);
-            eventBeginDateView.setText(currentTimestamp);
-        } else {
-            eventBeginDateView.setText(
-                Event.DATE_FORMATTER.format(
-                    event.getEventStartAt().toDate()
-                )
-            );
-        }
-        eventBeginDateView.setOnClickListener(
-            v -> new EventEditEventBeginFrag(
-                eventBeginDateView.getText().toString()
+        binding.eventPeriodFromDateView.setOnClickListener(
+            v -> new EventBeginFrag(
+                binding.eventPeriodFromDateView.getText().toString()
             ).show(getSupportFragmentManager(), "EventDateBegin")
         );
-        // endregion
-        // region eventEndDateView
-        eventEndDateView = findViewById(R.id.event_period_to_date_view);
-        if (givenEventId == null) {
-            Date now = new Date();
-            event.setEventEndAt(new Timestamp(now));
-            String currentTimestamp = Event.DATE_FORMATTER.format(now);
-            eventEndDateView.setText(currentTimestamp);
-        } else {
-            eventEndDateView.setText(
-                Event.DATE_FORMATTER.format(
-                    event.getEventEndAt().toDate()
-                )
-            );
-        }
-        eventEndDateView.setOnClickListener(
-            v -> new EventEditEventEndFrag(
-                eventEndDateView.getText().toString()
+        binding.eventPeriodToDateView.setOnClickListener(
+            v -> new EventEndFrag(
+                binding.eventPeriodToDateView.getText().toString()
             ).show(getSupportFragmentManager(), "EventDateEnd")
         );
         // endregion
         // region geolocationRequiredBox
-        geolocationRequiredBox = findViewById(R.id.geo_loc_check_box);
-        if (givenEventId != null) {
-            geolocationRequiredBox.setChecked(event.getGeoRequired());
-        } else {
-            geolocationRequiredBox.setChecked(false);
-            event.setGeoRequired(false);
+        if (givenEventId == null) {
+            binding.getEventModel().setGeoRequired(false);
         }
-        geolocationRequiredBox.setOnClickListener(
-            v -> {
-                event.setGeoRequired(
-                    geolocationRequiredBox.isChecked()
-                );
-                System.out.println(geolocationRequiredBox.isChecked());
-            }
+        binding.geoLocCheckBox.setOnClickListener(
+            v -> binding.getEventModel().setGeoRequired(
+                binding.geoLocCheckBox.isChecked()
+            )
         );
         // endregion
         // region eventCapacityView
-        eventCapacityView = findViewById(R.id.capacity_view);
-        if (givenEventId != null) {
-            eventCapacityView.setText(String.valueOf(event.getCapacity()));
-        } else {
-            eventCapacityView.setText("20");
-            event.setCapacity(20);
+        if (givenEventId == null) {
+            binding.getEventModel().setCapacity(20);
         }
-        eventCapacityView.setOnClickListener(
-            v -> new EventEditEventCapacityFrag()
+        binding.capacityView.setOnClickListener(
+            v -> new EventCapacityFrag()
                 .show(getSupportFragmentManager(), "EventCap")
         );
         // endregion
         // region waitingListCapacityView
-        waitingListCapacityView = findViewById(R.id.wl_limit_view);
-        if (givenEventId != null) {
-            waitingListCapacityView.setText(String.valueOf(event.getPlannedSampleSize()));
-        } else {
-            waitingListCapacityView.setText("30");
-            event.setPlannedSampleSize(30);
+        if (givenEventId == null) {
+            binding.getEventModel().setPlannedSampleSize(30);
         }
-        waitingListCapacityView.setOnClickListener(
-            v -> new EventEditWaitingListCapFrag()
+        binding.wlLimitView.setOnClickListener(
+            v -> new WaitingListCapacityFrag()
                 .show(getSupportFragmentManager(), "WaitingListCap")
         );
         // endregion
         // region descTextView
-        descTitleView = findViewById(R.id.desc_title_view);
-        descTextView = findViewById(R.id.desc_text_view);
-        if (givenEventId != null) {
-            descTextView.setText(event.getDescription());
-        } else {
-            descTextView.setText("N/A");
-            event.setDescription("N/A");
+        if (givenEventId == null) {
+            binding.getEventModel().setDescription("N/A");
         }
-        View.OnClickListener descClickCallback = v -> {
-            new EventEditDetailFrag()
-                .show(getSupportFragmentManager(), "EventDetails");
-        };
-        descTitleView.setOnClickListener(descClickCallback);
-        descTextView.setOnClickListener(descClickCallback);
+        View.OnClickListener descClickCallback = v -> new DetailFrag().show(
+            getSupportFragmentManager(), "EventDetails"
+        );
+        binding.descTitleView.setOnClickListener(descClickCallback);
+        binding.descTextView.setOnClickListener(descClickCallback);
         // endregion
     }
 
@@ -258,8 +172,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.save_button) {
-            if (EventCache.tryUpload(event, this)) {
-                //TODO: exit event editing activity
+            if (EventCache.tryUpload(binding.getEventModel(), this)) {
                 Toast.makeText(this, "Event uploaded successfully", Toast.LENGTH_SHORT).show();
             }
             return true;
@@ -269,107 +182,110 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
 
     @Override
     public void updateTitle(String newTitle) {
-        titleView.setText(newTitle);
-        event.setTitle(newTitle);
+        binding.getEventModel().setTitle(newTitle);
     }
 
     @Override
     public void updateLocation(String newLocation) {
-        locView.setText(newLocation);
-        event.setVenue(newLocation);
+        binding.getEventModel().setVenue(newLocation);
+    }
+
+    private void autoUpdateRegEndDate() {
+        Date regBeginDate = binding.getEventModel().getRegistrationOpenAt().toDate();
+        Date regEndDate = binding.getEventModel().getRegistrationCloseAt().toDate();
+        if (regEndDate.before(regBeginDate)) {
+            binding.getEventModel().setRegistrationCloseAt(new Timestamp(regBeginDate));
+        }
+        autoUpdateEventStartDate();
+    }
+
+    private void autoUpdateEventStartDate() {
+        Date regEndDate = binding.getEventModel().getRegistrationCloseAt().toDate();
+        Date eventStartDate = binding.getEventModel().getEventStartAt().toDate();
+        if (eventStartDate.before(regEndDate)) {
+            binding.getEventModel().setEventStartAt(new Timestamp(regEndDate));
+        }
+        autoUpdateEventEndDate();
+    }
+
+    private void autoUpdateEventEndDate() {
+        Date eventStartDate = binding.getEventModel().getEventStartAt().toDate();
+        Date eventEndDate = binding.getEventModel().getEventEndAt().toDate();
+        if (eventEndDate.before(eventStartDate)) {
+            binding.getEventModel().setEventEndAt(new Timestamp(eventStartDate));
+        }
     }
 
     @Override
     public void updateRegBeginDate(long dateInMilli) {
-        regPeriodBeginDateView.setText(
-            Event.DATE_FORMATTER.format(
-                new Date(dateInMilli)
-            )
-        );
-        event.setRegistrationOpenAt(new Timestamp(new Date(dateInMilli)));
+        binding.getEventModel().setRegistrationOpenAt(new Timestamp(new Date(dateInMilli)));
+        autoUpdateRegEndDate();
     }
 
     @Override
     public void updateRegEndDate(long dateInMilli) {
-        if (dateInMilli < event.getRegistrationCloseAt().toDate().getTime()) {
+        Date regEndDate = new Date(dateInMilli);
+        if (regEndDate.before(binding.getEventModel().getRegistrationOpenAt().toDate())) {
             Toast.makeText(
                 this,
                 "Registration end date must be later than start date",
                 Toast.LENGTH_SHORT
             ).show();
-        } else {
-            regPeriodEndDateView.setText(
-                Event.DATE_FORMATTER.format(
-                    new Date(dateInMilli)
-                )
-            );
-            event.setRegistrationCloseAt(new Timestamp(new Date(dateInMilli)));
+            return;
         }
+        binding.getEventModel().setRegistrationCloseAt(new Timestamp(regEndDate));
+        autoUpdateEventStartDate();
     }
 
     @Override
     public void updateEventBeginDate(long dateInMilli) {
-        if (dateInMilli < event.getRegistrationCloseAt().toDate().getTime()) {
+        Date eventStartDate = new Date(dateInMilli);
+        if (eventStartDate.before(binding.getEventModel().getRegistrationCloseAt().toDate())) {
             Toast.makeText(
                 this,
                 "Event start date must be later than registration ends",
                 Toast.LENGTH_SHORT
             ).show();
-        } else {
-            eventBeginDateView.setText(
-                Event.DATE_FORMATTER.format(
-                    new Date(dateInMilli)
-                )
-            );
-            event.setEventStartAt(new Timestamp(new Date(dateInMilli)));
+            return;
         }
+        binding.getEventModel().setEventStartAt(new Timestamp(eventStartDate));
+        autoUpdateEventEndDate();
     }
 
     @Override
     public void updateEventEndDate(long dateInMilli) {
-        if (dateInMilli < event.getEventStartAt().toDate().getTime()) {
+        Date eventEndDate = new Date(dateInMilli);
+        if (eventEndDate.before(binding.getEventModel().getEventStartAt().toDate())) {
             Toast.makeText(
                 this,
                 "Event end date must be later than start date",
                 Toast.LENGTH_SHORT
             ).show();
-        } else {
-            eventEndDateView.setText(
-                Event.DATE_FORMATTER.format(
-                    new Date(dateInMilli)
-                )
-            );
-            event.setEventEndAt(new Timestamp(new Date(dateInMilli)));
+            return;
         }
-    }
-
-    private void updateWaitingListCapInternal(int newCapacity) {
-        waitingListCapacityView.setText(String.valueOf(newCapacity));
-        event.setPlannedSampleSize(newCapacity);
+        binding.getEventModel().setEventEndAt(new Timestamp(eventEndDate));
     }
 
     @Override
     public void updateEventCapacity(int newCapacity) {
-        eventCapacityView.setText(String.valueOf(newCapacity));
-        event.setCapacity(newCapacity);
-        if (event.getPlannedSampleSize() < newCapacity) {
-            updateWaitingListCapInternal(newCapacity);
+        binding.getEventModel().setCapacity(newCapacity);
+        if (binding.getEventModel().getPlannedSampleSize() < newCapacity) {
+            binding.getEventModel().setPlannedSampleSize(newCapacity);
             Toast.makeText(this, "Waiting list capacity is updated automatically.", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void updateWaitingListCapacity(int newCapacity) {
-        if (newCapacity < event.getCapacity()) {
+        if (newCapacity < binding.getEventModel().getCapacity()) {
             Toast.makeText(this, "Waiting list capacity can not be less than event capacity", Toast.LENGTH_SHORT).show();
         } else {
-            updateWaitingListCapInternal(newCapacity);
+            binding.getEventModel().setPlannedSampleSize(newCapacity);
         }
     }
 
     @Override
     public void updateDetail(String newDetail) {
-        descTextView.setText(newDetail);
-        event.setDescription(newDetail);
+        binding.getEventModel().setDescription(newDetail);
     }
 }

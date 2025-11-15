@@ -1,7 +1,5 @@
 package com.example.helloworldproject;
 
-import static com.example.helloworldproject.model.UserGroup.ENTRANT;
-
 import com.example.helloworldproject.model.Profile;
 import com.example.helloworldproject.model.UserGroup;
 
@@ -31,9 +29,13 @@ public class ProfileModelTest {
         assertFalse(p.getNotificationOptOut());
     }
 
-
+    @Test
     public void isSerializable_roundTrip() throws Exception {
-        Profile p = new Profile("12345", "device-123", "Alex", "alex@example.com","1234675", ENTRANT);
+        Profile p = new Profile(
+            "12345", "device-123",
+            "Alex", "alex@example.com",
+            "1234675", UserGroup.ENTRANT
+        );
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);

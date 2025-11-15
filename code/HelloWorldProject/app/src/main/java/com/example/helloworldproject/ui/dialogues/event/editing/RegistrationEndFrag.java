@@ -1,9 +1,9 @@
-package com.example.helloworldproject.ui.dialogues.event;
+package com.example.helloworldproject.ui.dialogues.event.editing;
 
 import android.content.DialogInterface;
 
-public class EventEditRegEndFrag extends AbstractEventEditDateFrag {
-    public EventEditRegEndFrag(String preSetTimestamp) {
+public class RegistrationEndFrag extends AbstractDateFrag {
+    public RegistrationEndFrag(String preSetTimestamp) {
         super("Registration End Date", preSetTimestamp);
     }
 

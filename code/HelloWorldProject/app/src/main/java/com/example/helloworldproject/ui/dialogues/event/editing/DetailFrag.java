@@ -1,12 +1,12 @@
-package com.example.helloworldproject.ui.dialogues.event;
+package com.example.helloworldproject.ui.dialogues.event.editing;
 
 import android.content.DialogInterface;
 import android.widget.EditText;
 
 import com.example.helloworldproject.R;
 
-public class EventEditDetailFrag extends AbstractEventEditPlainTextFrag {
-    public EventEditDetailFrag() {
+public class DetailFrag extends AbstractPlainTextFrag {
+    public DetailFrag() {
         super(
             "Event Detail",
             R.layout.event_edit_multi_line_text_frag,
