@@ -40,7 +40,7 @@ public class EventDetailActivity_old extends AppCompatActivity {
         tvWaitlistCount = findViewById(R.id.tv_waitlist_count);
         btnLotteryRules = findViewById(R.id.btn_lottery_rules);
 
-        eventRepo = new EventRepository();
+//        eventRepo = new EventRepository();
         waitlistRepo = new WaitlistRepository();
 
         eventId = getIntent().getStringExtra(EXTRA_EVENT_ID);

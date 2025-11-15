@@ -9,14 +9,14 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
-
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 
 import com.example.helloworldproject.R;
+import com.example.helloworldproject.data.EventRepository;
 import com.example.helloworldproject.databinding.ActivityEventEditingBinding;
 import com.example.helloworldproject.model.Event;
 import com.example.helloworldproject.ui.dialogues.event.editing.DetailFrag;
@@ -62,13 +62,39 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
         // givenEventId being null means that we are creating new event
         givenEventId = getIntent().getStringExtra(KEY_EVENT_ID);
         if (givenEventId != null) {
-            Event event = EventCache.tryGet(givenEventId, this);
-            if (event == null) {
-                Toast.makeText(this, "Event is null", Toast.LENGTH_SHORT).show();
+            final Event[] event = new Event[] { null };
+            EventCache.tryGetSingle(givenEventId,
+                new EventRepository.LoadCallback() {
+                    @Override
+                    public void onLoaded(Event e) {
+                        event[0] = e;
+                    }
+
+                    @Override
+                    public void onNotFound() {
+                        Toast.makeText(
+                            EventEditingActivity.this,
+                            "Event with ID " + givenEventId + " not found.",
+                            Toast.LENGTH_SHORT
+                        ).show();
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Toast.makeText(
+                            EventEditingActivity.this,
+                            "Exception occurs when loading event: " + givenEventId + " " + e.getMessage(),
+                            Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                }
+            );
+            if (event[0] == null) {
+                Toast.makeText(this, "Event " + givenEventId + " is null", Toast.LENGTH_SHORT).show();
                 finish();
                 return;
             } else {
-                binding.setEventModel(event);
+                binding.setEventModel(event[0]);
             }
         } else {
             binding.setEventModel(CurrentProfile.get().createBlankEvent());
@@ -146,7 +172,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
         if (givenEventId == null) {
             binding.getEventModel().setPlannedSampleSize(30);
         }
-        binding.wlLimitView.setOnClickListener(
+        binding.eventEditWaitListLimitView.setOnClickListener(
             v -> new WaitingListCapacityFrag()
                 .show(getSupportFragmentManager(), "WaitingListCap")
         );
@@ -172,10 +198,28 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.save_button) {
-            if (EventCache.tryUpload(binding.getEventModel(), this)) {
-                Toast.makeText(this, "Event uploaded successfully", Toast.LENGTH_SHORT).show();
-            }
-            return true;
+            EventCache.tryUploadSingle(
+                binding.getEventModel(),
+                new EventRepository.CompleteCallback() {
+                    @Override
+                    public void onComplete() {
+                        Toast.makeText(
+                            EventEditingActivity.this,
+                            "Event uploaded successfully",
+                            Toast.LENGTH_LONG
+                        ).show();
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Toast.makeText(
+                            EventEditingActivity.this,
+                            "Event upload failed. Cause: " + e.getMessage(),
+                            Toast.LENGTH_LONG
+                        ).show();
+                    }
+                }
+            );
         }
         return super.onOptionsItemSelected(item);
     }

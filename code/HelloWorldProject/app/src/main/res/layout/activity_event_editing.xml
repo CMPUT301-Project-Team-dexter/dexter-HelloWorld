@@ -6,309 +6,309 @@
             type="com.example.helloworldproject.model.Event" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.activities.HomeActivity">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:title="Event Editing"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ScrollView
-        android:id="@+id/event_edit_scroll_view"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+        android:layout_height="match_parent"
+        tools:context=".ui.activities.HomeActivity">
 
-        <LinearLayout
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:title="Event Editing"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ScrollView
+            android:id="@+id/event_edit_scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/poster"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/debug_card_image"
-
-                />
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingLeft="16sp"
-                android:paddingRight="16sp">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/event_edit_title_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-                    android:drawablePadding="4sp"
-                    android:text="@{eventModel.title}"
-                    android:textSize="34sp"
-                    android:textStyle="bold"
-                    app:drawableStartCompat="@drawable/ic_pen" />
-
-                <TextView
-                    android:id="@+id/reg_period_title_view"
+                <ImageView
+                    android:id="@+id/poster"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="200dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/debug_card_image"
 
-                    android:text="Register Period"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-
-                <TableLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="12sp"
-                    android:paddingBottom="4sp">
-
-                    <TableRow
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/reg_period_from_title_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="From: "
-                            android:textSize="20sp" />
-
-                        <TextView
-                            android:id="@+id/reg_period_from_date_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawablePadding="4sp"
-                            android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.registrationOpenAt)}"
-                            android:textSize="20sp"
-                            app:drawableStartCompat="@drawable/ic_calender" />
-
-                    </TableRow>
-
-                    <TableRow
-                        android:id="@+id/TableRow"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/reg_period_to_title_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="To: "
-                            android:textSize="20sp" />
-
-                        <TextView
-                            android:id="@+id/reg_period_to_date_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawablePadding="4sp"
-                            android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.registrationCloseAt)}"
-                            android:textSize="20sp"
-                            app:drawableStartCompat="@drawable/ic_calender" />
-                    </TableRow>
-
-                </TableLayout>
-
-                <TextView
-                    android:id="@+id/event_period_title_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Event Period"
-
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-
-                <TableLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="12sp"
-                    android:paddingBottom="4sp">
-
-                    <TableRow
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/event_period_from_title_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="From: "
-                            android:textSize="20sp" />
-
-                        <TextView
-                            android:id="@+id/event_period_from_date_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawablePadding="4sp"
-                            android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.eventStartAt)}"
-                            android:textSize="20sp"
-                            app:drawableStartCompat="@drawable/ic_calender" />
-                    </TableRow>
-
-                    <TableRow
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/event_period_to_ttle_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="To: "
-                            android:textSize="20sp" />
-
-                        <TextView
-                            android:id="@+id/event_period_to_date_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawablePadding="4sp"
-                            android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.eventEndAt)}"
-                            android:textSize="20sp"
-                            app:drawableStartCompat="@drawable/ic_calender" />
-                    </TableRow>
-
-                </TableLayout>
+                    />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:paddingBottom="4sp">
+                    android:orientation="vertical"
+                    android:paddingLeft="16sp"
+                    android:paddingRight="16sp">
 
                     <TextView
-                        android:id="@+id/location_title_view"
+                        android:id="@+id/event_edit_title_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Location: "
 
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/location_view"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:drawablePadding="4sp"
-                        android:text="@{eventModel.venue}"
-                        android:textSize="20sp"
+                        android:text="@{eventModel.title}"
+                        android:textSize="34sp"
+                        android:textStyle="bold"
                         app:drawableStartCompat="@drawable/ic_pen" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/geo_required_title_view"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/reg_period_title_view"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Geolocation limit: "
-                        android:textSize="20sp"
+
+                        android:text="Register Period"
+                        android:textSize="24sp"
                         android:textStyle="bold" />
 
-                    <CheckBox
-                        android:id="@+id/geo_loc_check_box"
-                        android:layout_width="wrap_content"
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="12sp"
+                        android:paddingBottom="4sp">
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <TextView
+                                android:id="@+id/reg_period_from_title_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="From: "
+                                android:textSize="20sp" />
+
+                            <TextView
+                                android:id="@+id/reg_period_from_date_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawablePadding="4sp"
+                                android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.registrationOpenAt)}"
+                                android:textSize="20sp"
+                                app:drawableStartCompat="@drawable/ic_calender" />
+
+                        </TableRow>
+
+                        <TableRow
+                            android:id="@+id/TableRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <TextView
+                                android:id="@+id/reg_period_to_title_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="To: "
+                                android:textSize="20sp" />
+
+                            <TextView
+                                android:id="@+id/reg_period_to_date_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawablePadding="4sp"
+                                android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.registrationCloseAt)}"
+                                android:textSize="20sp"
+                                app:drawableStartCompat="@drawable/ic_calender" />
+                        </TableRow>
+
+                    </TableLayout>
+
+                    <TextView
+                        android:id="@+id/event_period_title_view"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0"
-                        android:checked="@{eventModel.geoRequired}"
-                        android:text="@{eventModel.geoRequired ? `ON` : `OFF`}"
+                        android:text="Event Period"
+
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="12sp"
+                        android:paddingBottom="4sp">
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <TextView
+                                android:id="@+id/event_period_from_title_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="From: "
+                                android:textSize="20sp" />
+
+                            <TextView
+                                android:id="@+id/event_period_from_date_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawablePadding="4sp"
+                                android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.eventStartAt)}"
+                                android:textSize="20sp"
+                                app:drawableStartCompat="@drawable/ic_calender" />
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <TextView
+                                android:id="@+id/event_period_to_ttle_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="To: "
+                                android:textSize="20sp" />
+
+                            <TextView
+                                android:id="@+id/event_period_to_date_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawablePadding="4sp"
+                                android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.eventEndAt)}"
+                                android:textSize="20sp"
+                                app:drawableStartCompat="@drawable/ic_calender" />
+                        </TableRow>
+
+                    </TableLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingBottom="4sp">
+
+                        <TextView
+                            android:id="@+id/location_title_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Location: "
+
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/location_view"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:drawablePadding="4sp"
+                            android:text="@{eventModel.venue}"
+                            android:textSize="20sp"
+                            app:drawableStartCompat="@drawable/ic_pen" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/geo_required_title_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Geolocation limit: "
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <CheckBox
+                            android:id="@+id/geo_loc_check_box"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0"
+                            android:checked="@{eventModel.geoRequired}"
+                            android:text="@{eventModel.geoRequired ? `ON` : `OFF`}"
+                            android:textSize="20sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingBottom="4sp">
+
+                        <TextView
+                            android:id="@+id/capacity_title_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Event Capacity: "
+
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/capacity_view"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:drawablePadding="4sp"
+                            android:text="@{String.valueOf(eventModel.capacity)}"
+                            android:textSize="20sp"
+                            app:drawableStartCompat="@drawable/ic_pen" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingBottom="4sp">
+
+                        <TextView
+                            android:id="@+id/wl_limit_title_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Waiting list capacity: "
+
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/event_edit_wait_list_limit_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@{String.valueOf(eventModel.plannedSampleSize)}"
+                            android:textSize="20sp"
+                            app:drawableStartCompat="@drawable/ic_pen" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/desc_title_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:drawablePadding="4sp"
+                        android:text="Description"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        app:drawableStartCompat="@drawable/ic_pen" />
+
+                    <TextView
+                        android:id="@+id/desc_text_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@{eventModel.description}"
                         android:textSize="20sp" />
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:paddingBottom="4sp">
-
-                    <TextView
-                        android:id="@+id/capacity_title_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Event Capacity: "
-
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/capacity_view"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:drawablePadding="4sp"
-                        android:text="@{String.valueOf(eventModel.capacity)}"
-                        android:textSize="20sp"
-                        app:drawableStartCompat="@drawable/ic_pen" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:paddingBottom="4sp">
-
-                    <TextView
-                        android:id="@+id/wl_limit_title_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Waiting list capacity: "
-
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/wl_limit_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@{String.valueOf(eventModel.plannedSampleSize)}"
-                        android:textSize="20sp"
-                        app:drawableStartCompat="@drawable/ic_pen" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/desc_title_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-
-                    android:drawablePadding="4sp"
-                    android:text="Description"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    app:drawableStartCompat="@drawable/ic_pen" />
-
-                <TextView
-                    android:id="@+id/desc_text_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@{eventModel.description}"
-                    android:textSize="20sp" />
-
             </LinearLayout>
-
-        </LinearLayout>
-    </ScrollView>
+        </ScrollView>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

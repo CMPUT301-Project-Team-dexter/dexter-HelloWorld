@@ -5,6 +5,7 @@ import androidx.databinding.Bindable;
 
 import com.example.helloworldproject.BR;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.Exclude;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -23,6 +24,7 @@ public class Event extends BaseObservable {
 
     private String id;
     private Timestamp createdAt;
+    private String creator;
     private String title;
     private String description;
     private String venue;
@@ -39,8 +41,7 @@ public class Event extends BaseObservable {
     private Boolean geoRequired;       // true/false
     private Integer plannedSampleSize; // e.g., 20
 
-    public Event() {
-    }
+    public Event() {  }
 
     public String getId() {
         return id;
@@ -48,6 +49,39 @@ public class Event extends BaseObservable {
 
     public Timestamp getCreatedAt() {
         return createdAt;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * Get the real-time status of the event based on current time.
+     * @return the EventStatus enum representing the current status
+     */
+    @Exclude
+    public EventStatus getRealTimeStatus() {
+        Timestamp now = Timestamp.now();
+        if (now.compareTo(getRegistrationOpenAt()) < 0) {
+            return EventStatus.NOT_OPEN;
+        } else if (
+            now.compareTo(getRegistrationOpenAt()) >= 0
+                && now.compareTo(getRegistrationCloseAt()) < 0
+        ) {
+            return EventStatus.REGISTRATION_OPEN;
+        } else if (
+            now.compareTo(getRegistrationCloseAt()) >= 0
+                && now.compareTo(getEventStartAt()) < 0
+        ) {
+            return EventStatus.REGISTRATION_CLOSED;
+        } else if (
+            now.compareTo(getEventStartAt()) >= 0
+                && now.compareTo(getEventEndAt()) < 0
+        ) {
+            return EventStatus.ONGOING;
+        } else {
+            return EventStatus.ENDED;
+        }
     }
 
     @Bindable
@@ -118,6 +152,10 @@ public class Event extends BaseObservable {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
     public void setTitle(String title) {
