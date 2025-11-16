@@ -117,15 +117,16 @@ public class EventRepository {
         }
         Tasks.whenAllSuccess(tasks)
             .addOnSuccessListener(results -> {
+                List<Event> out = new ArrayList<>();
                 for (Object result : results) {
                     QuerySnapshot snap = (QuerySnapshot) result;
                     for (QueryDocumentSnapshot d : snap) {
                         Event e = d.toObject(Event.class);
                         e.setId(d.getId());
-                        cachedEvents.add(e);
+                        out.add(e);
                     }
                 }
-                cb.onLoaded(cachedEvents);
+                cb.onLoaded(out);
             })
             .addOnFailureListener(cb::onError);
     }

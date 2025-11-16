@@ -7,6 +7,7 @@ import com.example.helloworldproject.model.Event;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class EventCache {
@@ -24,6 +25,8 @@ public class EventCache {
 
     /**
      * Try to get a single event by its ID. If cached, return from cache immediately.
+     * <p>
+     * There is no need to cache the result in the callback.
      *
      * @param eventId: the ID of the event
      * @param cb:      the callback to handle the result
@@ -32,12 +35,33 @@ public class EventCache {
         if (internalCache.containsKey(eventId)) {
             cb.onLoaded(internalCache.get(eventId));
         }
-        EventRepository.INSTANCE.loadById(eventId, cb);
+        EventRepository.INSTANCE.loadById(
+            eventId,
+            new EventRepository.LoadCallback() {
+                @Override
+                public void onLoaded(Event e) {
+                    cache(e);
+                    cb.onLoaded(e);
+                }
+
+                @Override
+                public void onNotFound() {
+                    cb.onNotFound();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    cb.onError(e);
+                }
+            }
+        );
     }
 
     /**
      * Try to get events created by a specific organizer.
      * Always attempt to load uncached events from the repository.
+     * <p>
+     *  There is no need to cache results in the callback.
      *
      * @param organizerName: the name of the organizer
      * @param cb:            the callback to handle the result
@@ -46,7 +70,23 @@ public class EventCache {
         ArrayList<Event> cachedEvents = internalCache.values().stream()
             .filter(e -> organizerName.equals(e.getCreator()))
             .collect(Collectors.toCollection(ArrayList::new));
-        EventRepository.INSTANCE.loadUncachedEventsCreatedBy(organizerName, cachedEvents, cb);
+        EventRepository.INSTANCE.loadUncachedEventsCreatedBy(
+            organizerName,
+            cachedEvents,
+            new EventRepository.ListCallback() {
+                @Override
+                public void onLoaded(List<Event> events) {
+                    events.forEach(EventCache::cache);
+                    cachedEvents.addAll(events);
+                    cb.onLoaded(cachedEvents);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    cb.onError(e);
+                }
+            }
+        );
     }
 
     /**

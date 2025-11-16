@@ -7,10 +7,11 @@
             name="eventModel"
             type="com.example.helloworldproject.model.Event" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
         tools:context=".ui.activities.HomeActivity">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -26,7 +27,6 @@
             app:titleTextColor="@color/white" />
 
         <ScrollView
-            android:id="@+id/event_edit_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -39,14 +39,64 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/poster"
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/debug_card_image"
+                    android:layout_height="220dp"
+                    android:layout_margin="16dp"
+                    app:cardCornerRadius="16dp" >
 
-                    />
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/event_poster_image"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@null"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/debug_card_image" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="bottom"
+                            android:orientation="vertical"
+                            android:padding="12sp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="#66000000"
+                                android:padding="4sp"
+                                android:text="@string/tap_to_update_poster"
+                                android:textColor="@color/white"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <ImageButton
+                            android:id="@+id/delete_event_button"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="top|end"
+                            android:layout_margin="8sp"
+                            android:background="@drawable/bg_icon_circle_dim"
+                            android:contentDescription="@string/delete_event"
+
+                            android:src="@drawable/ic_close"
+                            app:tint="@color/white" />
+
+                    </FrameLayout>
+
+                    <View
+                        android:id="@+id/event_poster_clickable_overlay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:importantForAccessibility="no" />
+                </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -56,7 +106,7 @@
                     android:paddingRight="16sp">
 
                     <TextView
-                        android:id="@+id/event_edit_title_view"
+                        android:id="@+id/event_title_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
@@ -67,12 +117,11 @@
                         app:drawableStartCompat="@drawable/ic_pen" />
 
                     <TextView
-                        android:id="@+id/reg_period_title_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
 
                         android:text="Register Period"
-                        android:textSize="24sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <TableLayout
@@ -86,9 +135,9 @@
                             android:layout_height="match_parent">
 
                             <TextView
-                                android:id="@+id/reg_period_from_title_view"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:text="From: "
                                 android:textSize="20sp" />
 
@@ -109,9 +158,9 @@
                             android:layout_height="match_parent">
 
                             <TextView
-                                android:id="@+id/reg_period_to_title_view"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:text="To: "
                                 android:textSize="20sp" />
 
@@ -133,7 +182,7 @@
                         android:layout_height="wrap_content"
                         android:text="Event Period"
 
-                        android:textSize="24sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <TableLayout
@@ -147,9 +196,9 @@
                             android:layout_height="match_parent">
 
                             <TextView
-                                android:id="@+id/event_period_from_title_view"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:text="From: "
                                 android:textSize="20sp" />
 
@@ -168,9 +217,9 @@
                             android:layout_height="match_parent">
 
                             <TextView
-                                android:id="@+id/event_period_to_ttle_view"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:text="To: "
                                 android:textSize="20sp" />
 
@@ -193,19 +242,18 @@
                         android:paddingBottom="4sp">
 
                         <TextView
-                            android:id="@+id/location_title_view"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Location: "
+                            android:layout_weight="1"
 
+                            android:text="Location: "
                             android:textSize="20sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/location_view"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:drawablePadding="4sp"
                             android:text="@{eventModel.venue}"
                             android:textSize="20sp"
@@ -218,21 +266,18 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:id="@+id/geo_required_title_view"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="Geolocation limit: "
                             android:textSize="20sp"
                             android:textStyle="bold" />
 
-                        <CheckBox
-                            android:id="@+id/geo_loc_check_box"
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/geo_limit_switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="0"
-                            android:checked="@{eventModel.geoRequired}"
-                            android:text="@{eventModel.geoRequired ? `ON` : `OFF`}"
-                            android:textSize="20sp" />
+                            android:checked="@{eventModel.geoRequired}" />
 
                     </LinearLayout>
 
@@ -243,19 +288,18 @@
                         android:paddingBottom="4sp">
 
                         <TextView
-                            android:id="@+id/capacity_title_view"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Event Capacity: "
+                            android:layout_weight="1"
 
+                            android:text="Event Capacity: "
                             android:textSize="20sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/capacity_view"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:drawablePadding="4sp"
                             android:text="@{String.valueOf(eventModel.capacity)}"
                             android:textSize="20sp"
@@ -269,19 +313,19 @@
                         android:paddingBottom="4sp">
 
                         <TextView
-                            android:id="@+id/wl_limit_title_view"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Waiting list capacity: "
+                            android:layout_weight="1"
 
+                            android:text="Waiting list capacity: "
                             android:textSize="20sp"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/event_edit_wait_list_limit_view"
+                            android:id="@+id/wait_list_limit_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
+                            android:drawablePadding="4sp"
                             android:text="@{String.valueOf(eventModel.plannedSampleSize)}"
                             android:textSize="20sp"
                             app:drawableStartCompat="@drawable/ic_pen" />

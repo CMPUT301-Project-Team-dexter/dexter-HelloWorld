@@ -10,9 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 
 import com.example.helloworldproject.R;
@@ -76,14 +74,18 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
                     public void onError(Exception e) {
                         Toast.makeText(
                             EventEditingActivity.this,
-                            "Exception occurs when loading event: " + givenEventId + " " + e.getMessage(),
+                            "Exception occurs when loading event " + givenEventId + ": " + e.getMessage(),
                             Toast.LENGTH_SHORT
                         ).show();
                     }
                 }
             );
             if (event[0] == null) {
-                Toast.makeText(this, "Event " + givenEventId + " is null", Toast.LENGTH_SHORT).show();
+                Toast.makeText(
+                    this,
+                    "Event " + givenEventId + " is null",
+                    Toast.LENGTH_SHORT
+                ).show();
                 finish();
                 return;
             } else {
@@ -96,7 +98,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
         if (givenEventId == null) {
             binding.getEventModel().setTitle("N/A");
         }
-        binding.eventEditTitleView.setOnClickListener(
+        binding.eventTitleView.setOnClickListener(
             v -> new TitleFrag().show(
                 getSupportFragmentManager(), "EditTitle"
             )
@@ -146,9 +148,9 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
         if (givenEventId == null) {
             binding.getEventModel().setGeoRequired(false);
         }
-        binding.geoLocCheckBox.setOnClickListener(
+        binding.geoLimitSwitch.setOnClickListener(
             v -> binding.getEventModel().setGeoRequired(
-                binding.geoLocCheckBox.isChecked()
+                binding.geoLimitSwitch.isChecked()
             )
         );
         // endregion
@@ -165,7 +167,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
         if (givenEventId == null) {
             binding.getEventModel().setPlannedSampleSize(30);
         }
-        binding.eventEditWaitListLimitView.setOnClickListener(
+        binding.waitListLimitView.setOnClickListener(
             v -> new WaitingListCapacityFrag()
                 .show(getSupportFragmentManager(), "WaitingListCap")
         );

@@ -119,7 +119,6 @@ public class HomeEventCardListFragment extends Fragment {
                 @Override
                 public void onLoaded(List<Event> events) {
                     // TODO: filter/sort events
-                    events.forEach(EventCache::cache);
                     updateAdapterFrom(events);
                 }
 
