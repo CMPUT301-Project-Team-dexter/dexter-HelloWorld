@@ -51,14 +51,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_editing);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_event_editing);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-        }
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
-        }
+        setSupportActionBar(binding.toolbar);
         // givenEventId being null means that we are creating new event
         givenEventId = getIntent().getStringExtra(KEY_EVENT_ID);
         if (givenEventId != null) {

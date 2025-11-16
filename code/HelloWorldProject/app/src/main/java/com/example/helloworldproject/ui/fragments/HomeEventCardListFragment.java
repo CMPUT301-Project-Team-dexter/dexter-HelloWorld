@@ -31,7 +31,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class HomeEventCardListFragment extends Fragment {
     FragHomeEventListBinding binding;
     ArrayList<Event> eventListBackEnd = new ArrayList<>();
@@ -70,7 +69,12 @@ public class HomeEventCardListFragment extends Fragment {
         // remove the title text in the top bar
         ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(true);
+            if (CurrentProfile.isOrganizer()) {
+                actionBar.setTitle("My Events");
+            } else {
+                actionBar.setTitle("Available Events");
+            }
         }
 
         adapter = new EventCardAdapter(requireContext(), eventListBackEnd);

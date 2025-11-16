@@ -55,7 +55,7 @@ public class EventCardAdapter extends ArrayAdapter<Event> {
                 cardBinding.eventStatus.setText("Registration open until " + Event.formatDate(item.getRegistrationCloseAt()));
                 break;
             case REGISTRATION_CLOSED:
-                cardBinding.eventStatus.setText("Registration Closed. Event starts on " + Event.formatDate(item.getEventStartAt()));
+                cardBinding.eventStatus.setText("Registration Closed.\nEvent starts on " + Event.formatDate(item.getEventStartAt()));
                 break;
             case ONGOING:
                 cardBinding.eventStatus.setText("Ongoing. Ends on " + Event.formatDate(item.getEventEndAt()));
