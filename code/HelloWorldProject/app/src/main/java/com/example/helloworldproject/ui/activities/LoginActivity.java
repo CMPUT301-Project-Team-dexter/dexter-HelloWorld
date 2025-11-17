@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
         repo = new ProfileRepository();
 
         setLoading(true);
-        DeviceId.getOrFetch(this, new DeviceId.DeviceIdCallback() {
+        DeviceId.get(new DeviceId.DeviceIdCallback() {
             @Override public void onSuccess(String id) {
                 deviceId = id;
                 // Try to load existing profile (for update).
@@ -69,7 +69,11 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
                             return;
                         }
-                        Toast.makeText(LoginActivity.this, "Failed to load: profile is null", Toast.LENGTH_LONG).show();
+                        Toast.makeText(
+                            LoginActivity.this,
+                            "Failed to load: profile is null",
+                            Toast.LENGTH_LONG
+                        ).show();
                     }
 
                     @Override public void onNotFound() {
@@ -79,14 +83,22 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override public void onError(Exception e) {
                         setLoading(false);
-                        Toast.makeText(LoginActivity.this, "Failed to load: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(
+                            LoginActivity.this,
+                            "Failed to get installation id: " + e.getMessage(),
+                            Toast.LENGTH_LONG
+                        ).show();
                     }
                 });
             }
 
             @Override public void onError(Exception e) {
                 setLoading(false);
-                Toast.makeText(LoginActivity.this, "Failed to get device ID: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(
+                    LoginActivity.this,
+                    "Failed to get device ID: " + e.getMessage(),
+                    Toast.LENGTH_LONG
+                ).show();
             }
         });
 
@@ -124,7 +136,11 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override public void onError(Exception e) {
                     setLoading(false);
-                    Toast.makeText(LoginActivity.this, "Save failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(
+                        LoginActivity.this,
+                        "Save failed: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                    ).show();
                 }
             });
         });

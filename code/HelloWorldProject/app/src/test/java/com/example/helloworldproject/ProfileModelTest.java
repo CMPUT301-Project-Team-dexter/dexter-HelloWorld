@@ -1,13 +1,17 @@
 package com.example.helloworldproject;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import com.example.helloworldproject.model.Profile;
 import com.example.helloworldproject.model.UserGroup;
 
 import org.junit.Test;
 
-import java.io.*;
-
-import static org.junit.Assert.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class ProfileModelTest {
 

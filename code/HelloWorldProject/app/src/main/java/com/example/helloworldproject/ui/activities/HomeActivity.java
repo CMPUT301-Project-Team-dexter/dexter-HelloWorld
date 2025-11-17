@@ -5,14 +5,15 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 
 import com.example.helloworldproject.R;
+import com.example.helloworldproject.databinding.ActivityHomeBinding;
 import com.example.helloworldproject.model.Profile;
 import com.example.helloworldproject.ui.fragments.AccountFragment;
 import com.example.helloworldproject.ui.fragments.AllEventsFragment;
 import com.example.helloworldproject.ui.fragments.HomeEventCardListFragment;
 import com.example.helloworldproject.util.CurrentProfile;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 public class HomeActivity extends AppCompatActivity {
@@ -20,42 +21,45 @@ public class HomeActivity extends AppCompatActivity {
         return new Intent(context, HomeActivity.class);
     }
 
+    ActivityHomeBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_home);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
 
         Profile currentUser = CurrentProfile.get();
         Snackbar.make(
-                findViewById(R.id.home_nav_view),
-                "Log in as " + currentUser.getUserGroup().name() + " " + currentUser.getName(),
-                Snackbar.LENGTH_LONG
+            binding.homeNavView,
+            "Log in as " + currentUser.getUserGroup().name() + " " + currentUser.getName(),
+            Snackbar.LENGTH_LONG
         ).show();
 
-        BottomNavigationView nav = findViewById(R.id.home_nav_view);
-        nav.setOnItemSelectedListener(item -> {
+        binding.homeNavView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new HomeEventCardListFragment())
-                        .commit();
+                    .replace(R.id.fragment_container, new HomeEventCardListFragment())
+                    .commit();
                 return true;
             } else if (id == R.id.nav_events) {
+                // TODO: move to admin console
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new AllEventsFragment())
-                        .commit();
+                    .replace(R.id.fragment_container, new AllEventsFragment())
+                    .commit();
                 return true;
             } else if (id == R.id.nav_account) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new AccountFragment())
-                        .commit();
+                    .replace(R.id.fragment_container, new AccountFragment())
+                    .commit();
                 return true;
             }
             return false;
         });
 
         if (savedInstanceState == null) {
-            nav.setSelectedItemId(R.id.nav_home);
+            binding.homeNavView.setSelectedItemId(R.id.nav_home);
         }
     }
 }

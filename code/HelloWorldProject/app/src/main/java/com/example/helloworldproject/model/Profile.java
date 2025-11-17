@@ -90,11 +90,16 @@ public class Profile implements Serializable {
         this.userGroup = userGroup;
     }
 
+    /**
+     * Create a blank event with default settings.
+     * @return a new Event object with default values
+     */
     public Event createBlankEvent() {
         Event e = new Event();
         Ulid u = UlidCreator.getMonotonicUlid();
-        e.setId(u.toString() + "_" + name);
+        e.setId(u.toString());
         e.setCreatedAt(Timestamp.now());
+        e.setCreator(name);
         // TODO: decide things regarding to sample methods
         e.setSelectionMethod("FISHER_YATES");
         e.setSeedPolicy("RANDOM_LOGGED");

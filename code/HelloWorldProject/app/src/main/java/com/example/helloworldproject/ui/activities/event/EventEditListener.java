@@ -1,4 +1,4 @@
-package com.example.helloworldproject.ui.activities;
+package com.example.helloworldproject.ui.activities.event;
 
 public interface EventEditListener {
     void updateTitle(String newTitle);
