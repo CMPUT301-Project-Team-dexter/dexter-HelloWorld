@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorldProject">
         <activity
-            android:name=".ui.activities.EventEditingActivity"
+            android:name=".ui.activities.event.EventEditingActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activities.LoginActivity"
@@ -31,7 +31,7 @@
             android:label="Profile"
             android:parentActivityName=".ui.activities.LoginActivity" />
         <activity
-            android:name=".ui.event.EventDetailActivity_old"
+            android:name=".ui.activities.event.EventDetailActivity"
             android:exported="false"
             android:label="Event Detail" />
 

@@ -4,6 +4,8 @@ import com.example.helloworldproject.model.Event;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -12,6 +14,7 @@ import com.google.firebase.firestore.SetOptions;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -43,21 +46,33 @@ public class EventRepository {
 
     /**
      * Load a single event by its ID.
+     * <p>
+     * Warning: this method blocks the calling thread until completion.
+     * Do NOT call this method on the main/UI thread.
+     *
      * @param eventId: the ID of the event to load
      * @param cb: the callback to handle the result
      */
-    public void loadById(String eventId, final LoadCallback cb) {
-        db.collection("events").document(eventId).get()
-                .addOnSuccessListener(ds -> {
-                    if (ds.exists()) {
-                        Event e = ds.toObject(Event.class);
-                        if (e != null) e.setId(ds.getId());
-                        cb.onLoaded(e);
-                    } else {
-                        cb.onNotFound();
-                    }
-                })
-                .addOnFailureListener(cb::onError);
+    public void syncLoadById(String eventId, final LoadCallback cb) {
+        Task<DocumentSnapshot> task =
+            db.collection("events").document(eventId).get();
+        try {
+            Tasks.await(task, 10, TimeUnit.SECONDS);
+            if (task.isSuccessful()) {
+                DocumentSnapshot ds = task.getResult();
+                if (ds != null && ds.exists()) {
+                    Event e = ds.toObject(Event.class);
+                    if (e != null) e.setId(ds.getId());
+                    cb.onLoaded(e);
+                } else {
+                    cb.onNotFound();
+                }
+            } else {
+                cb.onError(task.getException());
+            }
+        } catch (Exception e) {
+            cb.onError(e);
+        }
     }
 
     /**
@@ -78,20 +93,27 @@ public class EventRepository {
 
     /**
      * Load events created by a specific organizer, excluding those already cached.
+     * <p>
+     * Warning: this method blocks the calling thread until completion.
+     * Do NOT call this method on the main/UI thread.
+     *
      * @param organizerName: the name of the organizer
      * @param cachedEvents: the list of already cached events
      * @param cb: the callback to handle the result
      */
-    public void loadUncachedEventsCreatedBy(
+    public void syncLoadUncachedEventsCreatedBy(
         String organizerName,
         ArrayList<Event> cachedEvents,
         final ListCallback cb
     ) {
         if (cachedEvents.isEmpty()) {
-            db.collection("events")
+            Task<QuerySnapshot> task = db.collection("events")
                 .whereEqualTo("creator", organizerName)
-                .get()
-                .addOnSuccessListener(snap -> {
+                .get();
+            try {
+                Tasks.await(task, 10, TimeUnit.SECONDS);
+                if (task.isSuccessful()) {
+                    QuerySnapshot snap = task.getResult();
                     List<Event> out = new ArrayList<>();
                     for (QueryDocumentSnapshot d : snap) {
                         Event e = d.toObject(Event.class);
@@ -99,8 +121,12 @@ public class EventRepository {
                         out.add(e);
                     }
                     cb.onLoaded(out);
-                })
-                .addOnFailureListener(cb::onError);
+                } else {
+                    cb.onError(task.getException());
+                }
+            } catch (Exception e) {
+                cb.onError(e);
+            }
             return;
         }
         List<Task<QuerySnapshot>> tasks = new ArrayList<>();
@@ -109,26 +135,31 @@ public class EventRepository {
             .collect(Collectors.toList());
         for (int i = 0; i < cachedIds.size(); i += BATCH_SIZE) {
             List<String> batchIds = cachedIds.subList(i, Math.min(i + BATCH_SIZE, cachedIds.size()));
-            Task<QuerySnapshot> task = db.collection("events")
+            Task<QuerySnapshot> subtask = db.collection("events")
                 .whereEqualTo("creator", organizerName)
-                .whereNotIn("id", batchIds)
+                .whereNotIn(FieldPath.documentId(), batchIds)
                 .get();
-            tasks.add(task);
+            tasks.add(subtask);
         }
-        Tasks.whenAllSuccess(tasks)
-            .addOnSuccessListener(results -> {
+        Task<List<QuerySnapshot>> task = Tasks.whenAllSuccess(tasks);
+        try {
+            Tasks.await(task, 10, TimeUnit.SECONDS);
+            if (task.isSuccessful()) {
                 List<Event> out = new ArrayList<>();
-                for (Object result : results) {
-                    QuerySnapshot snap = (QuerySnapshot) result;
-                    for (QueryDocumentSnapshot d : snap) {
+                for (QuerySnapshot qs : task.getResult()) {
+                    for (QueryDocumentSnapshot d : qs) {
                         Event e = d.toObject(Event.class);
                         e.setId(d.getId());
                         out.add(e);
                     }
                 }
                 cb.onLoaded(out);
-            })
-            .addOnFailureListener(cb::onError);
+            } else {
+                cb.onError(task.getException());
+            }
+        } catch (Exception e) {
+            cb.onError(e);
+        }
     }
 
     /**

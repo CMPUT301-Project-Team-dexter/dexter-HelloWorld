@@ -15,7 +15,7 @@
         tools:context=".ui.activities.HomeActivity">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/evt_ed_toolbar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -32,7 +32,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar">
+            app:layout_constraintTop_toBottomOf="@+id/evt_ed_toolbar">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                         android:layout_height="match_parent">
 
                         <ImageView
-                            android:id="@+id/event_poster_image"
+                            android:id="@+id/evt_ed_poster_image"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:contentDescription="@null"
@@ -76,26 +76,26 @@
 
                         </LinearLayout>
 
-                        <ImageButton
-                            android:id="@+id/delete_event_button"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_gravity="top|end"
-                            android:layout_margin="8sp"
-                            android:background="@drawable/bg_icon_circle_dim"
-                            android:contentDescription="@string/delete_event"
-
-                            android:src="@drawable/ic_close"
-                            app:tint="@color/white" />
-
                     </FrameLayout>
 
                     <View
-                        android:id="@+id/event_poster_clickable_overlay"
+                        android:id="@+id/evt_ed_poster_clickable"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:importantForAccessibility="no" />
+
+                    <ImageButton
+                        android:id="@+id/evt_ed_delete_button"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="top|end"
+                        android:layout_margin="8sp"
+                        android:background="@drawable/bg_icon_circle_dim"
+                        android:contentDescription="@string/delete_event"
+
+                        android:src="@drawable/ic_close"
+                        app:tint="@color/white" />
                 </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
@@ -106,7 +106,7 @@
                     android:paddingRight="16sp">
 
                     <TextView
-                        android:id="@+id/event_title_view"
+                        android:id="@+id/evt_ed_title_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
@@ -142,7 +142,7 @@
                                 android:textSize="20sp" />
 
                             <TextView
-                                android:id="@+id/reg_period_from_date_view"
+                                android:id="@+id/evt_ed_reg_start_view"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:drawablePadding="4sp"
@@ -165,7 +165,7 @@
                                 android:textSize="20sp" />
 
                             <TextView
-                                android:id="@+id/reg_period_to_date_view"
+                                android:id="@+id/evt_ed_reg_end_view"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:drawablePadding="4sp"
@@ -177,7 +177,6 @@
                     </TableLayout>
 
                     <TextView
-                        android:id="@+id/event_period_title_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Event Period"
@@ -203,7 +202,7 @@
                                 android:textSize="20sp" />
 
                             <TextView
-                                android:id="@+id/event_period_from_date_view"
+                                android:id="@+id/evt_ed_event_start_view"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:drawablePadding="4sp"
@@ -224,7 +223,7 @@
                                 android:textSize="20sp" />
 
                             <TextView
-                                android:id="@+id/event_period_to_date_view"
+                                android:id="@+id/evt_ed_event_end_view"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:drawablePadding="4sp"
@@ -251,7 +250,7 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/location_view"
+                            android:id="@+id/evt_ed_location_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="4sp"
@@ -274,7 +273,7 @@
                             android:textStyle="bold" />
 
                         <com.google.android.material.materialswitch.MaterialSwitch
-                            android:id="@+id/geo_limit_switch"
+                            android:id="@+id/evt_ed_geo_limit_switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="@{eventModel.geoRequired}" />
@@ -297,7 +296,7 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/capacity_view"
+                            android:id="@+id/evt_ed_capacity_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="4sp"
@@ -322,7 +321,7 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/wait_list_limit_view"
+                            android:id="@+id/evt_ed_wait_list_limit_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:drawablePadding="4sp"
@@ -332,7 +331,7 @@
                     </LinearLayout>
 
                     <TextView
-                        android:id="@+id/desc_title_view"
+                        android:id="@+id/evt_ed_desc_title_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
 
@@ -343,7 +342,7 @@
                         app:drawableStartCompat="@drawable/ic_pen" />
 
                     <TextView
-                        android:id="@+id/desc_text_view"
+                        android:id="@+id/evt_ed_desc_text_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@{eventModel.description}"

@@ -21,7 +21,8 @@ import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.EventRepository;
 import com.example.helloworldproject.databinding.FragHomeEventListBinding;
 import com.example.helloworldproject.model.Event;
-import com.example.helloworldproject.ui.activities.EventEditingActivity;
+import com.example.helloworldproject.ui.activities.event.EventDetailActivity;
+import com.example.helloworldproject.ui.activities.event.EventEditingActivity;
 import com.example.helloworldproject.ui.utils.EventCardAdapter;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
@@ -30,8 +31,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HomeEventCardListFragment extends Fragment {
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     FragHomeEventListBinding binding;
     ArrayList<Event> eventListBackEnd = new ArrayList<>();
     private EventCardAdapter adapter;
@@ -79,6 +83,18 @@ public class HomeEventCardListFragment extends Fragment {
 
         adapter = new EventCardAdapter(requireContext(), eventListBackEnd);
         binding.eventListView.setAdapter(adapter);
+        binding.eventListView.setOnItemClickListener((parent, view1, position, id) -> {
+            Event e = adapter.getItem(position);
+            if (e != null) {
+                startActivity(EventDetailActivity.newIntent(requireActivity(), e.getId()));
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Error loading event details: event is null",
+                    Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
 
         refreshEventList();
 
@@ -113,25 +129,26 @@ public class HomeEventCardListFragment extends Fragment {
      */
     private void loadEventsForOrganizer() {
         String organizerName = CurrentProfile.get().getName();
-        EventCache.tryGetEventsCreatedBy(
+        executor.execute(() -> EventCache.syncTryGetEventsCreatedBy(
             organizerName,
             new EventRepository.ListCallback() {
                 @Override
                 public void onLoaded(List<Event> events) {
                     // TODO: filter/sort events
-                    updateAdapterFrom(events);
+                    requireActivity().runOnUiThread(() -> updateAdapterFrom(events));
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    Toast.makeText(
+                    e.printStackTrace();
+                    requireActivity().runOnUiThread(() -> Toast.makeText(
                         requireContext(),
-                        "Failed to load events created by " + organizerName + ": " + e.getMessage(),
+                        "Failed to load events created by " + organizerName + ": " + e.getClass().getCanonicalName(),
                         Toast.LENGTH_SHORT
-                    ).show();
+                    ).show());
                 }
             }
-        );
+        ));
     }
 
     // Below are helper functions for Entrant view

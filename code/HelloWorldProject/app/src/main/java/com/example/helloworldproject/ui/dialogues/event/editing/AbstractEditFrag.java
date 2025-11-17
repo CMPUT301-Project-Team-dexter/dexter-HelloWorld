@@ -5,7 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.helloworldproject.ui.activities.EventEditListener;
+import com.example.helloworldproject.ui.activities.event.EventEditListener;
 
 public abstract class AbstractEditFrag extends DialogFragment {
     protected EventEditListener listener;

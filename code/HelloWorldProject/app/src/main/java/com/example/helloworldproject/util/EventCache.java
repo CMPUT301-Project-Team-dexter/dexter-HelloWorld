@@ -27,15 +27,19 @@ public class EventCache {
      * Try to get a single event by its ID. If cached, return from cache immediately.
      * <p>
      * There is no need to cache the result in the callback.
+     * <p>
+     * Warning: this method blocks the calling thread until completion.
+     * Do NOT call this method on the main/UI thread.
      *
      * @param eventId: the ID of the event
      * @param cb:      the callback to handle the result
      */
-    public static void tryGetSingle(String eventId, EventRepository.LoadCallback cb) {
+    public static void syncTryGetSingle(String eventId, EventRepository.LoadCallback cb) {
         if (internalCache.containsKey(eventId)) {
             cb.onLoaded(internalCache.get(eventId));
+            return;
         }
-        EventRepository.INSTANCE.loadById(
+        EventRepository.INSTANCE.syncLoadById(
             eventId,
             new EventRepository.LoadCallback() {
                 @Override
@@ -61,16 +65,19 @@ public class EventCache {
      * Try to get events created by a specific organizer.
      * Always attempt to load uncached events from the repository.
      * <p>
-     *  There is no need to cache results in the callback.
+     * There is no need to cache results in the callback.
+     * <p>
+     * Warning: this method blocks the calling thread until completion.
+     * Do NOT call this method on the main/UI thread.
      *
      * @param organizerName: the name of the organizer
      * @param cb:            the callback to handle the result
      */
-    public static void tryGetEventsCreatedBy(String organizerName, EventRepository.ListCallback cb) {
+    public static void syncTryGetEventsCreatedBy(String organizerName, EventRepository.ListCallback cb) {
         ArrayList<Event> cachedEvents = internalCache.values().stream()
             .filter(e -> organizerName.equals(e.getCreator()))
             .collect(Collectors.toCollection(ArrayList::new));
-        EventRepository.INSTANCE.loadUncachedEventsCreatedBy(
+        EventRepository.INSTANCE.syncLoadUncachedEventsCreatedBy(
             organizerName,
             cachedEvents,
             new EventRepository.ListCallback() {
@@ -87,14 +94,5 @@ public class EventCache {
                 }
             }
         );
-    }
-
-    /**
-     * Try to upload a single event to the repository.
-     * @param e: the event to be uploaded
-     * @param cb: the callback to handle completion
-     */
-    public static void tryUploadSingle(@NonNull Event e, EventRepository.CompleteCallback cb) {
-        EventRepository.INSTANCE.saveOrUpdate(e, cb);
     }
 }
