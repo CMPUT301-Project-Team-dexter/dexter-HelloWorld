@@ -1,9 +1,12 @@
 package com.example.helloworldproject.model;
 
+import android.graphics.Bitmap;
+
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 
 import com.example.helloworldproject.BR;
+import com.example.helloworldproject.util.QRCodeUtils;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Exclude;
 
@@ -82,6 +85,21 @@ public class Event extends BaseObservable {
         } else {
             return EventStatus.ENDED;
         }
+    }
+
+    @Exclude
+    Bitmap qrCodeBitmap = null;
+
+    /**
+     * Get the QR code bitmap representing the event ID.
+     * @return Bitmap of the QR code
+     */
+    @Exclude
+    public Bitmap getQRCodeBitmap() {
+        if (qrCodeBitmap == null) {
+            qrCodeBitmap = QRCodeUtils.generate(id, 512);
+        }
+        return qrCodeBitmap;
     }
 
     @Bindable

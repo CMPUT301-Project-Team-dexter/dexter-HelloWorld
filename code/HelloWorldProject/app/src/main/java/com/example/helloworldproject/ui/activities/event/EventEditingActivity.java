@@ -220,6 +220,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
                     }
                 }
             );
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

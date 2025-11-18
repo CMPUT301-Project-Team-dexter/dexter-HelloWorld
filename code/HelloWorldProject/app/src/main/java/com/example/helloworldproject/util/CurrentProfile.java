@@ -26,4 +26,8 @@ public class CurrentProfile {
     public static boolean isAdmin() {
         return currentUser.getUserGroup() == UserGroup.ADMIN;
     }
+
+    public static boolean isEntrant() {
+        return currentUser.getUserGroup() == UserGroup.ENTRANT;
+    }
 }
