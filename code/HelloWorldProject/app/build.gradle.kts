@@ -42,6 +42,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-installations")
     implementation("com.github.f4b6a3:ulid-creator:5.2.3")
+    implementation("com.google.zxing:core:3.5.1")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)

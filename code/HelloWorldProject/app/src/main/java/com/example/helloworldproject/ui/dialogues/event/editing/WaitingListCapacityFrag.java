@@ -10,7 +10,7 @@ public class WaitingListCapacityFrag extends AbstractPlainTextFrag {
     public WaitingListCapacityFrag() {
         super(
             "Event Capacity",
-            R.layout.event_edit_num_frag,
+            R.layout.frag_event_edit_num,
             R.id.edit_num_input,
             "waiting list capacity number"
         );

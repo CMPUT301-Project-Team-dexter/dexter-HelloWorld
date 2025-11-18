@@ -26,7 +26,7 @@ public abstract class AbstractDateFrag extends AbstractEditFrag {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        View view = getLayoutInflater().inflate(R.layout.event_edit_date_frag, null);
+        View view = getLayoutInflater().inflate(R.layout.frag_event_edit_date, null);
         CalendarView datePicker = view.findViewById(R.id.date_picker_view);
         datePicker.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
             Calendar cal = Calendar.getInstance();

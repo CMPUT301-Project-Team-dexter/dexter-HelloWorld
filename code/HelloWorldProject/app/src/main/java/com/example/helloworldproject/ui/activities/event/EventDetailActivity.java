@@ -3,6 +3,8 @@ package com.example.helloworldproject.ui.activities.event;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -15,6 +17,7 @@ import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.EventRepository;
 import com.example.helloworldproject.databinding.ActivityEventDetailBinding;
 import com.example.helloworldproject.model.Event;
+import com.example.helloworldproject.ui.dialogues.event.QRCodeFrag;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
 
@@ -52,20 +55,26 @@ public class EventDetailActivity extends AppCompatActivity {
 
                     @Override
                     public void onNotFound() {
-                        runOnUiThread(() -> Toast.makeText(
-                        EventDetailActivity.this,
-                            "Event with ID " + givenEventId + " not found.",
-                            Toast.LENGTH_SHORT
-                        ).show());
+                        runOnUiThread(() -> {
+                            Toast.makeText(
+                                EventDetailActivity.this,
+                                "Event with ID " + givenEventId + " not found.",
+                                Toast.LENGTH_SHORT
+                            ).show();
+                            finish();
+                        });
                     }
 
                     @Override
                     public void onError(Exception e) {
-                        runOnUiThread(() -> Toast.makeText(
-                        EventDetailActivity.this,
-                            "Exception occurs when loading event " + givenEventId + ": " + e.getClass().getCanonicalName(),
-                            Toast.LENGTH_SHORT
-                        ).show());
+                        runOnUiThread(() -> {
+                            Toast.makeText(
+                                EventDetailActivity.this,
+                                "Exception occurs when loading event " + givenEventId + ": " + e.getClass().getCanonicalName(),
+                                Toast.LENGTH_SHORT
+                            ).show();
+                            finish();
+                        });
                     }
                 }
             );
@@ -95,5 +104,34 @@ public class EventDetailActivity extends AppCompatActivity {
                 }
             });
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.event_detail_menu, menu);
+        if (
+            CurrentProfile.isOrganizer() &&
+            CurrentProfile.get().getName()
+                .contentEquals(binding.getEventModel().getCreator())
+        ) {
+            MenuItem qrCodeGen = menu.findItem(R.id.evt_dtl_qr_gen_btn);
+            qrCodeGen.setVisible(true);
+            MenuItem eventManageItem = menu.findItem(R.id.evt_dtl_manage_btn);
+            eventManageItem.setVisible(true);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.evt_dtl_qr_gen_btn) {
+            new QRCodeFrag(binding.getEventModel())
+                .show(getSupportFragmentManager(), "EventQRCodeDialog");
+            return true;
+        } else if (item.getItemId() == R.id.evt_dtl_manage_btn) {
+//            startActivity(EventManagementActivity.newIntent(this, givenEventId));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

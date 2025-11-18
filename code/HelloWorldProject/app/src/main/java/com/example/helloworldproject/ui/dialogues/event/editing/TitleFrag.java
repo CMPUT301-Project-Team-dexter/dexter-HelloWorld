@@ -10,7 +10,7 @@ public class TitleFrag extends AbstractPlainTextFrag {
     public TitleFrag() {
         super(
             "Title",
-            R.layout.event_edit_text_frag,
+            R.layout.frag_event_edit_text,
             R.id.edit_text_input,
             "Title text"
         );

@@ -10,7 +10,7 @@ public class LocationFrag extends AbstractPlainTextFrag {
     public LocationFrag() {
         super(
             "Location",
-            R.layout.event_edit_text_frag,
+            R.layout.frag_event_edit_text,
             R.id.edit_text_input,
             "Location text"
         );

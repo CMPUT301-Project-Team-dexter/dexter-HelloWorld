@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +25,7 @@ import com.example.helloworldproject.databinding.FragHomeEventListBinding;
 import com.example.helloworldproject.model.Event;
 import com.example.helloworldproject.ui.activities.event.EventDetailActivity;
 import com.example.helloworldproject.ui.activities.event.EventEditingActivity;
+import com.example.helloworldproject.ui.activities.event.EventQRCodeScanActivity;
 import com.example.helloworldproject.ui.utils.EventCardAdapter;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
@@ -36,6 +39,7 @@ import java.util.concurrent.Executors;
 
 public class HomeEventCardListFragment extends Fragment {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    ActivityResultLauncher<String> requestCamera = null;
     FragHomeEventListBinding binding;
     ArrayList<Event> eventListBackEnd = new ArrayList<>();
     private EventCardAdapter adapter;
@@ -50,21 +54,50 @@ public class HomeEventCardListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if (CurrentProfile.isEntrant()) {
+             requestCamera = requireActivity().registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (!isGranted) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Camera permission is required to scan event QR codes.",
+                            Toast.LENGTH_LONG
+                        ).show();
+                    } else {
+                        startActivity(EventQRCodeScanActivity.newIntent(requireContext()));
+                    }
+                }
+            );
+        }
+
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menuInflater.inflate(R.menu.home_event_list_menu, menu);
+                MenuItem qrScanItem = menu.findItem(R.id.home_scan_button);
+                qrScanItem.setVisible(!CurrentProfile.isOrganizer());
             }
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 // TODO: implement filter function later
-                if (menuItem.getItemId() == R.id.filter_button) {
+                if (menuItem.getItemId() == R.id.home_filter_button) {
 
-                } else if (menuItem.getItemId() == R.id.scan_button) {
-
+                } else if (menuItem.getItemId() == R.id.home_scan_button) {
+                    if (requestCamera == null) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Camera permission is required to scan event QR codes.",
+                            Toast.LENGTH_LONG
+                        ).show();
+                        return true;
+                    } else {
+                        requestCamera.launch(android.Manifest.permission.CAMERA);
+                    }
+                    return true;
                 }
                 return false;
             }
@@ -140,7 +173,6 @@ public class HomeEventCardListFragment extends Fragment {
 
                 @Override
                 public void onError(Exception e) {
-                    e.printStackTrace();
                     requireActivity().runOnUiThread(() -> Toast.makeText(
                         requireContext(),
                         "Failed to load events created by " + organizerName + ": " + e.getClass().getCanonicalName(),

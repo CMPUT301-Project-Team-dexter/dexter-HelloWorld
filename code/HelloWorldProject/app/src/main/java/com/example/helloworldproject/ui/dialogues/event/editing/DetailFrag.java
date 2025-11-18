@@ -9,7 +9,7 @@ public class DetailFrag extends AbstractPlainTextFrag {
     public DetailFrag() {
         super(
             "Event Detail",
-            R.layout.event_edit_multi_line_text_frag,
+            R.layout.frag_event_edit_multi_line_text,
             R.id.edit_multi_line_input,
             "sample\ntext"
         );
