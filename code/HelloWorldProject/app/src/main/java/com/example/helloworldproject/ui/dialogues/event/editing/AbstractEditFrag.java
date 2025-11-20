@@ -1,17 +1,17 @@
-package com.example.helloworldproject.ui.dialogues.event;
+package com.example.helloworldproject.ui.dialogues.event.editing;
 
 import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.helloworldproject.ui.activities.EventEditListener;
+import com.example.helloworldproject.ui.activities.event.EventEditListener;
 
-public abstract class AbstractEventEditFrag extends DialogFragment {
+public abstract class AbstractEditFrag extends DialogFragment {
     protected EventEditListener listener;
     protected String dialogTitle;
 
-    public AbstractEventEditFrag(String dialogTitle) {
+    public AbstractEditFrag(String dialogTitle) {
         this.dialogTitle = dialogTitle;
     }
 

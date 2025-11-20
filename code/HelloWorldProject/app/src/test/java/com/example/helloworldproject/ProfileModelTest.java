@@ -1,12 +1,17 @@
 package com.example.helloworldproject;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import com.example.helloworldproject.model.Profile;
+import com.example.helloworldproject.model.UserGroup;
 
 import org.junit.Test;
 
-import java.io.*;
-
-import static org.junit.Assert.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class ProfileModelTest {
 
@@ -30,7 +35,11 @@ public class ProfileModelTest {
 
     @Test
     public void isSerializable_roundTrip() throws Exception {
-        Profile p = new Profile("device-123", "device-123", "Alex", "alex@example.com", "123-456");
+        Profile p = new Profile(
+            "12345", "device-123",
+            "Alex", "alex@example.com",
+            "1234675", UserGroup.ENTRANT
+        );
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);

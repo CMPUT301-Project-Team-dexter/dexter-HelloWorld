@@ -1,11 +1,11 @@
 package com.example.helloworldproject;
 
+import static org.junit.Assert.assertTrue;
+
 import com.example.helloworldproject.model.Event;
 import com.example.helloworldproject.ui.event.LotteryTextBuilder;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class LotteryTextBuilderTest {
 

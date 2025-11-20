@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/home_scan_button"
+        android:icon="@drawable/ic_scanner"
+        android:title="scan"
+        android:visible="false"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/home_filter_button"
+        android:icon="@drawable/outline_filter_alt_128"
+        android:title="filter"
+        app:showAsAction="always"/>
+</menu>

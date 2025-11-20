@@ -1,4 +1,4 @@
-package com.example.helloworldproject.ui.dialogues.event;
+package com.example.helloworldproject.ui.dialogues.event.editing;
 
 import android.content.DialogInterface;
 import android.widget.EditText;
@@ -6,11 +6,11 @@ import android.widget.Toast;
 
 import com.example.helloworldproject.R;
 
-public class EventEditEventCapacityFrag extends AbstractEventEditPlainTextFrag {
-    public EventEditEventCapacityFrag() {
+public class EventCapacityFrag extends AbstractPlainTextFrag {
+    public EventCapacityFrag() {
         super(
             "Event Capacity",
-            R.layout.event_edit_num_frag,
+            R.layout.frag_event_edit_num,
             R.id.edit_num_input,
             "capacity number"
         );

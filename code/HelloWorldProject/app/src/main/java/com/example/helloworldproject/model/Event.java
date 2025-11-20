@@ -1,6 +1,14 @@
 package com.example.helloworldproject.model;
 
+import android.graphics.Bitmap;
+
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+
+import com.example.helloworldproject.BR;
+import com.example.helloworldproject.util.QRCodeUtils;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.Exclude;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -8,12 +16,18 @@ import java.util.Locale;
 /**
  * Event model displayed in details screen.
  */
-public class Event {
+public class Event extends BaseObservable {
     public static final SimpleDateFormat DATE_FORMATTER =
         new SimpleDateFormat("MMM. dd, yyyy", Locale.ENGLISH);
 
+    public static String formatDate(Timestamp ts) {
+        if (ts == null) return "NULL";
+        return DATE_FORMATTER.format(ts.toDate());
+    }
+
     private String id;
     private Timestamp createdAt;
+    private String creator;
     private String title;
     private String description;
     private String venue;
@@ -30,8 +44,7 @@ public class Event {
     private Boolean geoRequired;       // true/false
     private Integer plannedSampleSize; // e.g., 20
 
-    public Event() {
-    }
+    public Event() {  }
 
     public String getId() {
         return id;
@@ -41,36 +54,90 @@ public class Event {
         return createdAt;
     }
 
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * Get the real-time status of the event based on current time.
+     * @return the EventStatus enum representing the current status
+     */
+    @Exclude
+    public EventStatus getRealTimeStatus() {
+        Timestamp now = Timestamp.now();
+        if (now.compareTo(getRegistrationOpenAt()) < 0) {
+            return EventStatus.NOT_OPEN;
+        } else if (
+            now.compareTo(getRegistrationOpenAt()) >= 0
+                && now.compareTo(getRegistrationCloseAt()) < 0
+        ) {
+            return EventStatus.REGISTRATION_OPEN;
+        } else if (
+            now.compareTo(getRegistrationCloseAt()) >= 0
+                && now.compareTo(getEventStartAt()) < 0
+        ) {
+            return EventStatus.REGISTRATION_CLOSED;
+        } else if (
+            now.compareTo(getEventStartAt()) >= 0
+                && now.compareTo(getEventEndAt()) < 0
+        ) {
+            return EventStatus.ONGOING;
+        } else {
+            return EventStatus.ENDED;
+        }
+    }
+
+    @Exclude
+    Bitmap qrCodeBitmap = null;
+
+    /**
+     * Get the QR code bitmap representing the event ID.
+     * @return Bitmap of the QR code
+     */
+    @Exclude
+    public Bitmap getQRCodeBitmap() {
+        if (qrCodeBitmap == null) {
+            qrCodeBitmap = QRCodeUtils.generate(id, 512);
+        }
+        return qrCodeBitmap;
+    }
+
+    @Bindable
     public String getTitle() {
         return title;
     }
 
+    @Bindable
     public String getDescription() {
         return description;
     }
 
+    @Bindable
     public String getVenue() {
         return venue;
     }
 
+    @Bindable
     public Timestamp getRegistrationOpenAt() {
         return registrationOpenAt;
     }
 
+    @Bindable
     public Timestamp getRegistrationCloseAt() {
         return registrationCloseAt;
     }
 
-
+    @Bindable
     public Timestamp getEventStartAt() {
         return eventStartAt;
     }
 
-
+    @Bindable
     public Timestamp getEventEndAt() {
         return eventEndAt;
     }
 
+    @Bindable
     public Integer getCapacity() {
         return capacity;
     }
@@ -87,10 +154,12 @@ public class Event {
         return duplicatePolicy;
     }
 
+    @Bindable
     public Boolean getGeoRequired() {
         return geoRequired;
     }
 
+    @Bindable
     public Integer getPlannedSampleSize() {
         return plannedSampleSize;
     }
@@ -103,35 +172,47 @@ public class Event {
         this.createdAt = createdAt;
     }
 
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
     public void setTitle(String title) {
         this.title = title;
+        notifyPropertyChanged(BR.title);
     }
 
     public void setDescription(String description) {
         this.description = description;
+        notifyPropertyChanged(BR.description);
     }
 
     public void setVenue(String venue) {
         this.venue = venue;
+        notifyPropertyChanged(BR.venue);
     }
 
     public void setRegistrationOpenAt(Timestamp registrationOpenAt) {
         this.registrationOpenAt = registrationOpenAt;
+        notifyPropertyChanged(BR.registrationOpenAt);
     }
 
     public void setRegistrationCloseAt(Timestamp registrationCloseAt) {
         this.registrationCloseAt = registrationCloseAt;
+        notifyPropertyChanged(BR.registrationCloseAt);
     }
 
     public void setEventStartAt(Timestamp eventStartAt) {
         this.eventStartAt = eventStartAt;
+        notifyPropertyChanged(BR.eventStartAt);
     }
     public void setEventEndAt(Timestamp eventEndAt) {
         this.eventEndAt = eventEndAt;
+        notifyPropertyChanged(BR.eventEndAt);
     }
 
     public void setCapacity(Integer capacity) {
         this.capacity = capacity;
+        notifyPropertyChanged(BR.capacity);
     }
 
     public void setSelectionMethod(String selectionMethod) {
@@ -148,9 +229,11 @@ public class Event {
 
     public void setGeoRequired(Boolean geoRequired) {
         this.geoRequired = geoRequired;
+        notifyPropertyChanged(BR.geoRequired);
     }
 
     public void setPlannedSampleSize(Integer plannedSampleSize) {
         this.plannedSampleSize = plannedSampleSize;
+        notifyPropertyChanged(BR.plannedSampleSize);
     }
 }

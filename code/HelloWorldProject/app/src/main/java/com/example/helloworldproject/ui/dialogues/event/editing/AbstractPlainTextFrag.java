@@ -1,4 +1,4 @@
-package com.example.helloworldproject.ui.dialogues.event;
+package com.example.helloworldproject.ui.dialogues.event.editing;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -12,7 +12,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public abstract class AbstractEventEditPlainTextFrag extends AbstractEventEditFrag {
+public abstract class AbstractPlainTextFrag extends AbstractEditFrag {
     @LayoutRes
     private final int resId;
 
@@ -21,7 +21,7 @@ public abstract class AbstractEventEditPlainTextFrag extends AbstractEventEditFr
 
     private final String hint;
 
-    public AbstractEventEditPlainTextFrag(
+    public AbstractPlainTextFrag(
         String dialogTitle,
         @LayoutRes int resId,
         @IdRes int viewId,

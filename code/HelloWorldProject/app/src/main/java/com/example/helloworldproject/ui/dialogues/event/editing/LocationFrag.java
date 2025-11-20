@@ -1,4 +1,4 @@
-package com.example.helloworldproject.ui.dialogues.event;
+package com.example.helloworldproject.ui.dialogues.event.editing;
 
 import android.content.DialogInterface;
 import android.widget.EditText;
@@ -6,11 +6,11 @@ import android.widget.Toast;
 
 import com.example.helloworldproject.R;
 
-public class EventEditLocFrag extends AbstractEventEditPlainTextFrag {
-    public EventEditLocFrag() {
+public class LocationFrag extends AbstractPlainTextFrag {
+    public LocationFrag() {
         super(
             "Location",
-            R.layout.event_edit_text_frag,
+            R.layout.frag_event_edit_text,
             R.id.edit_text_input,
             "Location text"
         );

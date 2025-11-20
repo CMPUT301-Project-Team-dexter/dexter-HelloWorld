@@ -7,87 +7,129 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuProvider;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 
-import com.example.helloworldproject.ui.activities.EventEditingActivity;
-import com.example.helloworldproject.ui.utils.EventCardAdapter;
-import com.example.helloworldproject.ui.utils.EventCardView;
 import com.example.helloworldproject.R;
+import com.example.helloworldproject.data.EventRepository;
+import com.example.helloworldproject.databinding.FragHomeEventListBinding;
+import com.example.helloworldproject.model.Event;
+import com.example.helloworldproject.ui.activities.event.EventDetailActivity;
+import com.example.helloworldproject.ui.activities.event.EventEditingActivity;
+import com.example.helloworldproject.ui.activities.event.EventQRCodeScanActivity;
+import com.example.helloworldproject.ui.utils.EventCardAdapter;
 import com.example.helloworldproject.util.CurrentProfile;
+import com.example.helloworldproject.util.EventCache;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import android.widget.Toast;
-
-import com.example.helloworldproject.data.EventRepository;
-import com.example.helloworldproject.model.Event;
-
-import java.text.DateFormat;
-import java.util.Date;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HomeEventCardListFragment extends Fragment {
-    private EventRepository eventRepo;
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    ActivityResultLauncher<String> requestCamera = null;
+    FragHomeEventListBinding binding;
+    ArrayList<Event> eventListBackEnd = new ArrayList<>();
     private EventCardAdapter adapter;
-    private final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
 
-    private ListView listView;
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = DataBindingUtil.inflate(inflater, R.layout.frag_home_event_list, container, false);
+        return binding.getRoot();
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if (CurrentProfile.isEntrant()) {
+             requestCamera = requireActivity().registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (!isGranted) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Camera permission is required to scan event QR codes.",
+                            Toast.LENGTH_LONG
+                        ).show();
+                    } else {
+                        startActivity(EventQRCodeScanActivity.newIntent(requireContext()));
+                    }
+                }
+            );
+        }
 
-        // This part is to minimally associate menu/filter_menu.xml with register_history_fragment.xml.
-        // So that the menu on this page can function properly.
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.filter_menu, menu);
+                menuInflater.inflate(R.menu.home_event_list_menu, menu);
+                MenuItem qrScanItem = menu.findItem(R.id.home_scan_button);
+                qrScanItem.setVisible(!CurrentProfile.isOrganizer());
             }
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                // TODO: implement filter function later
+                if (menuItem.getItemId() == R.id.home_filter_button) {
+
+                } else if (menuItem.getItemId() == R.id.home_scan_button) {
+                    if (requestCamera == null) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Camera permission is required to scan event QR codes.",
+                            Toast.LENGTH_LONG
+                        ).show();
+                        return true;
+                    } else {
+                        requestCamera.launch(android.Manifest.permission.CAMERA);
+                    }
+                    return true;
+                }
                 return false;
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
-
-        // This part is to remove the title text in the top bar
+        // remove the title text in the top bar
         ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(true);
+            if (CurrentProfile.isOrganizer()) {
+                actionBar.setTitle("My Events");
+            } else {
+                actionBar.setTitle("Available Events");
+            }
         }
 
+        adapter = new EventCardAdapter(requireContext(), eventListBackEnd);
+        binding.eventListView.setAdapter(adapter);
+        binding.eventListView.setOnItemClickListener((parent, view1, position, id) -> {
+            Event e = adapter.getItem(position);
+            if (e != null) {
+                startActivity(EventDetailActivity.newIntent(requireActivity(), e.getId()));
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Error loading event details: event is null",
+                    Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
 
-
-        // TODO: update event list according to user group of the current logged-in user
-        // TODO: e.g. for an ORGANIZER, show the list of events that are created by the organizer
-        // ENTRANT path only for now, still need to add organizer/admin later
-        listView = view.findViewById(R.id.listview);
-        adapter = new EventCardAdapter(requireContext(), new ArrayList<>());
-        listView.setAdapter(adapter);
-        eventRepo = new EventRepository();
-        // Uncomment the dummy list for test
-        //items.add(new EventCardView("Event 1", "Archive", R.drawable.debug_card_image));
-        //items.add(new EventCardView("Event 2", "In Progress\n Archive", R.drawable.debug_card_image2));
-        //items.add(new EventCardView("Event 3", "Jover", R.drawable.debug_card_image2));
-        //items.add(new EventCardView("Event 67", "123", R.drawable.debug_card_image));
-        loadJoinableEvents();
-
-
+        refreshEventList();
 
         FloatingActionButton addEventBtn = view.findViewById(R.id.add_event_fab);
         if (CurrentProfile.isOrganizer()) {
@@ -100,54 +142,56 @@ public class HomeEventCardListFragment extends Fragment {
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.home_event_list, container, false);
-        listView = view.findViewById(R.id.listview);
-
-        return view;
+    private void updateAdapterFrom(List<Event> events) {
+        adapter.addAll(events);
+        adapter.notifyDataSetChanged();
     }
+
+    private void refreshEventList() {
+        // TODO: add a loading spinner here?
+        adapter.clear();
+        if (CurrentProfile.isOrganizer()) {
+            loadEventsForOrganizer();
+        } else {
+
+        }
+    }
+
+    /**
+     * Load events created by the current organizer and update the adapter.
+     */
+    private void loadEventsForOrganizer() {
+        String organizerName = CurrentProfile.get().getName();
+        executor.execute(() -> EventCache.syncTryGetEventsCreatedBy(
+            organizerName,
+            new EventRepository.ListCallback() {
+                @Override
+                public void onLoaded(List<Event> events) {
+                    // TODO: filter/sort events
+                    requireActivity().runOnUiThread(() -> updateAdapterFrom(events));
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    requireActivity().runOnUiThread(() -> Toast.makeText(
+                        requireContext(),
+                        "Failed to load events created by " + organizerName + ": " + e.getClass().getCanonicalName(),
+                        Toast.LENGTH_SHORT
+                    ).show());
+                }
+            }
+        ));
+    }
+
     // Below are helper functions for Entrant view
     private void loadJoinableEvents() {
-        eventRepo.loadJoinableEvents(new EventRepository.ListCallback() {
-            @Override public void onLoaded(List<Event> events) {
-                updateAdapterFrom(events);
-            }
-            @Override public void onError(Exception e) {
-                Toast.makeText(requireContext(), "Failed to load events: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+//        EventRepository.INSTANCE.loadJoinableEvents(new EventRepository.ListCallback() {
+//            @Override public void onLoaded(List<Event> events) {
+//                updateAdapterFrom(events);
+//            }
+//            @Override public void onError(Exception e) {
+//                Toast.makeText(requireContext(), "Failed to load events: " + e.getMessage(), Toast.LENGTH_LONG).show();
+//            }
+//        });
     }
-
-    private void updateAdapterFrom(List<Event> events) {
-        List<EventCardView> items = new ArrayList<>();
-        if (events != null) {
-            for (Event e : events) {
-                String title = safe(e.getTitle());
-                String status = computeStatus(e);   // “Upcoming / Open / Closed” with dates
-                int img = R.drawable.debug_card_image; // placeholder poster for now
-                items.add(new EventCardView(title, status, img));
-            }
-        }
-        adapter = new EventCardAdapter(requireContext(), items);
-        listView.setAdapter(adapter);
-    }
-
-    private String computeStatus(Event e) {
-        if (e.getRegistrationOpenAt() == null || e.getRegistrationCloseAt() == null) return "";
-        long now = System.currentTimeMillis();
-        long open = e.getRegistrationOpenAt().toDate().getTime();
-        long close = e.getRegistrationCloseAt().toDate().getTime();
-
-        if (now < open) {
-            return "Upcoming\nOpens " + df.format(new Date(open));
-        } else if (now >= open && now < close) {
-            return "Open\nCloses " + df.format(new Date(close));
-        } else {
-            return "Closed\nEnded " + df.format(new Date(close));
-        }
-    }
-
-    private static String safe(String s) { return s == null ? "" : s; }
-
 }

@@ -16,8 +16,8 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 
-import com.example.helloworldproject.ui.utils.EventItemAdapter;
 import com.example.helloworldproject.R;
+import com.example.helloworldproject.ui.utils.EventItemAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class AllEventsFragment extends Fragment {
         }
 
 
-        listView = view.findViewById(R.id.listview);
+        listView = view.findViewById(R.id.event_list_view);
         ArrayList<String> userNames = new ArrayList<>();
         userNames.add("AlphaBravo");
         userNames.add("TestName2");
@@ -78,7 +78,7 @@ public class AllEventsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.filter_menu_list_base, container, false);
-        listView = view.findViewById(R.id.listview);
+        listView = view.findViewById(R.id.event_list_view);
 
         return view;
     }
