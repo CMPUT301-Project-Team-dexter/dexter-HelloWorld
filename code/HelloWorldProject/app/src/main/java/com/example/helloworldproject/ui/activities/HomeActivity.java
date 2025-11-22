@@ -14,6 +14,7 @@ import com.example.helloworldproject.ui.fragments.AccountFragment;
 import com.example.helloworldproject.ui.fragments.AllEventsFragment;
 import com.example.helloworldproject.ui.fragments.HomeEventCardListFragment;
 import com.example.helloworldproject.util.CurrentProfile;
+import com.example.helloworldproject.ui.activities.LoginActivity;
 import com.google.android.material.snackbar.Snackbar;
 
 public class HomeActivity extends AppCompatActivity {
@@ -26,7 +27,12 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        if (!CurrentProfile.isInitialized()) {
+            startActivity(LoginActivity.newIntent(this));
+            finish();
+            return;
+        }
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
 
         Profile currentUser = CurrentProfile.get();
