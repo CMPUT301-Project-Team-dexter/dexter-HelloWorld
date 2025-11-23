@@ -152,8 +152,10 @@ public class HomeEventCardListFragment extends Fragment {
         adapter.clear();
         if (CurrentProfile.isOrganizer()) {
             loadEventsForOrganizer();
+        } else if (CurrentProfile.isEntrant()) {
+            loadJoinableEvents();
         } else {
-
+            loadEventsForAdmin();
         }
     }
 
@@ -184,14 +186,52 @@ public class HomeEventCardListFragment extends Fragment {
     }
 
     // Below are helper functions for Entrant view
+// Below are helper functions for Entrant view
     private void loadJoinableEvents() {
-//        EventRepository.INSTANCE.loadJoinableEvents(new EventRepository.ListCallback() {
-//            @Override public void onLoaded(List<Event> events) {
-//                updateAdapterFrom(events);
-//            }
-//            @Override public void onError(Exception e) {
-//                Toast.makeText(requireContext(), "Failed to load events: " + e.getMessage(), Toast.LENGTH_LONG).show();
-//            }
-//        });
+        EventRepository.INSTANCE.loadJoinableEvents(new EventRepository.ListCallback() {
+            @Override
+            public void onLoaded(List<Event> events) {
+                // We are already on main thread because of Firestore listeners,
+                // but using runOnUiThread keeps it safe if that ever changes.
+                requireActivity().runOnUiThread(() -> updateAdapterFrom(events));
+            }
+
+            @Override
+            public void onError(Exception e) {
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(
+                                requireContext(),
+                                "Failed to load events: " + e.getMessage(),
+                                Toast.LENGTH_LONG
+                        ).show()
+                );
+            }
+        });
     }
+
+    private void loadEventsForAdmin() {
+        // Admin should see ALL events in the system
+        EventRepository repo = EventRepository.INSTANCE; // or new EventRepository() if you don't use INSTANCE
+
+        repo.loadAllEvents(new EventRepository.ListCallback() {
+            @Override
+            public void onLoaded(List<Event> events) {
+                // Keep UI updates on main thread
+                requireActivity().runOnUiThread(() -> updateAdapterFrom(events));
+            }
+
+            @Override
+            public void onError(Exception e) {
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(
+                                requireContext(),
+                                "Failed to load events: " + e.getMessage(),
+                                Toast.LENGTH_LONG
+                        ).show()
+                );
+            }
+        });
+    }
+
+
 }
