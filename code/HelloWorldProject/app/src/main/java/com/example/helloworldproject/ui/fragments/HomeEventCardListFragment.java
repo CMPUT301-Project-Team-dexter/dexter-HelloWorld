@@ -48,11 +48,10 @@ public class HomeEventCardListFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         if (CurrentProfile.isEntrant()) {
-             requestCamera = requireActivity().registerForActivityResult(
+            requestCamera = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> {
                     if (!isGranted) {
@@ -67,6 +66,11 @@ public class HomeEventCardListFragment extends Fragment {
                 }
             );
         }
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
@@ -150,7 +154,7 @@ public class HomeEventCardListFragment extends Fragment {
         if (CurrentProfile.isOrganizer()) {
             loadEventsForOrganizer();
         } else {
-
+            loadJoinableEvents();
         }
     }
 
@@ -182,13 +186,18 @@ public class HomeEventCardListFragment extends Fragment {
 
     // Below are helper functions for Entrant view
     private void loadJoinableEvents() {
-//        EventRepository.INSTANCE.loadJoinableEvents(new EventRepository.ListCallback() {
-//            @Override public void onLoaded(List<Event> events) {
-//                updateAdapterFrom(events);
-//            }
-//            @Override public void onError(Exception e) {
-//                Toast.makeText(requireContext(), "Failed to load events: " + e.getMessage(), Toast.LENGTH_LONG).show();
-//            }
-//        });
+        EventRepository.INSTANCE.loadJoinableEvents(new EventRepository.ListCallback() {
+            @Override public void onLoaded(List<Event> events) {
+                requireActivity().runOnUiThread(() -> updateAdapterFrom(events));
+            }
+
+            @Override public void onError(Exception e) {
+                requireActivity().runOnUiThread(() -> Toast.makeText(
+                    requireContext(),
+                    "Failed to load events: " + e.getMessage(),
+                    Toast.LENGTH_LONG
+                ).show());
+            }
+        });
     }
 }
