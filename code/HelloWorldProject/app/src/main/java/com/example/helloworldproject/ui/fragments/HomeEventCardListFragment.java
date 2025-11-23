@@ -34,8 +34,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HomeEventCardListFragment extends Fragment {
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     ActivityResultLauncher<String> requestCamera = null;
     FragHomeEventListBinding binding;
     ArrayList<Event> eventListBackEnd = new ArrayList<>();
@@ -163,25 +166,25 @@ public class HomeEventCardListFragment extends Fragment {
      */
     private void loadEventsForOrganizer() {
         String organizerName = CurrentProfile.get().getName();
-        EventCache.asyncTryGetEventsCreatedBy(
+        executor.execute(() -> EventCache.syncTryGetEventsCreatedBy(
             organizerName,
             new EventRepository.ListCallback() {
                 @Override
                 public void onLoaded(List<Event> events) {
                     // TODO: filter/sort events
-                    updateAdapterFrom(events);
+                    requireActivity().runOnUiThread(() -> updateAdapterFrom(events));
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    Toast.makeText(
+                    requireActivity().runOnUiThread(() -> Toast.makeText(
                         requireContext(),
                         "Failed to load events created by " + organizerName + ": " + e.getClass().getCanonicalName(),
                         Toast.LENGTH_SHORT
-                    ).show();
+                    ).show());
                 }
             }
-        );
+        ));
     }
 
     // Below are helper functions for Entrant view
