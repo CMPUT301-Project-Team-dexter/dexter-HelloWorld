@@ -65,22 +65,15 @@ public class EventDetailActivity extends AppCompatActivity {
                     ).show();
                     finish();
                 }
-                binding.setEventModel(eventPseudoArr[0]);
-                if (CurrentProfile.isOrganizer()) {
-                    binding.evtDtlOrgEditBtn.setOnClickListener(v -> {
-                        startActivity(EventEditingActivity.newIntent(this, givenEventId));
-                    });
-                    binding.evtDtlOrgEditBtn.setVisibility(View.VISIBLE);
-                    setupOrganizerLottery(eventPseudoArr[0]);
-                } else if (CurrentProfile.isAdmin()) {
-                    binding.evtDtlAdminDeleteBtn.setOnClickListener(v -> {
-                        // TODO: implement admin delete functionality
-                    });
-                    binding.evtDtlAdminDeleteBtn.setVisibility(View.VISIBLE);
-                } else {
-                    renderLotteryGuidelines(eventPseudoArr[0]);
-                    setupEntrantButtons(eventPseudoArr[0]);
-                    observeInviteStatus();
+
+                @Override
+                public void onError(Exception e) {
+                    Toast.makeText(
+                        EventDetailActivity.this,
+                        "Exception occurs when loading event " + givenEventId + ": " + e.getClass().getCanonicalName(),
+                        Toast.LENGTH_SHORT
+                    ).show();
+                    finish();
                 }
             }
         );
@@ -108,7 +101,9 @@ public class EventDetailActivity extends AppCompatActivity {
             });
             binding.evtDtlAdminDeleteBtn.setVisibility(View.VISIBLE);
         } else {
-            // TODO: show buttons under different circumstances
+            renderLotteryGuidelines(e);
+            setupEntrantButtons(e);
+            observeInviteStatus();
         }
     }
 
