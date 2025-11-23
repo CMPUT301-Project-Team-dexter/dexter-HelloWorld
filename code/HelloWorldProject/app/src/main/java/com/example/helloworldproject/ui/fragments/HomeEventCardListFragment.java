@@ -79,16 +79,19 @@ public class HomeEventCardListFragment extends Fragment {
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menuInflater.inflate(R.menu.home_event_list_menu, menu);
                 MenuItem qrScanItem = menu.findItem(R.id.home_scan_button);
-                qrScanItem.setVisible(!CurrentProfile.isOrganizer());
+                // Only entrant can see the scan button
+                qrScanItem.setVisible(CurrentProfile.isEntrant());
             }
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 // TODO: implement filter function later
                 if (menuItem.getItemId() == R.id.home_filter_button) {
-
+                    // filter not implemented yet
+                    return true;
                 } else if (menuItem.getItemId() == R.id.home_scan_button) {
                     if (requestCamera == null) {
+                        // This should only happen for non-entrants
                         Toast.makeText(
                             requireContext(),
                             "Camera permission is required to scan event QR codes.",
@@ -97,14 +100,14 @@ public class HomeEventCardListFragment extends Fragment {
                         return true;
                     } else {
                         requestCamera.launch(android.Manifest.permission.CAMERA);
+                        return true;
                     }
-                    return true;
                 }
                 return false;
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
-        // remove the title text in the top bar
+        // Top bar title
         ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(true);
@@ -135,9 +138,9 @@ public class HomeEventCardListFragment extends Fragment {
         FloatingActionButton addEventBtn = view.findViewById(R.id.add_event_fab);
         if (CurrentProfile.isOrganizer()) {
             addEventBtn.setVisibility(View.VISIBLE);
-            addEventBtn.setOnClickListener(v -> {
-                startActivity(EventEditingActivity.newIntent(getContext(), null));
-            });
+            addEventBtn.setOnClickListener(v ->
+                startActivity(EventEditingActivity.newIntent(getContext(), null))
+            );
         } else {
             addEventBtn.setVisibility(View.GONE);
         }
@@ -153,8 +156,11 @@ public class HomeEventCardListFragment extends Fragment {
         adapter.clear();
         if (CurrentProfile.isOrganizer()) {
             loadEventsForOrganizer();
-        } else {
+        } else if (CurrentProfile.isEntrant()) {
             loadJoinableEvents();
+        } else {
+            // admin (or fallback)
+            loadEventsForAdmin();
         }
     }
 
@@ -184,20 +190,45 @@ public class HomeEventCardListFragment extends Fragment {
         );
     }
 
-    // Below are helper functions for Entrant view
+    // Entrant view: only joinable events
     private void loadJoinableEvents() {
-        EventRepository.INSTANCE.loadJoinableEvents(new EventRepository.ListCallback() {
-            @Override public void onLoaded(List<Event> events) {
-                requireActivity().runOnUiThread(() -> updateAdapterFrom(events));
-            }
+        EventRepository.INSTANCE.loadJoinableEvents(
+            new EventRepository.ListCallback() {
+                @Override
+                public void onLoaded(List<Event> events) {
+                    updateAdapterFrom(events);
+                }
 
-            @Override public void onError(Exception e) {
-                requireActivity().runOnUiThread(() -> Toast.makeText(
-                    requireContext(),
-                    "Failed to load events: " + e.getMessage(),
-                    Toast.LENGTH_LONG
-                ).show());
+                @Override
+                public void onError(Exception e) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed to load events: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                    ).show();
+                }
             }
-        });
+        );
+    }
+
+    // Admin view: all events
+    private void loadEventsForAdmin() {
+        EventRepository.INSTANCE.loadAllEvents(
+            new EventRepository.ListCallback() {
+                @Override
+                public void onLoaded(List<Event> events) {
+                    updateAdapterFrom(events);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed to load events: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                    ).show();
+                }
+            }
+        );
     }
 }

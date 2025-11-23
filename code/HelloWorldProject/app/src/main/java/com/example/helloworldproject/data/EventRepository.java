@@ -168,4 +168,26 @@ public class EventRepository {
                 })
                 .addOnFailureListener(cb::onError);
     }
+
+    public void loadAllEvents(final ListCallback cb) {
+        db.collection("events")
+                .get()
+                .addOnSuccessListener(snap -> {
+                    List<Event> out = new ArrayList<>();
+                    for (QueryDocumentSnapshot d : snap) {
+                        if (d != null) {
+                            Event e = d.toObject(Event.class);
+                            e.setId(d.getId());
+                            out.add(e);
+                        }
+                    }
+
+                    // Optional: sort by registrationCloseAt ascending (soonest deadlines first)
+                    out.sort(Comparator.comparing(Event::getRegistrationCloseAt,
+                            Comparator.nullsLast(Timestamp::compareTo)));
+
+                    cb.onLoaded(out);
+                })
+                .addOnFailureListener(cb::onError);
+    }
 }

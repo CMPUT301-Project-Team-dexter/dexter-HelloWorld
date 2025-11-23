@@ -1,4 +1,11 @@
 package com.example.helloworldproject.ui.fragments;
+import android.widget.Toast;
+
+import com.example.helloworldproject.data.EventRepository;
+import com.example.helloworldproject.model.Event;
+
+import java.util.List;
+
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -54,25 +61,77 @@ public class AllEventsFragment extends Fragment {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
+         // Dummy data
+        //listView = view.findViewById(R.id.event_list_view);
+        //ArrayList<String> userNames = new ArrayList<>();
+        //userNames.add("AlphaBravo");
+        //userNames.add("TestName2");
+        //userNames.add("Chill");
+        //ArrayList<String> userIds = new ArrayList<>();
+        //userIds.add("id1");
+        //userIds.add("id2");
+        //userIds.add("id3");
+        //ArrayList<String> eventNames = new ArrayList<>();
+        //eventNames.add("Carnival");
+        //eventNames.add("Delusion");
+        //eventNames.add("All Saints Day");
+        //EventItemAdapter adapter = new EventItemAdapter(requireContext(), userNames, userIds, eventNames);
+        //listView.setAdapter(adapter);
 
         listView = view.findViewById(R.id.event_list_view);
+
+// Backing lists for the adapter
         ArrayList<String> userNames = new ArrayList<>();
-        userNames.add("AlphaBravo");
-        userNames.add("TestName2");
-        userNames.add("Chill");
-
         ArrayList<String> userIds = new ArrayList<>();
-        userIds.add("id1");
-        userIds.add("id2");
-        userIds.add("id3");
-
         ArrayList<String> eventNames = new ArrayList<>();
-        eventNames.add("Carnival");
-        eventNames.add("Delusion");
-        eventNames.add("All Saints Day");
 
-        EventItemAdapter adapter = new EventItemAdapter(requireContext(), userNames, userIds, eventNames);
+// Hook up adapter first (empty list to start)
+        EventItemAdapter adapter = new EventItemAdapter(
+                requireContext(),
+                userNames,
+                userIds,
+                eventNames
+        );
         listView.setAdapter(adapter);
+
+// Use the repository method we just added
+        EventRepository repo = EventRepository.INSTANCE; // or new EventRepository()
+
+        repo.loadAllEvents(new EventRepository.ListCallback() {
+            @Override
+            public void onLoaded(List<Event> events) {
+                // Clear old data and repopulate
+                userNames.clear();
+                userIds.clear();
+                eventNames.clear();
+
+                for (Event e : events) {
+                    // Map Event -> row fields:
+                    // eventName  = title (main label)
+                    // userName   = venue
+                    // userId     = event id
+                    String title = e.getTitle() != null ? e.getTitle() : "(Untitled event)";
+                    String venue = e.getVenue() != null ? e.getVenue() : "No venue";
+                    String id    = e.getId()    != null ? e.getId()    : "";
+
+                    userNames.add(venue);
+                    userIds.add(id);
+                    eventNames.add(title);
+                }
+
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(
+                        requireContext(),
+                        "Failed to load events: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                ).show();
+            }
+        });
+
     }
 
     @Override
