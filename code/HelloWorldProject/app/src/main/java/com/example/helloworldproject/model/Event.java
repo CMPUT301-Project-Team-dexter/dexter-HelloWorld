@@ -65,27 +65,37 @@ public class Event extends BaseObservable {
     @Exclude
     public EventStatus getRealTimeStatus() {
         Timestamp now = Timestamp.now();
-        if (now.compareTo(getRegistrationOpenAt()) < 0) {
+
+        Timestamp registrationOpenAt = getRegistrationOpenAt();
+        Timestamp registrationCloseAt = getRegistrationCloseAt();
+        Timestamp eventStartAt = getEventStartAt();
+        Timestamp eventEndAt = getEventEndAt();
+
+        // 🔒 Null-safety for older / incomplete events:
+        // If any of the key timestamps are missing, don't try to compare them.
+        // Just fall back to a safe default so the UI can still render.
+        if (registrationOpenAt == null ||
+                registrationCloseAt == null ||
+                eventStartAt == null ||
+                eventEndAt == null) {
+
+            // You can choose any default you like. Using NOT_OPEN is safe for admin views.
             return EventStatus.NOT_OPEN;
-        } else if (
-            now.compareTo(getRegistrationOpenAt()) >= 0
-                && now.compareTo(getRegistrationCloseAt()) < 0
-        ) {
+        }
+
+        if (now.compareTo(registrationOpenAt) < 0) {
+            return EventStatus.NOT_OPEN;
+        } else if (now.compareTo(registrationCloseAt) <= 0) {
             return EventStatus.REGISTRATION_OPEN;
-        } else if (
-            now.compareTo(getRegistrationCloseAt()) >= 0
-                && now.compareTo(getEventStartAt()) < 0
-        ) {
+        } else if (now.compareTo(eventStartAt) < 0) {
             return EventStatus.REGISTRATION_CLOSED;
-        } else if (
-            now.compareTo(getEventStartAt()) >= 0
-                && now.compareTo(getEventEndAt()) < 0
-        ) {
+        } else if (now.compareTo(eventEndAt) <= 0) {
             return EventStatus.ONGOING;
         } else {
             return EventStatus.ENDED;
         }
     }
+
 
     @Exclude
     Bitmap qrCodeBitmap = null;

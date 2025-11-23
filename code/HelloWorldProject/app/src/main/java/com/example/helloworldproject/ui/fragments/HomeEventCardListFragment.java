@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuProvider;
@@ -38,14 +39,42 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class HomeEventCardListFragment extends Fragment {
+
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    ActivityResultLauncher<String> requestCamera = null;
-    FragHomeEventListBinding binding;
-    ArrayList<Event> eventListBackEnd = new ArrayList<>();
+
+    private ActivityResultLauncher<String> requestCamera = null;
+    private FragHomeEventListBinding binding;
+    private final ArrayList<Event> eventListBackEnd = new ArrayList<>();
     private EventCardAdapter adapter;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Register ActivityResultLauncher on the Fragment itself, before STARTED state
+        if (CurrentProfile.isEntrant()) {
+            requestCamera = registerForActivityResult(
+                    new ActivityResultContracts.RequestPermission(),
+                    isGranted -> {
+                        if (!isGranted) {
+                            Toast.makeText(
+                                    requireContext(),
+                                    "Camera permission is required to scan event QR codes.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        } else {
+                            // Permission granted → open scanner
+                            startActivity(EventQRCodeScanActivity.newIntent(requireContext()));
+                        }
+                    }
+            );
+        }
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.frag_home_event_list, container, false);
         return binding.getRoot();
     }
@@ -54,30 +83,15 @@ public class HomeEventCardListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (CurrentProfile.isEntrant()) {
-             requestCamera = requireActivity().registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                isGranted -> {
-                    if (!isGranted) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Camera permission is required to scan event QR codes.",
-                            Toast.LENGTH_LONG
-                        ).show();
-                    } else {
-                        startActivity(EventQRCodeScanActivity.newIntent(requireContext()));
-                    }
-                }
-            );
-        }
-
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menuInflater.inflate(R.menu.home_event_list_menu, menu);
                 MenuItem qrScanItem = menu.findItem(R.id.home_scan_button);
+                // Hide scan for organizers; entrants (and possibly admins) can see it
                 qrScanItem.setVisible(!CurrentProfile.isOrganizer());
             }
 
@@ -85,25 +99,27 @@ public class HomeEventCardListFragment extends Fragment {
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 // TODO: implement filter function later
                 if (menuItem.getItemId() == R.id.home_filter_button) {
-
+                    // filter not implemented yet
+                    return true;
                 } else if (menuItem.getItemId() == R.id.home_scan_button) {
                     if (requestCamera == null) {
+                        // This should only happen for non-entrants
                         Toast.makeText(
-                            requireContext(),
-                            "Camera permission is required to scan event QR codes.",
-                            Toast.LENGTH_LONG
+                                requireContext(),
+                                "QR scanner is only available for entrants.",
+                                Toast.LENGTH_LONG
                         ).show();
                         return true;
                     } else {
                         requestCamera.launch(android.Manifest.permission.CAMERA);
+                        return true;
                     }
-                    return true;
                 }
                 return false;
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
-        // remove the title text in the top bar
+        // Top bar title
         ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(true);
@@ -122,9 +138,9 @@ public class HomeEventCardListFragment extends Fragment {
                 startActivity(EventDetailActivity.newIntent(requireActivity(), e.getId()));
             } else {
                 Toast.makeText(
-                    requireContext(),
-                    "Error loading event details: event is null",
-                    Toast.LENGTH_SHORT
+                        requireContext(),
+                        "Error loading event details: event is null",
+                        Toast.LENGTH_SHORT
                 ).show();
             }
         });
@@ -134,9 +150,9 @@ public class HomeEventCardListFragment extends Fragment {
         FloatingActionButton addEventBtn = view.findViewById(R.id.add_event_fab);
         if (CurrentProfile.isOrganizer()) {
             addEventBtn.setVisibility(View.VISIBLE);
-            addEventBtn.setOnClickListener(v -> {
-                startActivity(EventEditingActivity.newIntent(getContext(), null));
-            });
+            addEventBtn.setOnClickListener(v ->
+                    startActivity(EventEditingActivity.newIntent(getContext(), null))
+            );
         } else {
             addEventBtn.setVisibility(View.GONE);
         }
@@ -148,13 +164,14 @@ public class HomeEventCardListFragment extends Fragment {
     }
 
     private void refreshEventList() {
-        // TODO: add a loading spinner here?
         adapter.clear();
+
         if (CurrentProfile.isOrganizer()) {
             loadEventsForOrganizer();
         } else if (CurrentProfile.isEntrant()) {
             loadJoinableEvents();
         } else {
+            // admin (or fallback)
             loadEventsForAdmin();
         }
     }
@@ -165,34 +182,33 @@ public class HomeEventCardListFragment extends Fragment {
     private void loadEventsForOrganizer() {
         String organizerName = CurrentProfile.get().getName();
         executor.execute(() -> EventCache.syncTryGetEventsCreatedBy(
-            organizerName,
-            new EventRepository.ListCallback() {
-                @Override
-                public void onLoaded(List<Event> events) {
-                    // TODO: filter/sort events
-                    requireActivity().runOnUiThread(() -> updateAdapterFrom(events));
-                }
+                organizerName,
+                new EventRepository.ListCallback() {
+                    @Override
+                    public void onLoaded(List<Event> events) {
+                        requireActivity().runOnUiThread(() -> updateAdapterFrom(events));
+                    }
 
-                @Override
-                public void onError(Exception e) {
-                    requireActivity().runOnUiThread(() -> Toast.makeText(
-                        requireContext(),
-                        "Failed to load events created by " + organizerName + ": " + e.getClass().getCanonicalName(),
-                        Toast.LENGTH_SHORT
-                    ).show());
+                    @Override
+                    public void onError(Exception e) {
+                        requireActivity().runOnUiThread(() ->
+                                Toast.makeText(
+                                        requireContext(),
+                                        "Failed to load events created by " + organizerName + ": " +
+                                                e.getClass().getCanonicalName(),
+                                        Toast.LENGTH_SHORT
+                                ).show()
+                        );
+                    }
                 }
-            }
         ));
     }
 
-    // Below are helper functions for Entrant view
-// Below are helper functions for Entrant view
+    // Entrant view: only joinable events
     private void loadJoinableEvents() {
         EventRepository.INSTANCE.loadJoinableEvents(new EventRepository.ListCallback() {
             @Override
             public void onLoaded(List<Event> events) {
-                // We are already on main thread because of Firestore listeners,
-                // but using runOnUiThread keeps it safe if that ever changes.
                 requireActivity().runOnUiThread(() -> updateAdapterFrom(events));
             }
 
@@ -209,14 +225,13 @@ public class HomeEventCardListFragment extends Fragment {
         });
     }
 
+    // Admin view: all events
     private void loadEventsForAdmin() {
-        // Admin should see ALL events in the system
-        EventRepository repo = EventRepository.INSTANCE; // or new EventRepository() if you don't use INSTANCE
+        EventRepository repo = EventRepository.INSTANCE;
 
         repo.loadAllEvents(new EventRepository.ListCallback() {
             @Override
             public void onLoaded(List<Event> events) {
-                // Keep UI updates on main thread
                 requireActivity().runOnUiThread(() -> updateAdapterFrom(events));
             }
 
@@ -232,6 +247,4 @@ public class HomeEventCardListFragment extends Fragment {
             }
         });
     }
-
-
 }
