@@ -26,7 +26,12 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        if (!CurrentProfile.isInitialized()) {
+            startActivity(LoginActivity.newIntent(this));
+            finish();
+            return;
+        }
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
 
         Profile currentUser = CurrentProfile.get();
