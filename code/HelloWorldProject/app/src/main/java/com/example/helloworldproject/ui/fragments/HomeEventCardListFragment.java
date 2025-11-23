@@ -36,7 +36,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeEventCardListFragment extends Fragment {
-    ActivityResultLauncher<String> requestCamera = null;
+    // app was crashing earlier when clicking on the "Home" button in the bottom nav bar
+    private final ActivityResultLauncher<String> requestCamera = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                if (!isGranted) {
+                    Toast.makeText(
+                            requireContext(),
+                            "Camera permission is required to scan event QR codes.",
+                            Toast.LENGTH_LONG
+                    ).show();
+                } else {
+                    startActivity(EventQRCodeScanActivity.newIntent(requireContext()));
+                }
+            }
+    );
+
     FragHomeEventListBinding binding;
     ArrayList<Event> eventListBackEnd = new ArrayList<>();
     private EventCardAdapter adapter;
@@ -50,23 +65,6 @@ public class HomeEventCardListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        if (CurrentProfile.isEntrant()) {
-             requestCamera = requireActivity().registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                isGranted -> {
-                    if (!isGranted) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Camera permission is required to scan event QR codes.",
-                            Toast.LENGTH_LONG
-                        ).show();
-                    } else {
-                        startActivity(EventQRCodeScanActivity.newIntent(requireContext()));
-                    }
-                }
-            );
-        }
 
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
@@ -82,18 +80,11 @@ public class HomeEventCardListFragment extends Fragment {
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 // TODO: implement filter function later
                 if (menuItem.getItemId() == R.id.home_filter_button) {
-
+                    // added a placeholder just so we know the filter button is registering being clicked
+                    Toast.makeText(requireContext(),
+                            "Filter button clicked", Toast.LENGTH_SHORT).show();
                 } else if (menuItem.getItemId() == R.id.home_scan_button) {
-                    if (requestCamera == null) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Camera permission is required to scan event QR codes.",
-                            Toast.LENGTH_LONG
-                        ).show();
-                        return true;
-                    } else {
-                        requestCamera.launch(android.Manifest.permission.CAMERA);
-                    }
+                    requestCamera.launch(android.Manifest.permission.CAMERA);
                     return true;
                 }
                 return false;
