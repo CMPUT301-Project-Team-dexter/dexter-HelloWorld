@@ -10,10 +10,6 @@ public class CurrentProfile {
 
     private static Profile currentUser = null;
 
-    public static boolean isInitialized() {
-        return currentUser != null;
-    }
-
     public static void init(@NonNull Profile p) {
         currentUser = p;
     }
