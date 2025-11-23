@@ -31,11 +31,8 @@ import com.example.helloworldproject.util.EventCache;
 import com.google.firebase.Timestamp;
 
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class EventEditingActivity extends AppCompatActivity implements EventEditListener {
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final String KEY_EVENT_ID = "key_event_id";
 
     public static Intent newIntent(Context context, @Nullable String eventId) {
@@ -45,148 +42,147 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
     }
 
     ActivityEventEditingBinding binding;
+    String givenEventId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_event_editing);
         setSupportActionBar(binding.evtEdToolbar);
-        executor.execute(() -> {
-            String givenEventId = getIntent().getStringExtra(KEY_EVENT_ID);
-            final Event[] eventPseudoArr = new Event[] { null };
-            // givenEventId being null means that we are creating new event
-            if (givenEventId != null) {
-                EventCache.syncTryGetSingle(
-                    givenEventId,
-                    new EventRepository.LoadCallback() {
-                        @Override
-                        public void onLoaded(Event e) {
-                            eventPseudoArr[0] = e;
-                        }
-
-                        @Override
-                        public void onNotFound() {
-                            runOnUiThread(() -> Toast.makeText(
-                                EventEditingActivity.this,
-                                "Event with ID " + givenEventId + " not found.",
-                                Toast.LENGTH_SHORT
-                            ).show());
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            runOnUiThread(() -> Toast.makeText(
-                                EventEditingActivity.this,
-                                "Exception occurs when loading event " + givenEventId + ": " + e.getClass().getCanonicalName(),
-                                Toast.LENGTH_SHORT
-                            ).show());
-                        }
+        givenEventId = getIntent().getStringExtra(KEY_EVENT_ID);
+        // givenEventId being null means that we are creating new event
+        if (givenEventId != null) {
+            EventCache.asyncTryGetSingle(
+                givenEventId,
+                new EventRepository.LoadCallback() {
+                    @Override
+                    public void onLoaded(Event e) {
+                        onCreateContinued(e);
                     }
-                );
-            } else {
-                eventPseudoArr[0] = CurrentProfile.get().createBlankEvent();
-            }
-            runOnUiThread(() -> {
-                if (eventPseudoArr[0] == null) {
-                    Toast.makeText(
-                        this,
-                        "Event " + givenEventId + " is null",
-                        Toast.LENGTH_SHORT
-                    ).show();
-                    finish();
-                    return;
+
+                    @Override
+                    public void onNotFound() {
+                        runOnUiThread(() -> Toast.makeText(
+                            EventEditingActivity.this,
+                            "Event with ID " + givenEventId + " not found.",
+                            Toast.LENGTH_SHORT
+                        ).show());
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        runOnUiThread(() -> Toast.makeText(
+                            EventEditingActivity.this,
+                            "Exception occurs when loading event " + givenEventId + ": " + e.getClass().getCanonicalName(),
+                            Toast.LENGTH_SHORT
+                        ).show());
+                    }
                 }
-                binding.setEventModel(eventPseudoArr[0]);
-                // region Title
-                if (givenEventId == null) {
-                    binding.getEventModel().setTitle("Tap to edit title...");
-                }
-                binding.evtEdTitleView.setOnClickListener(
-                    v -> new TitleFrag().show(
-                        getSupportFragmentManager(), "EditTitle"
-                    )
-                );
-                // endregion
-                // region Location
-                if (givenEventId == null) {
-                    binding.getEventModel().setVenue("N/A");
-                }
-                binding.evtEdLocationView.setOnClickListener(
-                    v -> new LocationFrag().show(
-                        getSupportFragmentManager(), "EditLoc"
-                    )
-                );
-                // endregion
-                // region dates
-                if (givenEventId == null) {
-                    Date now = new Date();
-                    Event event = binding.getEventModel();
-                    event.setRegistrationOpenAt(new Timestamp(now));
-                    event.setRegistrationCloseAt(new Timestamp(now));
-                    event.setEventStartAt(new Timestamp(now));
-                    event.setEventEndAt(new Timestamp(now));
-                }
-                binding.evtEdRegStartView.setOnClickListener(
-                    v -> new RegistrationBeginFrag(
-                        binding.evtEdRegStartView.getText().toString()
-                    ).show(getSupportFragmentManager(), "RegDateBegin")
-                );
-                binding.evtEdRegEndView.setOnClickListener(
-                    v -> new RegistrationEndFrag(
-                        binding.evtEdRegEndView.getText().toString()
-                    ).show(getSupportFragmentManager(), "RegDateEnd")
-                );
-                binding.evtEdEventStartView.setOnClickListener(
-                    v -> new EventBeginFrag(
-                        binding.evtEdEventStartView.getText().toString()
-                    ).show(getSupportFragmentManager(), "EventDateBegin")
-                );
-                binding.evtEdEventEndView.setOnClickListener(
-                    v -> new EventEndFrag(
-                        binding.evtEdEventEndView.getText().toString()
-                    ).show(getSupportFragmentManager(), "EventDateEnd")
-                );
-                // endregion
-                // region geolocationRequiredBox
-                if (givenEventId == null) {
-                    binding.getEventModel().setGeoRequired(false);
-                }
-                binding.evtEdGeoLimitSwitch.setOnClickListener(
-                    v -> binding.getEventModel().setGeoRequired(
-                        binding.evtEdGeoLimitSwitch.isChecked()
-                    )
-                );
-                // endregion
-                // region eventCapacityView
-                if (givenEventId == null) {
-                    binding.getEventModel().setCapacity(20);
-                }
-                binding.evtEdCapacityView.setOnClickListener(
-                    v -> new EventCapacityFrag()
-                        .show(getSupportFragmentManager(), "EventCap")
-                );
-                // endregion
-                // region waitingListCapacityView
-                if (givenEventId == null) {
-                    binding.getEventModel().setPlannedSampleSize(30);
-                }
-                binding.evtEdWaitListLimitView.setOnClickListener(
-                    v -> new WaitingListCapacityFrag()
-                        .show(getSupportFragmentManager(), "WaitingListCap")
-                );
-                // endregion
-                // region descTextView
-                if (givenEventId == null) {
-                    binding.getEventModel().setDescription("Tap to edit event details...");
-                }
-                View.OnClickListener descClickCallback = v -> new DetailFrag().show(
-                    getSupportFragmentManager(), "EventDetails"
-                );
-                binding.evtEdDescTitleView.setOnClickListener(descClickCallback);
-                binding.evtEdDescTextView.setOnClickListener(descClickCallback);
-                // endregion
-            });
-        });
+            );
+        } else {
+            onCreateContinued(CurrentProfile.get().createBlankEvent());
+        }
+    }
+
+    private void onCreateContinued(@Nullable Event e) {
+        if (e == null) {
+            Toast.makeText(
+                this,
+                "Event " + givenEventId + " is null",
+                Toast.LENGTH_SHORT
+            ).show();
+            finish();
+            return;
+        }
+        binding.setEventModel(e);
+        // region Title
+        if (givenEventId == null) {
+            binding.getEventModel().setTitle("Tap to edit title...");
+        }
+        binding.evtEdTitleView.setOnClickListener(
+            v -> new TitleFrag().show(
+                getSupportFragmentManager(), "EditTitle"
+            )
+        );
+        // endregion
+        // region Location
+        if (givenEventId == null) {
+            binding.getEventModel().setVenue("N/A");
+        }
+        binding.evtEdLocationView.setOnClickListener(
+            v -> new LocationFrag().show(
+                getSupportFragmentManager(), "EditLoc"
+            )
+        );
+        // endregion
+        // region dates
+        if (givenEventId == null) {
+            Date now = new Date();
+            Event event = binding.getEventModel();
+            event.setRegistrationOpenAt(new Timestamp(now));
+            event.setRegistrationCloseAt(new Timestamp(now));
+            event.setEventStartAt(new Timestamp(now));
+            event.setEventEndAt(new Timestamp(now));
+        }
+        binding.evtEdRegStartView.setOnClickListener(
+            v -> new RegistrationBeginFrag(
+                binding.evtEdRegStartView.getText().toString()
+            ).show(getSupportFragmentManager(), "RegDateBegin")
+        );
+        binding.evtEdRegEndView.setOnClickListener(
+            v -> new RegistrationEndFrag(
+                binding.evtEdRegEndView.getText().toString()
+            ).show(getSupportFragmentManager(), "RegDateEnd")
+        );
+        binding.evtEdEventStartView.setOnClickListener(
+            v -> new EventBeginFrag(
+                binding.evtEdEventStartView.getText().toString()
+            ).show(getSupportFragmentManager(), "EventDateBegin")
+        );
+        binding.evtEdEventEndView.setOnClickListener(
+            v -> new EventEndFrag(
+                binding.evtEdEventEndView.getText().toString()
+            ).show(getSupportFragmentManager(), "EventDateEnd")
+        );
+        // endregion
+        // region geolocationRequiredBox
+        if (givenEventId == null) {
+            binding.getEventModel().setGeoRequired(false);
+        }
+        binding.evtEdGeoLimitSwitch.setOnClickListener(
+            v -> binding.getEventModel().setGeoRequired(
+                binding.evtEdGeoLimitSwitch.isChecked()
+            )
+        );
+        // endregion
+        // region eventCapacityView
+        if (givenEventId == null) {
+            binding.getEventModel().setCapacity(20);
+        }
+        binding.evtEdCapacityView.setOnClickListener(
+            v -> new EventCapacityFrag()
+                .show(getSupportFragmentManager(), "EventCap")
+        );
+        // endregion
+        // region waitingListCapacityView
+        if (givenEventId == null) {
+            binding.getEventModel().setPlannedSampleSize(30);
+        }
+        binding.evtEdWaitListLimitView.setOnClickListener(
+            v -> new WaitingListCapacityFrag()
+                .show(getSupportFragmentManager(), "WaitingListCap")
+        );
+        // endregion
+        // region descTextView
+        if (givenEventId == null) {
+            binding.getEventModel().setDescription("Tap to edit event details...");
+        }
+        View.OnClickListener descClickCallback = v -> new DetailFrag().show(
+            getSupportFragmentManager(), "EventDetails"
+        );
+        binding.evtEdDescTitleView.setOnClickListener(descClickCallback);
+        binding.evtEdDescTextView.setOnClickListener(descClickCallback);
+        // endregion
     }
 
     @Override

@@ -25,11 +25,7 @@ import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
 import com.google.firebase.firestore.ListenerRegistration;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class EventDetailActivity extends AppCompatActivity {
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final String KEY_EVENT_ID = "key_event_id";
 
     public static Intent newIntent(Context context, @NonNull String eventId) {
@@ -51,51 +47,23 @@ public class EventDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_event_detail);
         setSupportActionBar(binding.evtDtlToolbar);
-        executor.execute(() -> {
-            givenEventId = getIntent().getStringExtra(KEY_EVENT_ID);
-            final Event[] eventPseudoArr = new Event[] { null };
-            EventCache.syncTryGetSingle(
-                givenEventId,
-                new EventRepository.LoadCallback() {
-                    @Override
-                    public void onLoaded(Event e) {
-                        eventPseudoArr[0] = e;
-                    }
-
-                    @Override
-                    public void onNotFound() {
-                        runOnUiThread(() -> {
-                            Toast.makeText(
-                                EventDetailActivity.this,
-                                "Event with ID " + givenEventId + " not found.",
-                                Toast.LENGTH_SHORT
-                            ).show();
-                            finish();
-                        });
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        runOnUiThread(() -> {
-                            Toast.makeText(
-                                EventDetailActivity.this,
-                                "Exception occurs when loading event " + givenEventId + ": " + e.getClass().getCanonicalName(),
-                                Toast.LENGTH_SHORT
-                            ).show();
-                            finish();
-                        });
-                    }
+        givenEventId = getIntent().getStringExtra(KEY_EVENT_ID);
+        EventCache.asyncTryGetSingle(
+            givenEventId,
+            new EventRepository.LoadCallback() {
+                @Override
+                public void onLoaded(Event e) {
+                    onCreateContinued(e);
                 }
-            );
-            runOnUiThread(() -> {
-                if (eventPseudoArr[0] == null) {
+
+                @Override
+                public void onNotFound() {
                     Toast.makeText(
-                        this,
-                        "Event " + givenEventId + " is null",
+                        EventDetailActivity.this,
+                        "Event with ID " + givenEventId + " not found.",
                         Toast.LENGTH_SHORT
                     ).show();
                     finish();
-                    return;
                 }
                 binding.setEventModel(eventPseudoArr[0]);
                 if (CurrentProfile.isOrganizer()) {
@@ -114,8 +82,34 @@ public class EventDetailActivity extends AppCompatActivity {
                     setupEntrantButtons(eventPseudoArr[0]);
                     observeInviteStatus();
                 }
+            }
+        );
+    }
+
+    private void onCreateContinued(@Nullable Event e) {
+        if (e == null) {
+            Toast.makeText(
+                this,
+                "Event " + givenEventId + " is null",
+                Toast.LENGTH_SHORT
+            ).show();
+            finish();
+            return;
+        }
+        binding.setEventModel(e);
+        if (CurrentProfile.isOrganizer()) {
+            binding.evtDtlOrgEditBtn.setOnClickListener(v -> {
+                startActivity(EventEditingActivity.newIntent(this, givenEventId));
             });
-        });
+            binding.evtDtlOrgEditBtn.setVisibility(View.VISIBLE);
+        } else if (CurrentProfile.isAdmin()) {
+            binding.evtDtlAdminDeleteBtn.setOnClickListener(v -> {
+                // TODO: implement admin delete functionality
+            });
+            binding.evtDtlAdminDeleteBtn.setVisibility(View.VISIBLE);
+        } else {
+            // TODO: show buttons under different circumstances
+        }
     }
 
     @Override
