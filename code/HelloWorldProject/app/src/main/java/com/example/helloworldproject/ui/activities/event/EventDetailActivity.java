@@ -95,6 +95,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 startActivity(EventEditingActivity.newIntent(this, givenEventId));
             });
             binding.evtDtlOrgEditBtn.setVisibility(View.VISIBLE);
+            setupOrganizerLottery(e);
         } else if (CurrentProfile.isAdmin()) {
             binding.evtDtlAdminDeleteBtn.setOnClickListener(v -> {
                 // TODO: implement admin delete functionality
