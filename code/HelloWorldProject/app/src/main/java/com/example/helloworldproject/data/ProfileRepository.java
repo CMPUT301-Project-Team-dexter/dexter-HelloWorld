@@ -54,4 +54,28 @@ public class ProfileRepository {
                 .addOnSuccessListener(unused -> cb.onComplete())
                 .addOnFailureListener(cb::onError);
     }
+
+    public void deleteProfile(Profile profile, final CompleteCallback cb) {
+        String docId = profile.getDeviceId();
+
+        db.collection("profiles")
+                .document(docId)
+                .delete() // The core Firestore operation to delete the document
+
+                // Success listener
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        cb.onComplete();
+                    }
+                })
+
+                // Failure listener
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        cb.onError(e);
+                    }
+                });
+    }
 }
