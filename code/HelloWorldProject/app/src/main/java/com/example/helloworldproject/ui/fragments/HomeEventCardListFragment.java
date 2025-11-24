@@ -30,6 +30,8 @@ import com.example.helloworldproject.ui.utils.EventCardAdapter;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -65,6 +67,7 @@ public class HomeEventCardListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        List<String> dynamicFilters = new ArrayList<>();
 
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
@@ -128,6 +131,13 @@ public class HomeEventCardListFragment extends Fragment {
         } else {
             addEventBtn.setVisibility(View.GONE);
         }
+
+        // Example data
+        dynamicFilters.add("My Events");
+        dynamicFilters.add("Waitlisted");
+        dynamicFilters.add("By Interest");
+
+        setupDynamicFilters(dynamicFilters);
     }
 
     private void updateAdapterFrom(List<Event> events) {
@@ -181,5 +191,65 @@ public class HomeEventCardListFragment extends Fragment {
                 Toast.makeText(requireContext(), "Failed to load events: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void setupDynamicFilters(List<String> filterOptions) {
+        ChipGroup chipGroup = binding.getRoot().findViewById(R.id.filter_chip_group);
+        chipGroup.removeAllViews();
+
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+
+        for (String filterName : filterOptions) {
+            Chip chip = (Chip) inflater.inflate(R.layout.item_filter_chip, chipGroup, false);
+
+            chip.setText(filterName);
+            chip.setId(View.generateViewId());
+
+            chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    applyFilter(filterName);
+                } else {
+                    applyFilter("All");
+                }
+            });
+
+            chipGroup.addView(chip);
+        }
+    }
+
+    private void applyFilter(String filterName) {
+        // for debugging purposes
+        Toast.makeText(getContext(), "Filtering by: " + filterName, Toast.LENGTH_SHORT).show();
+
+        adapter.clear();
+
+        switch (filterName) {
+            case "My Events":
+                if (CurrentProfile.isOrganizer()) {
+                    loadEventsForOrganizer();
+                } else {
+                    // loadSignedUpEvents();
+                }
+                break;
+
+            case "Waitlisted":
+                // TODO:
+                // loadWaitlistedEvents();
+                break;
+
+            case "By Interest":
+                // TODO:
+                // loadEventsByInterest();
+                break;
+
+            case "All":
+            default:
+                if (CurrentProfile.isOrganizer()) {
+                    loadEventsForOrganizer();
+                } else {
+                    loadJoinableEvents();
+                }
+                break;
+        }
     }
 }
