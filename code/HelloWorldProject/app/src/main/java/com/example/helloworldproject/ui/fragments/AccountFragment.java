@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -59,7 +60,8 @@ public class AccountFragment extends Fragment {
             public void onComplete() {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
                 alertDialogBuilder.setMessage("Are you sure you would like to delete this account permanently?")
-                        .setPositiveButton("Affirm", new DialogInterface.OnClickListener() {
+                        .setTitle("Account Deletion Warning")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Toast.makeText(requireContext(), "Profile successfully deleted.", Toast.LENGTH_LONG).show();
                         startActivity(LoginActivity.newIntent(requireContext()));
@@ -69,7 +71,8 @@ public class AccountFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
                     }
-                }).create().show();
+                }).setIcon(android.R.drawable.ic_dialog_alert).create().show();
+
             }
 
             @Override
