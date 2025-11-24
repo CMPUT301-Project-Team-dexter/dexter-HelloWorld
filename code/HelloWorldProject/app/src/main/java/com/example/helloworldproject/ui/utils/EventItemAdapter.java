@@ -12,7 +12,6 @@ import com.example.helloworldproject.R;
 import java.util.ArrayList;
 
 public class EventItemAdapter extends BaseAdapter {
-    private final Context context;
     private final ArrayList<String> userName;
     private final ArrayList<String> userId;
     private final ArrayList<String> eventName;
@@ -22,7 +21,6 @@ public class EventItemAdapter extends BaseAdapter {
                             ArrayList<String> userName,
                             ArrayList<String> userId,
                             ArrayList<String> eventName) {
-        this.context = context;
         this.userName = userName;
         this.userId = userId;
         this.eventName = eventName;

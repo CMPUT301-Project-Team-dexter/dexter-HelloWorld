@@ -79,7 +79,7 @@ public class Event extends BaseObservable {
                 eventStartAt == null ||
                 eventEndAt == null) {
 
-            // You can choose any default you like. Using NOT_OPEN is safe for admin views.
+            // Using NOT_OPEN is safe for admin views.
             return EventStatus.NOT_OPEN;
         }
 
@@ -95,7 +95,6 @@ public class Event extends BaseObservable {
             return EventStatus.ENDED;
         }
     }
-
 
     @Exclude
     Bitmap qrCodeBitmap = null;

@@ -4,7 +4,6 @@ import com.example.helloworldproject.model.Event;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -14,7 +13,6 @@ import com.google.firebase.firestore.SetOptions;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -45,21 +43,19 @@ public class EventRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     /**
-     * Load a single event by its ID.
+     * Load a single event by its ID asynchronously.
      * <p>
-     * Warning: this method blocks the calling thread until completion.
-     * Do NOT call this method on the main/UI thread.
+     *     Note: The function returns immediately.
+     *     The result is delivered via the provided callback.
+     *     Anything relying on the result must be done in the {@link LoadCallback onLoaded} methods.
+     * </p>
      *
      * @param eventId: the ID of the event to load
      * @param cb: the callback to handle the result
      */
-    public void syncLoadById(String eventId, final LoadCallback cb) {
-        Task<DocumentSnapshot> task =
-            db.collection("events").document(eventId).get();
-        try {
-            Tasks.await(task, 10, TimeUnit.SECONDS);
-            if (task.isSuccessful()) {
-                DocumentSnapshot ds = task.getResult();
+    public void asyncLoadById(String eventId, final LoadCallback cb) {
+        db.collection("events").document(eventId).get()
+            .addOnSuccessListener((ds) -> {
                 if (ds != null && ds.exists()) {
                     Event e = ds.toObject(Event.class);
                     if (e != null) e.setId(ds.getId());
@@ -67,12 +63,8 @@ public class EventRepository {
                 } else {
                     cb.onNotFound();
                 }
-            } else {
-                cb.onError(task.getException());
-            }
-        } catch (Exception e) {
-            cb.onError(e);
-        }
+            })
+            .addOnFailureListener(cb::onError);
     }
 
     /**
@@ -94,39 +86,33 @@ public class EventRepository {
     /**
      * Load events created by a specific organizer, excluding those already cached.
      * <p>
-     * Warning: this method blocks the calling thread until completion.
-     * Do NOT call this method on the main/UI thread.
+     *     Note: The function returns immediately.
+     *     The result is delivered via the provided callback.
+     *     Anything relying on the result must be done in the {@link ListCallback onLoaded} methods.
+     * </p>
      *
      * @param organizerName: the name of the organizer
      * @param cachedEvents: the list of already cached events
      * @param cb: the callback to handle the result
      */
-    public void syncLoadUncachedEventsCreatedBy(
+    public void asyncLoadUncachedEventsCreatedBy(
         String organizerName,
         ArrayList<Event> cachedEvents,
         final ListCallback cb
     ) {
         if (cachedEvents.isEmpty()) {
-            Task<QuerySnapshot> task = db.collection("events")
-                .whereEqualTo("creator", organizerName)
-                .get();
-            try {
-                Tasks.await(task, 10, TimeUnit.SECONDS);
-                if (task.isSuccessful()) {
-                    QuerySnapshot snap = task.getResult();
+            db.collection("events")
+                .whereEqualTo("creator", organizerName).get()
+                .addOnSuccessListener((ds) -> {
                     List<Event> out = new ArrayList<>();
-                    for (QueryDocumentSnapshot d : snap) {
+                    for (QueryDocumentSnapshot d : ds) {
                         Event e = d.toObject(Event.class);
                         e.setId(d.getId());
                         out.add(e);
                     }
                     cb.onLoaded(out);
-                } else {
-                    cb.onError(task.getException());
-                }
-            } catch (Exception e) {
-                cb.onError(e);
-            }
+                })
+                .addOnFailureListener(cb::onError);
             return;
         }
         List<Task<QuerySnapshot>> tasks = new ArrayList<>();
@@ -141,12 +127,11 @@ public class EventRepository {
                 .get();
             tasks.add(subtask);
         }
-        Task<List<QuerySnapshot>> task = Tasks.whenAllSuccess(tasks);
-        try {
-            Tasks.await(task, 10, TimeUnit.SECONDS);
-            if (task.isSuccessful()) {
+        Tasks.whenAllSuccess(tasks)
+            .addOnSuccessListener(results -> {
                 List<Event> out = new ArrayList<>();
-                for (QuerySnapshot qs : task.getResult()) {
+                for (Object result : results) {
+                    QuerySnapshot qs = (QuerySnapshot) result;
                     for (QueryDocumentSnapshot d : qs) {
                         Event e = d.toObject(Event.class);
                         e.setId(d.getId());
@@ -154,12 +139,8 @@ public class EventRepository {
                     }
                 }
                 cb.onLoaded(out);
-            } else {
-                cb.onError(task.getException());
-            }
-        } catch (Exception e) {
-            cb.onError(e);
-        }
+            })
+            .addOnFailureListener(cb::onError);
     }
 
     /**
@@ -194,8 +175,8 @@ public class EventRepository {
                 .addOnSuccessListener(snap -> {
                     List<Event> out = new ArrayList<>();
                     for (QueryDocumentSnapshot d : snap) {
-                        Event e = d.toObject(Event.class);
-                        if (e != null) {
+                        if (d != null) {
+                            Event e = d.toObject(Event.class);
                             e.setId(d.getId());
                             out.add(e);
                         }

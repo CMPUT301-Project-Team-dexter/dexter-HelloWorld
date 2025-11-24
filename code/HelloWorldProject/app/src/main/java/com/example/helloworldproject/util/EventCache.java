@@ -28,18 +28,22 @@ public class EventCache {
      * <p>
      * There is no need to cache the result in the callback.
      * <p>
-     * Warning: this method blocks the calling thread until completion.
-     * Do NOT call this method on the main/UI thread.
+     * <p>
+     *     Note: The function returns immediately.
+     *     The result is delivered via the provided callback.
+     *     Anything relying on the result must be done in the
+     *     {@link EventRepository.LoadCallback onLoaded} methods.
+     * </p>
      *
      * @param eventId: the ID of the event
      * @param cb:      the callback to handle the result
      */
-    public static void syncTryGetSingle(String eventId, EventRepository.LoadCallback cb) {
+    public static void asyncTryGetSingle(String eventId, EventRepository.LoadCallback cb) {
         if (internalCache.containsKey(eventId)) {
             cb.onLoaded(internalCache.get(eventId));
             return;
         }
-        EventRepository.INSTANCE.syncLoadById(
+        EventRepository.INSTANCE.asyncLoadById(
             eventId,
             new EventRepository.LoadCallback() {
                 @Override
@@ -67,17 +71,21 @@ public class EventCache {
      * <p>
      * There is no need to cache results in the callback.
      * <p>
-     * Warning: this method blocks the calling thread until completion.
-     * Do NOT call this method on the main/UI thread.
+     * <p>
+     *     Note: The function returns immediately.
+     *     The result is delivered via the provided callback.
+     *     Anything relying on the result must be done in the
+     *     {@link EventRepository.LoadCallback onLoaded} methods.
+     * </p>
      *
      * @param organizerName: the name of the organizer
      * @param cb:            the callback to handle the result
      */
-    public static void syncTryGetEventsCreatedBy(String organizerName, EventRepository.ListCallback cb) {
+    public static void asyncTryGetEventsCreatedBy(String organizerName, EventRepository.ListCallback cb) {
         ArrayList<Event> cachedEvents = internalCache.values().stream()
             .filter(e -> organizerName.equals(e.getCreator()))
             .collect(Collectors.toCollection(ArrayList::new));
-        EventRepository.INSTANCE.syncLoadUncachedEventsCreatedBy(
+        EventRepository.INSTANCE.asyncLoadUncachedEventsCreatedBy(
             organizerName,
             cachedEvents,
             new EventRepository.ListCallback() {

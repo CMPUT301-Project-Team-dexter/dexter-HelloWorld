@@ -1,5 +1,7 @@
 package com.example.helloworldproject.ui.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -22,6 +24,10 @@ import com.example.helloworldproject.util.DeviceId;
 
 /** Create/Update profile in a single screen. */
 public class LoginActivity extends AppCompatActivity {
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, LoginActivity.class);
+    }
 
     private EditText etName, etEmail, etPhone;
     private Spinner userGroupSpinner;
