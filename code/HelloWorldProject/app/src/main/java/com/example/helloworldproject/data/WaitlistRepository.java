@@ -1,21 +1,16 @@
 package com.example.helloworldproject.data;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.example.helloworldproject.model.Profile;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import com.example.helloworldproject.model.Profile;
 
 /** Firestore repository for event waitlist counts. */
 public class WaitlistRepository {
@@ -42,15 +37,13 @@ public class WaitlistRepository {
         return db.collection("events")
                 .document(eventId)
                 .collection("waitlist")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override public void onEvent(@Nullable QuerySnapshot snapshot, @Nullable FirebaseFirestoreException error) {
-                        if (error != null) {
-                            listener.onError(error);
-                            return;
-                        }
-                        int size = (snapshot == null) ? 0 : snapshot.size();
-                        listener.onCount(size);
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null) {
+                        listener.onError(error);
+                        return;
                     }
+                    int size = (snapshot == null) ? 0 : snapshot.size();
+                    listener.onCount(size);
                 });
     }
 
