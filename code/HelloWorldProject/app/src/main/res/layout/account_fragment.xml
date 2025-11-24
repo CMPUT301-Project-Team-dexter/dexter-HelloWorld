@@ -21,22 +21,6 @@
         android:layout_marginHorizontal="8dp" />
 
     <Button
-        android:id="@+id/admin_console_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="start"
-        android:text="Admin Console"
-        android:textColor="@android:color/holo_red_light"
-        android:textSize="20sp"
-        android:background="?attr/selectableItemBackground"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#BDBDBD"
-        android:layout_marginHorizontal="8dp" />
-
-    <Button
         android:id="@+id/settings_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

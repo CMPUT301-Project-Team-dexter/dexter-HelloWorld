@@ -30,7 +30,6 @@ import com.example.helloworldproject.ui.utils.EventCardAdapter;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,14 +134,13 @@ public class HomeEventCardListFragment extends Fragment {
 
         refreshEventList();
 
-        FloatingActionButton addEventBtn = view.findViewById(R.id.add_event_fab);
         if (CurrentProfile.isOrganizer()) {
-            addEventBtn.setVisibility(View.VISIBLE);
-            addEventBtn.setOnClickListener(v ->
+            binding.addEventFab.setVisibility(View.VISIBLE);
+            binding.addEventFab.setOnClickListener(v ->
                 startActivity(EventEditingActivity.newIntent(getContext(), null))
             );
         } else {
-            addEventBtn.setVisibility(View.GONE);
+            binding.addEventFab.setVisibility(View.GONE);
         }
     }
 
@@ -158,9 +156,6 @@ public class HomeEventCardListFragment extends Fragment {
             loadEventsForOrganizer();
         } else if (CurrentProfile.isEntrant()) {
             loadJoinableEvents();
-        } else {
-            // admin (or fallback)
-            loadEventsForAdmin();
         }
     }
 
@@ -193,27 +188,6 @@ public class HomeEventCardListFragment extends Fragment {
     // Entrant view: only joinable events
     private void loadJoinableEvents() {
         EventRepository.INSTANCE.loadJoinableEvents(
-            new EventRepository.ListCallback() {
-                @Override
-                public void onLoaded(List<Event> events) {
-                    updateAdapterFrom(events);
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Failed to load events: " + e.getMessage(),
-                        Toast.LENGTH_LONG
-                    ).show();
-                }
-            }
-        );
-    }
-
-    // Admin view: all events
-    private void loadEventsForAdmin() {
-        EventRepository.INSTANCE.loadAllEvents(
             new EventRepository.ListCallback() {
                 @Override
                 public void onLoaded(List<Event> events) {

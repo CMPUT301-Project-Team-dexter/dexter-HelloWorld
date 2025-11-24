@@ -48,6 +48,11 @@ public class EventDetailActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_event_detail);
         setSupportActionBar(binding.evtDtlToolbar);
         givenEventId = getIntent().getStringExtra(KEY_EVENT_ID);
+        if (givenEventId == null) {
+            Toast.makeText(this, "Event id is null", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         EventCache.asyncTryGetSingle(
             givenEventId,
             new EventRepository.LoadCallback() {
@@ -91,9 +96,9 @@ public class EventDetailActivity extends AppCompatActivity {
         }
         binding.setEventModel(e);
         if (CurrentProfile.isOrganizer()) {
-            binding.evtDtlOrgEditBtn.setOnClickListener(v -> {
-                startActivity(EventEditingActivity.newIntent(this, givenEventId));
-            });
+            binding.evtDtlOrgEditBtn.setOnClickListener(
+                v -> startActivity(EventEditingActivity.newIntent(this, givenEventId))
+            );
             binding.evtDtlOrgEditBtn.setVisibility(View.VISIBLE);
             setupOrganizerLottery(e);
         } else if (CurrentProfile.isAdmin()) {
@@ -131,7 +136,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 .show(getSupportFragmentManager(), "EventQRCodeDialog");
             return true;
         } else if (item.getItemId() == R.id.evt_dtl_manage_btn) {
-//            startActivity(EventManagementActivity.newIntent(this, givenEventId));
+            startActivity(EventManageActivity.newIntent(this, givenEventId));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -249,13 +254,12 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     private void renderLotteryGuidelines(Event event) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Lottery selection guidelines\n");
-        sb.append("Draw size: ").append(event.getPlannedSampleSize() == null ? "Not set" : event.getPlannedSampleSize()).append("\n");
-        sb.append("Selection method: ").append(event.getSelectionMethod() == null ? "Random draw" : event.getSelectionMethod()).append("\n");
-        sb.append("Seed policy: ").append(event.getSeedPolicy() == null ? "Randomly seeded" : event.getSeedPolicy()).append("\n");
-        sb.append("Duplicate policy: ").append(event.getDuplicatePolicy() == null ? "One entry per profile" : event.getDuplicatePolicy());
-        binding.evtDtlLotteryRules.setText(sb.toString());
+        String sb = "Lottery selection guidelines\n" +
+            "Draw size: " + (event.getPlannedSampleSize() == null ? "Not set" : event.getPlannedSampleSize()) + "\n" +
+            "Selection method: " + (event.getSelectionMethod() == null ? "Random draw" : event.getSelectionMethod()) + "\n" +
+            "Seed policy: " + (event.getSeedPolicy() == null ? "Randomly seeded" : event.getSeedPolicy()) + "\n" +
+            "Duplicate policy: " + (event.getDuplicatePolicy() == null ? "One entry per profile" : event.getDuplicatePolicy());
+        binding.evtDtlLotteryRules.setText(sb);
     }
 
     private void setupOrganizerLottery(Event event) {
