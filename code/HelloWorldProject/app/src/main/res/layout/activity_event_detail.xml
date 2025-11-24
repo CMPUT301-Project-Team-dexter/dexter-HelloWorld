@@ -30,7 +30,7 @@
             android:id="@+id/evt_dtl_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/evt_dtl_btn_zone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/evt_dtl_toolbar">
@@ -182,28 +182,22 @@
                             android:textSize="20sp" />
                     </LinearLayout>
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal"
-                        android:paddingBottom="4dp">
+                        android:layout_height="wrap_content"
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
+                        android:text="Waiting list status: "
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
-                            android:text="Waiting list status: "
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/evt_dtl_wait_list_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Loading waitlist..."
-                            android:textSize="20sp" />
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/evt_dtl_wait_list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
+                        android:text="Loading waitlist..."
+                        android:textAlignment="textEnd"
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/evt_dtl_lottery_rules"
@@ -228,127 +222,132 @@
                         android:text="@{eventModel.description}"
                         android:textSize="20sp" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="16dp" />
-
-                    <Button
-                        android:id="@+id/evt_dtl_org_edit_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="edit"
-                        android:textAllCaps="true"
-                        android:textSize="20sp"
-                        android:visibility="gone"
-                        app:cornerRadius="12dp"
-                        tools:visibility="visible" />
-
-                    <Button
-                        android:id="@+id/evt_dtl_admin_delete_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="#B40C0C"
-                        android:text="delete"
-                        android:textAllCaps="true"
-                        android:textSize="20sp"
-                        android:visibility="gone"
-                        app:cornerRadius="12dp" />
-
-                    <TextView
-                        android:id="@+id/evt_dtl_org_lottery_summary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="4dp"
-                        android:text="Invites – Pending: 0, Accepted: 0, Declined: 0"
-                        android:textSize="16sp"
-                        android:visibility="gone" />
-
-                    <Button
-                        android:id="@+id/evt_dtl_org_run_draw_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/evt_dtl_join_btn_bg_tint"
-                        android:text="Run lottery draw"
-                        android:textAllCaps="true"
-                        android:textSize="20sp"
-                        android:visibility="gone"
-                        app:cornerRadius="12dp" />
-
-                    <Button
-                        android:id="@+id/evt_dtl_org_replacement_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="#0F64D0"
-                        android:text="Draw replacement"
-                        android:textAllCaps="true"
-                        android:textSize="20sp"
-                        android:visibility="gone"
-                        app:cornerRadius="12dp" />
-
-                    <Button
-                        android:id="@+id/evt_dtl_join_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/evt_dtl_join_btn_bg_tint"
-                        android:enabled="true"
-                        android:text="join"
-                        android:textAllCaps="true"
-                        android:textSize="20sp"
-                        android:visibility="gone"
-                        app:cornerRadius="12dp" />
-
-                    <Button
-                        android:id="@+id/evt_dtl_leave_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="#0F64D0"
-                        android:text="leave"
-                        android:textAllCaps="true"
-                        android:textSize="20sp"
-                        android:visibility="gone"
-                        app:cornerRadius="12dp" />
-
-                    <TextView
-                        android:id="@+id/evt_dtl_invite_status"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="8dp"
-                        android:text="No invitation yet"
-                        android:textSize="16sp"
-                        android:visibility="gone" />
-
-                    <Button
-                        android:id="@+id/evt_dtl_accept_invite_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/evt_dtl_join_btn_bg_tint"
-                        android:text="Accept invitation"
-                        android:textAllCaps="true"
-                        android:textSize="20sp"
-                        android:visibility="gone"
-                        app:cornerRadius="12dp" />
-
-                    <Button
-                        android:id="@+id/evt_dtl_decline_invite_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="#B40C0C"
-                        android:text="Decline invitation"
-                        android:textAllCaps="true"
-                        android:textSize="20sp"
-                        android:visibility="gone"
-                        app:cornerRadius="12dp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="24dp" />
-
                 </LinearLayout>
 
             </LinearLayout>
         </ScrollView>
 
+        <LinearLayout
+            android:id="@+id/evt_dtl_btn_zone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#EEE1FB"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <Button
+                android:id="@+id/evt_dtl_org_edit_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="edit"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp"
+                tools:visibility="visible" />
+
+            <Button
+                android:id="@+id/evt_dtl_admin_delete_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#B40C0C"
+                android:text="delete"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+
+            <TextView
+                android:id="@+id/evt_dtl_org_lottery_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="4dp"
+                android:text="Invites – Pending: 0, Accepted: 0, Declined: 0"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/evt_dtl_org_run_draw_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/evt_dtl_join_btn_bg_tint"
+                android:text="Run lottery draw"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+
+            <Button
+                android:id="@+id/evt_dtl_org_replacement_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#0F64D0"
+                android:text="Draw replacement"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+
+            <Button
+                android:id="@+id/evt_dtl_join_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/evt_dtl_join_btn_bg_tint"
+                android:enabled="true"
+                android:text="join"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+
+            <Button
+                android:id="@+id/evt_dtl_leave_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#0F64D0"
+                android:text="leave"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+
+            <TextView
+                android:id="@+id/evt_dtl_invite_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:text="No invitation yet"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/evt_dtl_accept_invite_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/evt_dtl_join_btn_bg_tint"
+                android:text="Accept invitation"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+
+            <Button
+                android:id="@+id/evt_dtl_decline_invite_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#B40C0C"
+                android:text="Decline invitation"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+        </LinearLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

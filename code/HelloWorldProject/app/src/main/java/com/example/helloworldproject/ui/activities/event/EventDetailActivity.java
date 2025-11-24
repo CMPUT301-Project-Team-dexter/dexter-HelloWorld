@@ -249,13 +249,12 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     private void renderLotteryGuidelines(Event event) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Lottery selection guidelines\n");
-        sb.append("Draw size: ").append(event.getPlannedSampleSize() == null ? "Not set" : event.getPlannedSampleSize()).append("\n");
-        sb.append("Selection method: ").append(event.getSelectionMethod() == null ? "Random draw" : event.getSelectionMethod()).append("\n");
-        sb.append("Seed policy: ").append(event.getSeedPolicy() == null ? "Randomly seeded" : event.getSeedPolicy()).append("\n");
-        sb.append("Duplicate policy: ").append(event.getDuplicatePolicy() == null ? "One entry per profile" : event.getDuplicatePolicy());
-        binding.evtDtlLotteryRules.setText(sb.toString());
+        String sb = "Lottery selection guidelines\n" +
+            "Draw size: " + (event.getPlannedSampleSize() == null ? "Not set" : event.getPlannedSampleSize()) + "\n" +
+            "Selection method: " + (event.getSelectionMethod() == null ? "Random draw" : event.getSelectionMethod()) + "\n" +
+            "Seed policy: " + (event.getSeedPolicy() == null ? "Randomly seeded" : event.getSeedPolicy()) + "\n" +
+            "Duplicate policy: " + (event.getDuplicatePolicy() == null ? "One entry per profile" : event.getDuplicatePolicy());
+        binding.evtDtlLotteryRules.setText(sb);
     }
 
     private void setupOrganizerLottery(Event event) {
