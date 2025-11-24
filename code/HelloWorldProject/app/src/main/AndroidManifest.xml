@@ -19,6 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorldProject">
         <activity
+            android:name=".ui.activities.event.EventManageActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activities.event.AdminEventListActivity"
             android:exported="false" />
         <activity
