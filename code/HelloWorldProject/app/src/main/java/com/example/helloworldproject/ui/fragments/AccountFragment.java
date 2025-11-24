@@ -55,30 +55,29 @@ public class AccountFragment extends Fragment {
     }
 
     private void deleteProfileButtonFunction() {
-        profileRepo.deleteProfile(CurrentProfile.get(), new ProfileRepository.CompleteCallback() {
-            @Override
-            public void onComplete() {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-                alertDialogBuilder.setMessage("Are you sure you would like to delete this account permanently?")
-                        .setTitle("Account Deletion Warning")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+        alertDialogBuilder.setMessage("Are you sure you would like to delete this profile permanently?")
+                .setTitle("Profile Deletion Warning")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(requireContext(), "Profile successfully deleted.", Toast.LENGTH_LONG).show();
-                        startActivity(LoginActivity.newIntent(requireContext()));
-                        requireActivity().finish();
+                        profileRepo.deleteProfile(CurrentProfile.get(), new ProfileRepository.CompleteCallback() {
+                            @Override
+                            public void onComplete() {
+                                Toast.makeText(requireContext(), "Profile successfully deleted.", Toast.LENGTH_LONG).show();
+                                startActivity(LoginActivity.newIntent(requireContext()));
+                                requireActivity().finish();
+                            }
+
+                            @Override
+                            public void onError(@NonNull Exception e) {
+                                Toast.makeText(requireContext(), "Error loading profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
                     }
                 }).setIcon(android.R.drawable.ic_dialog_alert).create().show();
-
-            }
-
-            @Override
-            public void onError(@NonNull Exception e) {
-                Toast.makeText(requireContext(), "Error loading profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
     }
 }
