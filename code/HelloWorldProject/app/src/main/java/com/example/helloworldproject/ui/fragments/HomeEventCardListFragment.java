@@ -1,6 +1,7 @@
 package com.example.helloworldproject.ui.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +34,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,9 +86,39 @@ public class HomeEventCardListFragment extends Fragment {
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 // TODO: implement filter function later
                 if (menuItem.getItemId() == R.id.home_filter_button) {
-                    // added a placeholder just so we know the filter button is registering being clicked
-                    Toast.makeText(requireContext(),
-                            "Filter button clicked", Toast.LENGTH_SHORT).show();
+                    FilterBottomSheetFragment filterSheet = new FilterBottomSheetFragment(new FilterBottomSheetFragment.FilterListener() {
+                        @Override
+                        public void onFilterApplied(long date, List<String> interests) {
+                            Toast.makeText(getContext(),
+                                    "Filter Date=" + date + ", Tags=" + interests,
+                                    Toast.LENGTH_SHORT).show();
+
+                            EventRepository.INSTANCE.loadFilteredEvents(date, interests, new EventRepository.ListCallback() {
+                                @Override
+                                public void onLoaded(List<Event> events) {
+                                    if (events.isEmpty()) {
+                                        Toast.makeText(getContext(), "No events found matching specified filters", Toast.LENGTH_SHORT).show();
+                                    }
+                                    updateAdapterFrom(events);
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Toast.makeText(getContext(), "Filter Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFilterCleared() {
+                            Toast.makeText(getContext(), "Filters Cleared", Toast.LENGTH_SHORT).show();
+                            refreshEventList();
+                        }
+                    });
+
+                    filterSheet.show(getParentFragmentManager(), "FilterSheet");
+                    return true;
+
                 } else if (menuItem.getItemId() == R.id.home_scan_button) {
                     requestCamera.launch(android.Manifest.permission.CAMERA);
                     return true;
@@ -132,15 +165,31 @@ public class HomeEventCardListFragment extends Fragment {
             addEventBtn.setVisibility(View.GONE);
         }
 
-        // Example data
-        dynamicFilters.add("My Events");
-        dynamicFilters.add("Waitlisted");
-        dynamicFilters.add("By Interest");
+//        // Example of interests
+//        dynamicFilters.add("Running");
+//        dynamicFilters.add("Music");
+//        dynamicFilters.add("Swimming");
+//        dynamicFilters.add("Climbing");
+//        dynamicFilters.add("Community");
+//
+//
+//        setupDynamicFilters(dynamicFilters);
 
-        setupDynamicFilters(dynamicFilters);
+        FirebaseFirestore.getInstance().collection("events").get()
+                .addOnSuccessListener(snapshots -> {
+                    Log.d("SANITY_CHECK", "Found " + snapshots.size() + " documents.");
+                    for (DocumentSnapshot doc : snapshots) {
+                        // Print the ID and the raw timestamp to compare
+                        Log.d("SANITY_CHECK", "Doc ID: " + doc.getId() + " | Start: " + doc.get("eventStartAt"));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("SANITY_CHECK", "Error fetching docs: " + e.getMessage());
+                });
     }
 
     private void updateAdapterFrom(List<Event> events) {
+        adapter.clear();
         adapter.addAll(events);
         adapter.notifyDataSetChanged();
     }

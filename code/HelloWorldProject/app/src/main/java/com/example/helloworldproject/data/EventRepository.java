@@ -1,19 +1,26 @@
 package com.example.helloworldproject.data;
 
 import com.example.helloworldproject.model.Event;
+import com.example.helloworldproject.util.DateUtils;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import android.util.Log;
+import android.util.Pair;
 
 /**
  * Repository for managing Event data in Firestore.
@@ -167,5 +174,55 @@ public class EventRepository {
                     cb.onLoaded(out);
                 })
                 .addOnFailureListener(cb::onError);
+    }
+
+    public void loadFilteredEvents(long date, List<String> selectedInterests, ListCallback callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Query query = db.collection("events");
+
+        Pair<Long, Long> range = DateUtils.getDayRange(date);
+        if (date != 0) {
+            Timestamp startTimestamp = new Timestamp(new Date(range.first));
+            Timestamp endTimestamp = new Timestamp(new Date(range.second));
+
+            // DEBUG LOGS
+            Log.d("FILTER_DEBUG", "Filtering for Date Range: " + startTimestamp + " to " + endTimestamp);
+            if (selectedInterests != null) {
+                Log.d("FILTER_DEBUG", "Filtering for Interests: " + selectedInterests.toString());
+            } else {
+                Log.d("FILTER_DEBUG", "Interests filter is NULL/Empty");
+            }
+
+            query = query.whereGreaterThanOrEqualTo("eventStartAt", startTimestamp)
+                    .whereLessThanOrEqualTo("eventStartAt", endTimestamp);
+        }
+
+        if (selectedInterests != null && !selectedInterests.isEmpty()) {
+            query = query.whereArrayContainsAny("interests", selectedInterests);
+        }
+
+        query.get().addOnSuccessListener(queryDocumentSnapshots -> {
+
+            // for debugging returns of query
+            Log.d("FILTER_DEBUG", "Query Finished. Total Documents Found: " + queryDocumentSnapshots.size());
+
+            for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                // Print the ID and Title of every match found
+                Log.d("FILTER_DEBUG", "MATCH: ID=" + doc.getId() + ", Title=" + doc.get("title"));
+            }
+
+
+            List<Event> events = new ArrayList<>();
+            for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                events.add(doc.toObject(Event.class));
+            }
+            callback.onLoaded(events);
+        }).addOnFailureListener(e -> {
+
+            // for debugging errors from query
+            Log.e("FILTER_DEBUG", "Query FAILED: " + e.getMessage());
+
+            callback.onError(e);
+        });
     }
 }

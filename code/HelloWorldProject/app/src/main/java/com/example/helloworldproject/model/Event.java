@@ -11,6 +11,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Exclude;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -43,6 +44,7 @@ public class Event extends BaseObservable {
     private String duplicatePolicy;    // e.g., "ONE_ENTRY_PER_PROFILE"
     private Boolean geoRequired;       // true/false
     private Integer plannedSampleSize; // e.g., 20
+    private List<String> interests;
 
     public Event() {  }
 
@@ -64,6 +66,7 @@ public class Event extends BaseObservable {
      */
     @Exclude
     public EventStatus getRealTimeStatus() {
+
         Timestamp now = Timestamp.now();
         if (now.compareTo(getRegistrationOpenAt()) < 0) {
             return EventStatus.NOT_OPEN;
@@ -164,6 +167,11 @@ public class Event extends BaseObservable {
         return plannedSampleSize;
     }
 
+    @Bindable
+    public List<String> getInterests() {
+        return interests;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -235,5 +243,11 @@ public class Event extends BaseObservable {
     public void setPlannedSampleSize(Integer plannedSampleSize) {
         this.plannedSampleSize = plannedSampleSize;
         notifyPropertyChanged(BR.plannedSampleSize);
+    }
+
+    public void setInterests(List<String> interests) {
+        this.interests = interests;
+
+        notifyPropertyChanged(BR.interests);
     }
 }
