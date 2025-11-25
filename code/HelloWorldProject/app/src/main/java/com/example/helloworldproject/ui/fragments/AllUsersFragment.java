@@ -21,10 +21,22 @@ import com.example.helloworldproject.ui.utils.UserItemAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
+import android.widget.Toast;
+
+import com.example.helloworldproject.data.ProfileRepository;
+import com.example.helloworldproject.model.Profile;
+
+import java.util.List;
+
 
 public class AllUsersFragment extends Fragment {
 
     private ListView listView;
+    private UserItemAdapter adapter;
+    private final ArrayList<String> userNames = new ArrayList<>();
+    private final ArrayList<String> userIds = new ArrayList<>();
+    private final ProfileRepository profileRepository = new ProfileRepository();
+
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -56,18 +68,12 @@ public class AllUsersFragment extends Fragment {
 
 
         listView = view.findViewById(R.id.event_list_view);
-        ArrayList<String> userNames = new ArrayList<>();
-        userNames.add("AlphaBravo");
-        userNames.add("TestName2");
-        userNames.add("Chill");
 
-        ArrayList<String> userIds = new ArrayList<>();
-        userIds.add("id1");
-        userIds.add("id2");
-        userIds.add("id3");
-
-        UserItemAdapter adapter = new UserItemAdapter(requireContext(), userNames, userIds);
+        adapter = new UserItemAdapter(requireContext(), userNames, userIds);
         listView.setAdapter(adapter);
+
+        loadProfiles();
+
     }
 
     @Override
@@ -77,4 +83,37 @@ public class AllUsersFragment extends Fragment {
 
         return view;
     }
+    private void loadProfiles() {
+        profileRepository.loadAllProfiles(new ProfileRepository.ListCallback() {
+            @Override
+            public void onLoaded(List<Profile> profiles) {
+                requireActivity().runOnUiThread(() -> {
+                    userNames.clear();
+                    userIds.clear();
+
+                    for (Profile p : profiles) {
+                        String name = p.getName() == null ? "(Unnamed)" : p.getName();
+                        String id = p.getId() == null ? "No ID" : p.getId();
+
+                        userNames.add(name);
+                        userIds.add(id);
+                    }
+
+                    adapter.notifyDataSetChanged();
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(
+                                requireContext(),
+                                "Failed to load profiles: " + e.getMessage(),
+                                Toast.LENGTH_LONG
+                        ).show()
+                );
+            }
+        });
+    }
+
 }
