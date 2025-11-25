@@ -19,6 +19,7 @@ import com.example.helloworldproject.data.ProfileRepository;
 import com.example.helloworldproject.ui.activities.HomeActivity;
 import com.example.helloworldproject.ui.activities.LoginActivity;
 import com.example.helloworldproject.ui.activities.ProfileEditActivity;
+import com.example.helloworldproject.ui.activities.RegisterHistoryActivity;
 import com.example.helloworldproject.ui.activities.SettingsActivity;
 import com.example.helloworldproject.util.CurrentProfile;
 
@@ -41,6 +42,13 @@ public class AccountFragment extends Fragment {
         if (settingsBtn != null) {
             settingsBtn.setOnClickListener(v ->
                     startActivity(new Intent(requireContext(), SettingsActivity.class))
+            );
+        }
+
+        Button regHisBtn = view.findViewById(R.id.register_history_button1);
+        if (regHisBtn != null) {
+            regHisBtn.setOnClickListener(v ->
+                    startActivity(new Intent(requireContext(), RegisterHistoryActivity.class))
             );
         }
 
