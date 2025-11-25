@@ -56,6 +56,10 @@
             android:name=".ui.activities.ProfileEditActivity"
             android:exported="false"
             android:label="Edit Profile" />
+        <activity
+            android:name=".ui.activities.RegisterHistoryActivity"
+            android:exported="false"
+            android:label="Register History" />
     </application>
 
 </manifest>

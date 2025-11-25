@@ -1,18 +1,23 @@
 package com.example.helloworldproject.data;
 
 import com.example.helloworldproject.model.Event;
+import com.example.helloworldproject.util.CurrentProfile;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -190,4 +195,46 @@ public class EventRepository {
                 })
                 .addOnFailureListener(cb::onError);
     }
+
+    public void loadRegisterHistoryEvents (final ListCallback cb) {
+        String thisDeviceId = CurrentProfile.get().getDeviceId();
+        db.collection("events")
+                .get()
+                .addOnSuccessListener(snap -> {
+                    List<Task<QuerySnapshot>> tasks = new ArrayList<>();
+                    List<QueryDocumentSnapshot> parentEvents = new ArrayList<>(); // keep track of parent events
+
+                    for (QueryDocumentSnapshot d : snap) {
+                        parentEvents.add(d); // save the parent event
+                        tasks.add(d.getReference().collection("waitlist").get());
+                        tasks.add(d.getReference().collection("invites").get());
+                    }
+
+                    Tasks.whenAllSuccess(tasks).addOnSuccessListener(results -> {
+                        List<Event> out = new ArrayList<>();
+                        Set<String> addedEventIds = new HashSet<>();
+
+                        for (int i = 0; i < results.size(); i++) {
+                            QuerySnapshot subSnap = (QuerySnapshot) results.get(i);
+                            QueryDocumentSnapshot parentEvent = parentEvents.get(i / 2);
+
+                            for (QueryDocumentSnapshot dd : subSnap) {
+                                String profileId = dd.getString("profileId");
+                                if (thisDeviceId.equals(profileId)) {
+                                    Event e = parentEvent.toObject(Event.class);
+                                    e.setId(parentEvent.getId());
+                                    if (!addedEventIds.contains(parentEvent.getId())) {
+                                        addedEventIds.add(parentEvent.getId());
+                                        out.add(e);
+                                    }
+                                }
+                            }
+                        }
+
+                        cb.onLoaded(out);
+                    });
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
 }
