@@ -12,8 +12,6 @@ import com.example.helloworldproject.R;
 import java.util.ArrayList;
 
 public class UserItemAdapter extends BaseAdapter {
-
-    private final Context context;
     private final LayoutInflater inflater;
     private final ArrayList<String> userNames;
     private final ArrayList<String> userIds;
@@ -21,7 +19,6 @@ public class UserItemAdapter extends BaseAdapter {
     public UserItemAdapter(Context context,
                            ArrayList<String> userNames,
                            ArrayList<String> userIds) {
-        this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.userNames = userNames;
         this.userIds = userIds;

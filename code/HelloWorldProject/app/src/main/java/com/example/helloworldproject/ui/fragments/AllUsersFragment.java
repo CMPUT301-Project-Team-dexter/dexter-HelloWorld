@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -17,15 +18,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 
 import com.example.helloworldproject.R;
+import com.example.helloworldproject.data.ProfileRepository;
+import com.example.helloworldproject.model.Profile;
 import com.example.helloworldproject.ui.utils.UserItemAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
-import android.widget.Toast;
-
-import com.example.helloworldproject.data.ProfileRepository;
-import com.example.helloworldproject.model.Profile;
-
 import java.util.List;
 
 

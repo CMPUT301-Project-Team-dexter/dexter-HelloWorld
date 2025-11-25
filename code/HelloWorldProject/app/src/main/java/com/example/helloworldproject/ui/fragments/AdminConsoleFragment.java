@@ -10,9 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.helloworldproject.R;
 import com.example.helloworldproject.databinding.FragAdminConsoleBinding;
 import com.example.helloworldproject.ui.activities.event.AdminEventListActivity;
-import com.example.helloworldproject.R;
 
 
 public class AdminConsoleFragment extends Fragment {
@@ -30,14 +30,14 @@ public class AdminConsoleFragment extends Fragment {
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         activity.setSupportActionBar(binding.adminConsToolbar);
         // bind onclick for All Users
-        binding.adminConsAllUsersButton.setOnClickListener(v -> {
-            requireActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, new AllUsersFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
+        binding.adminConsAllUsersButton.setOnClickListener(
+            v -> requireActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, new AllUsersFragment())
+                .addToBackStack(null)
+                .commit()
+        );
         // TODO: bind onclick for other buttons
         binding.adminConsAllEventsButton.setOnClickListener(
             v -> startActivity(AdminEventListActivity.newIntent(getContext()))
