@@ -1,4 +1,5 @@
 package com.example.helloworldproject.ui.fragments;
+import com.example.helloworldproject.model.UserGroup;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -91,11 +92,31 @@ public class AllUsersFragment extends Fragment {
 
                     for (Profile p : profiles) {
                         String name = p.getName() == null ? "(Unnamed)" : p.getName();
-                        String id = p.getId() == null ? "No ID" : p.getId();
+
+                        UserGroup group = p.getUserGroup();
+                        String roleLabel;
+                        if (group == null) {
+                            roleLabel = "Unknown";
+                        } else {
+                            switch (group) {
+                                case ADMIN:
+                                    roleLabel = "Admin";
+                                    break;
+                                case ORGANIZER:
+                                    roleLabel = "Organizer";
+                                    break;
+                                case ENTRANT:
+                                    roleLabel = "Entrant";
+                                    break;
+                                default:
+                                    roleLabel = group.name();
+                            }
+                        }
 
                         userNames.add(name);
-                        userIds.add(id);
+                        userIds.add(roleLabel);
                     }
+
 
                     adapter.notifyDataSetChanged();
                 });
