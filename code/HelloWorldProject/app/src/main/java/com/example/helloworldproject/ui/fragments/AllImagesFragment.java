@@ -17,8 +17,8 @@ import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.helloworldproject.ui.utils.AllImagesFragmentAdapter;
 import com.example.helloworldproject.R;
+import com.example.helloworldproject.ui.utils.AllImagesFragmentAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;

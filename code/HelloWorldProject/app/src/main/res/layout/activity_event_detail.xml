@@ -1,49 +1,353 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:padding="16dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="eventModel"
+            type="com.example.helloworldproject.model.Event" />
+    </data>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".ui.activities.HomeActivity">
 
-        <TextView
-            android:id="@+id/tv_title"
-            android:textStyle="bold"
-            android:textSize="20sp"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/evt_dtl_toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="Event Detail"
+            app:titleTextColor="@color/white" />
+
+        <ScrollView
+            android:id="@+id/evt_dtl_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/evt_dtl_btn_zone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/evt_dtl_toolbar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:layout_margin="16dp"
+                    app:cardCornerRadius="16dp">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/evt_dtl_poster_image"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@null"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/debug_card_image" />
+
+                    </FrameLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:paddingLeft="16sp"
+                    android:paddingRight="16sp">
+
+                    <TextView
+                        android:id="@+id/evt_dtl_title_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:text="@{eventModel.title}"
+                        android:textSize="34sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:text="Register Period"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/evt_dtl_reg_period_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
+                        android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.registrationOpenAt) + ` to ` + com.example.helloworldproject.model.Event.formatDate(eventModel.registrationCloseAt)}"
+                        android:textAlignment="viewEnd"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Event Period"
+
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/evt_dtl_event_period_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
+                        android:text="@{com.example.helloworldproject.model.Event.formatDate(eventModel.eventStartAt) + ` to ` + com.example.helloworldproject.model.Event.formatDate(eventModel.eventEndAt)}"
+                        android:textAlignment="viewEnd"
+                        android:textSize="20sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingBottom="4dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+
+                            android:text="Location: "
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/evt_dtl_location_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{eventModel.venue}"
+                            android:textSize="20sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingBottom="4dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Geolocation limit: "
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/evt_dtl_geolocation_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{eventModel.geoRequired ? `Required` : `Not Required`}"
+                            android:textSize="20sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:paddingBottom="4dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+
+                            android:text="Event Capacity: "
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/evt_dtl_capacity_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{String.valueOf(eventModel.capacity)}"
+                            android:textSize="20sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:text="Waiting list status: "
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/evt_dtl_wait_list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
+                        android:text="Loading waitlist..."
+                        android:textAlignment="textEnd"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/evt_dtl_lottery_rules"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="4dp"
+                        android:text="Lottery selection guidelines"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:text="Description"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/evt_dtl_desc_text_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@{eventModel.description}"
+                        android:textSize="20sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/evt_dtl_btn_zone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Event title"/>
+            android:background="#EEE1FB"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
-        <TextView
-            android:id="@+id/tv_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Event description"/>
+            <Button
+                android:id="@+id/evt_dtl_org_edit_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="edit"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp"
+                tools:visibility="visible" />
 
-        <TextView
-            android:id="@+id/tv_venue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Venue"/>
+            <Button
+                android:id="@+id/evt_dtl_admin_delete_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#B40C0C"
+                android:text="delete"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
 
-        <TextView
-            android:id="@+id/tv_waitlist_count"
-            android:text="Waitlist size: 0"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"/>
+            <TextView
+                android:id="@+id/evt_dtl_org_lottery_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="4dp"
+                android:text="Invites – Pending: 0, Accepted: 0, Declined: 0"
+                android:textSize="16sp"
+                android:visibility="gone" />
 
-        <Button
-            android:id="@+id/btn_lottery_rules"
-            android:text="View lottery rules"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"/>
+            <Button
+                android:id="@+id/evt_dtl_org_run_draw_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/evt_dtl_join_btn_bg_tint"
+                android:text="Run lottery draw"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
 
-    </LinearLayout>
-</ScrollView>
+            <Button
+                android:id="@+id/evt_dtl_org_replacement_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#0F64D0"
+                android:text="Draw replacement"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+
+            <Button
+                android:id="@+id/evt_dtl_join_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/evt_dtl_join_btn_bg_tint"
+                android:enabled="true"
+                android:text="join"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+
+            <Button
+                android:id="@+id/evt_dtl_leave_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#0F64D0"
+                android:text="leave"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+
+            <TextView
+                android:id="@+id/evt_dtl_invite_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:text="No invitation yet"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/evt_dtl_accept_invite_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/evt_dtl_join_btn_bg_tint"
+                android:text="Accept invitation"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+
+            <Button
+                android:id="@+id/evt_dtl_decline_invite_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#B40C0C"
+                android:text="Decline invitation"
+                android:textAllCaps="true"
+                android:textSize="20sp"
+                android:visibility="gone"
+                app:cornerRadius="12dp" />
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

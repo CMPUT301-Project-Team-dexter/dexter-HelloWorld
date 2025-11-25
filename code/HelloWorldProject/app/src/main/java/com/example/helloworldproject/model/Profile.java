@@ -1,5 +1,9 @@
 package com.example.helloworldproject.model;
 
+import com.github.f4b6a3.ulid.Ulid;
+import com.github.f4b6a3.ulid.UlidCreator;
+import com.google.firebase.Timestamp;
+
 import java.io.Serializable;
 
 public class Profile implements Serializable {
@@ -84,5 +88,22 @@ public class Profile implements Serializable {
 
     public void setUserGroup(UserGroup userGroup) {
         this.userGroup = userGroup;
+    }
+
+    /**
+     * Create a blank event with default settings.
+     * @return a new Event object with default values
+     */
+    public Event createBlankEvent() {
+        Event e = new Event();
+        Ulid u = UlidCreator.getMonotonicUlid();
+        e.setId(u.toString());
+        e.setCreatedAt(Timestamp.now());
+        e.setCreator(name);
+        // TODO: decide things regarding to sample methods
+        e.setSelectionMethod("FISHER_YATES");
+        e.setSeedPolicy("RANDOM_LOGGED");
+        e.setDuplicatePolicy("ONE_ENTRY_PER_PROFILE");
+        return e;
     }
 }

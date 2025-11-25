@@ -1,4 +1,5 @@
 package com.example.helloworldproject.ui.fragments;
+import com.example.helloworldproject.model.UserGroup;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -17,14 +19,23 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 
 import com.example.helloworldproject.R;
+import com.example.helloworldproject.data.ProfileRepository;
+import com.example.helloworldproject.model.Profile;
 import com.example.helloworldproject.ui.utils.UserItemAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
+import java.util.List;
+
 
 public class AllUsersFragment extends Fragment {
 
     private ListView listView;
+    private UserItemAdapter adapter;
+    private final ArrayList<String> userNames = new ArrayList<>();
+    private final ArrayList<String> userIds = new ArrayList<>();
+    private final ProfileRepository profileRepository = new ProfileRepository();
+
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -55,26 +66,73 @@ public class AllUsersFragment extends Fragment {
         }
 
 
-        listView = view.findViewById(R.id.listview);
-        ArrayList<String> userNames = new ArrayList<>();
-        userNames.add("AlphaBravo");
-        userNames.add("TestName2");
-        userNames.add("Chill");
+        listView = view.findViewById(R.id.event_list_view);
 
-        ArrayList<String> userIds = new ArrayList<>();
-        userIds.add("id1");
-        userIds.add("id2");
-        userIds.add("id3");
-
-        UserItemAdapter adapter = new UserItemAdapter(requireContext(), userNames, userIds);
+        adapter = new UserItemAdapter(requireContext(), userNames, userIds);
         listView.setAdapter(adapter);
+
+        loadProfiles();
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.filter_menu_list_base, container, false);
-        listView = view.findViewById(R.id.listview);
+        listView = view.findViewById(R.id.event_list_view);
 
         return view;
     }
+    private void loadProfiles() {
+        profileRepository.loadAllProfiles(new ProfileRepository.ListCallback() {
+            @Override
+            public void onLoaded(List<Profile> profiles) {
+                requireActivity().runOnUiThread(() -> {
+                    userNames.clear();
+                    userIds.clear();
+
+                    for (Profile p : profiles) {
+                        String name = p.getName() == null ? "(Unnamed)" : p.getName();
+
+                        UserGroup group = p.getUserGroup();
+                        String roleLabel;
+                        if (group == null) {
+                            roleLabel = "Unknown";
+                        } else {
+                            switch (group) {
+                                case ADMIN:
+                                    roleLabel = "Admin";
+                                    break;
+                                case ORGANIZER:
+                                    roleLabel = "Organizer";
+                                    break;
+                                case ENTRANT:
+                                    roleLabel = "Entrant";
+                                    break;
+                                default:
+                                    roleLabel = group.name();
+                            }
+                        }
+
+                        userNames.add(name);
+                        userIds.add(roleLabel);
+                    }
+
+
+                    adapter.notifyDataSetChanged();
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(
+                                requireContext(),
+                                "Failed to load profiles: " + e.getMessage(),
+                                Toast.LENGTH_LONG
+                        ).show()
+                );
+            }
+        });
+    }
+
 }

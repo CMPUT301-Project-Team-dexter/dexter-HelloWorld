@@ -1,5 +1,7 @@
 package com.example.helloworldproject.ui.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -22,6 +24,10 @@ import com.example.helloworldproject.util.DeviceId;
 
 /** Create/Update profile in a single screen. */
 public class LoginActivity extends AppCompatActivity {
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, LoginActivity.class);
+    }
 
     private EditText etName, etEmail, etPhone;
     private Spinner userGroupSpinner;
@@ -52,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
         repo = new ProfileRepository();
 
         setLoading(true);
-        DeviceId.getOrFetch(this, new DeviceId.DeviceIdCallback() {
+        DeviceId.get(new DeviceId.DeviceIdCallback() {
             @Override public void onSuccess(String id) {
                 deviceId = id;
                 // Try to load existing profile (for update).
@@ -69,7 +75,11 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
                             return;
                         }
-                        Toast.makeText(LoginActivity.this, "Failed to load: profile is null", Toast.LENGTH_LONG).show();
+                        Toast.makeText(
+                            LoginActivity.this,
+                            "Failed to load: profile is null",
+                            Toast.LENGTH_LONG
+                        ).show();
                     }
 
                     @Override public void onNotFound() {
@@ -79,14 +89,22 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override public void onError(Exception e) {
                         setLoading(false);
-                        Toast.makeText(LoginActivity.this, "Failed to load: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(
+                            LoginActivity.this,
+                            "Failed to get installation id: " + e.getMessage(),
+                            Toast.LENGTH_LONG
+                        ).show();
                     }
                 });
             }
 
             @Override public void onError(Exception e) {
                 setLoading(false);
-                Toast.makeText(LoginActivity.this, "Failed to get device ID: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(
+                    LoginActivity.this,
+                    "Failed to get device ID: " + e.getMessage(),
+                    Toast.LENGTH_LONG
+                ).show();
             }
         });
 
@@ -124,7 +142,11 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override public void onError(Exception e) {
                     setLoading(false);
-                    Toast.makeText(LoginActivity.this, "Save failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(
+                        LoginActivity.this,
+                        "Save failed: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                    ).show();
                 }
             });
         });
