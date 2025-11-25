@@ -220,7 +220,7 @@ public class EventRepository {
 
                             for (QueryDocumentSnapshot dd : subSnap) {
                                 String profileId = dd.getString("profileId");
-                                if (CurrentProfile.get().getDeviceId().equals(profileId)) {
+                                if (thisDeviceId.equals(profileId)) {
                                     Event e = parentEvent.toObject(Event.class);
                                     e.setId(parentEvent.getId());
                                     if (!addedEventIds.contains(parentEvent.getId())) {
