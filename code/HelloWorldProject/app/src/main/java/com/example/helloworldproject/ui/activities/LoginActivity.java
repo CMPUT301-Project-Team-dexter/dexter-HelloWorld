@@ -42,6 +42,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        boolean skipAutoLogin = getIntent().getBooleanExtra("skip_auto_login", false);
+
         etName = findViewById(R.id.et_name);
         etEmail = findViewById(R.id.et_email);
         etPhone = findViewById(R.id.et_phone);
@@ -71,8 +73,10 @@ public class LoginActivity extends AppCompatActivity {
                             etPhone.setText(p.getPhone());
                             userGroupSpinner.setSelection(p.getUserGroup().ordinal());
                             CurrentProfile.init(p);
-                            startActivity(HomeActivity.newIntent(LoginActivity.this));
-                            finish();
+                            if (!skipAutoLogin) {
+                                startActivity(HomeActivity.newIntent(LoginActivity.this));
+                                finish();
+                            }
                             return;
                         }
                         Toast.makeText(
