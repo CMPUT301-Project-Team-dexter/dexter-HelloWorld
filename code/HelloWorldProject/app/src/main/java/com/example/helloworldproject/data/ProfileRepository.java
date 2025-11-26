@@ -6,13 +6,16 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Firestore repository for Profile. */
 public class ProfileRepository {
@@ -61,39 +64,68 @@ public class ProfileRepository {
     }
 
     public void deleteProfile(Profile profile, final CompleteCallback cb) {
-        String thisDeviceId = profile.getDeviceId();
+        String thisId = profile.getId();
+        String thisName = profile.getName();
         WriteBatch batch = db.batch();
 
-        DocumentReference profileDeviceIdRef = db.collection("profiles").document(thisDeviceId);
-        batch.delete(profileDeviceIdRef);
+        // 1. Delete the profile document itself
+        DocumentReference profileRef = db.collection("profiles").document(thisId);
+        batch.delete(profileRef);
 
+        // 2. Get all 'events' documents to process deletions
         db.collection("events")
                 .get()
                 .addOnSuccessListener(snap -> {
-                    List<Task<QuerySnapshot>> tasks = new ArrayList<>();
-                    List<QueryDocumentSnapshot> parentEvents = new ArrayList<>(); // keep track of parent events
+                    List<Task<QuerySnapshot>> subcollectionTasks = new ArrayList<>();
 
-                    for (QueryDocumentSnapshot d : snap) {
-                        parentEvents.add(d); // save the parent event
-                        tasks.add(d.getReference().collection("waitlist").get());
-                        tasks.add(d.getReference().collection("invites").get());
+                    for (QueryDocumentSnapshot eventDoc : snap) {
+                        DocumentReference eventRef = eventDoc.getReference();
+
+                        String creator = eventDoc.getString("creator");
+                        boolean isCreator = thisName.equals(creator);
+
+                        if (isCreator) {
+                            // If the profile is the creator, mark the whole event document for deletion
+                            batch.delete(eventRef);
+
+                            Task<QuerySnapshot> waitlistTask = eventRef.collection("waitlist").get();
+
+                            Task<QuerySnapshot> invitesTask = eventRef.collection("invites").get();
+
+                            subcollectionTasks.add(waitlistTask);
+                            subcollectionTasks.add(invitesTask);
+                        } else {
+                            Query waitlistQuery = eventRef.collection("waitlist").whereEqualTo("profileId", thisId);
+                            Task<QuerySnapshot> waitlistTask = waitlistQuery.get();
+
+                            Query invitesQuery = eventRef.collection("invites").whereEqualTo("profileId", thisId);
+                            Task<QuerySnapshot> invitesTask = invitesQuery.get();
+
+                            subcollectionTasks.add(waitlistTask);
+                            subcollectionTasks.add(invitesTask);
+                        }
                     }
 
-                    Tasks.whenAllSuccess(tasks).addOnSuccessListener(results -> {
+                    // 3. Wait for all subcollection fetches to complete
+                    Tasks.whenAllComplete(subcollectionTasks).addOnSuccessListener(completedTasks -> {
 
-                        for (int i = 0; i < results.size(); i++) {
-                            QuerySnapshot subSnap = (QuerySnapshot) results.get(i);
+                        for (Task<?> t : completedTasks) {
+                            if (!t.isSuccessful()) {
+                                cb.onError(t.getException());
+                                return;
+                            }
 
-                            for (DocumentSnapshot dd : subSnap.getDocuments()) {
-                                String profileId = dd.getString("profileId");
-                                if (thisDeviceId.equals(profileId)) {
-                                    batch.delete(dd.getReference());
-                                }
+                            QuerySnapshot subSnap = (QuerySnapshot) t.getResult();
+
+                            for (DocumentSnapshot subDoc : subSnap.getDocuments()) {
+                                batch.delete(subDoc.getReference());
                             }
                         }
-                        batch.commit();
-                        cb.onComplete();
-                    });
+
+                        batch.commit().addOnSuccessListener(unused -> cb.onComplete())
+                                .addOnFailureListener(cb::onError);
+
+                    }).addOnFailureListener(cb::onError);
                 })
                 .addOnFailureListener(cb::onError);
     }
