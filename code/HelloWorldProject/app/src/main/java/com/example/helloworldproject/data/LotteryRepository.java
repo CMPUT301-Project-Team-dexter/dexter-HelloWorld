@@ -11,8 +11,14 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
+import androidx.annotation.NonNull;
+
+import com.example.helloworldproject.model.InvitationRecord;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +55,38 @@ public class LotteryRepository {
 
     public interface CompletionListener {
         void onSuccess();
+        void onError(Exception e);
+    }
+    public interface AcceptedEntrantsListener {
+        /**
+         * Called whenever the accepted entrants list is loaded or updated.
+         *
+         * @param entrants A list of Profile objects corresponding to all invites
+         *                 whose status is "ACCEPTED" for the given event.
+         */
+        void onLoaded(List<Profile> entrants);
+
+        /**
+         * Called if there is any error while talking to Firestore.
+         *
+         * @param e The underlying exception from the Firestore SDK.
+         */
+        void onError(Exception e);
+    }
+
+    public interface InvitationHistoryListener {
+        /**
+         * Called when a new snapshot of invitations has been loaded.
+         *
+         * @param invitations The full list of invitations matching the current filter.
+         */
+        void onLoaded(List<InvitationRecord> invitations);
+
+        /**
+         * Called if an error happens while fetching data from Firestore.
+         *
+         * @param e The underlying exception.
+         */
         void onError(Exception e);
     }
 
@@ -238,6 +276,32 @@ public class LotteryRepository {
             .addOnSuccessListener(unused -> listener.onSuccess())
             .addOnFailureListener(listener::onError);
     }
+    public void cancelAcceptedEntrant(
+            @NonNull String eventId,
+            @NonNull String profileId,
+            @Nullable final CompletionListener listener
+    ) {
+        DocumentReference ref = db.collection("events")
+                .document(eventId)
+                .collection("invites")
+                .document(profileId);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("status", "CANCELLED");
+        updates.put("cancelledAt", FieldValue.serverTimestamp());
+
+        ref.update(updates)
+                .addOnSuccessListener(unused -> {
+                    if (listener != null) {
+                        listener.onSuccess();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (listener != null) {
+                        listener.onError(e);
+                    }
+                });
+    }
 
     /** Observe invite status for a single profile. */
     public ListenerRegistration observeInviteStatus(
@@ -291,5 +355,82 @@ public class LotteryRepository {
                     listener.onLoaded(pending, accepted, declined);
                 }
             });
+    }
+    public ListenerRegistration observeAcceptedEntrants(
+            String eventId,
+            final AcceptedEntrantsListener listener
+    ) {
+        return db.collection("events")
+                .document(eventId)
+                .collection("invites")
+                .whereEqualTo("status", "ACCEPTED")
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        listener.onError(error);
+                        return;
+                    }
+
+                    List<Profile> entrants = new ArrayList<>();
+                    if (snapshots != null) {
+                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                            String profileId = doc.getId();
+
+                            Profile p = new Profile();
+                            p.setId(profileId);
+                            p.setName(doc.getString("name"));
+                            p.setEmail(doc.getString("email"));
+                            p.setPhone(doc.getString("phone"));
+
+                            entrants.add(p);
+                        }
+                    }
+
+                    listener.onLoaded(entrants);
+                });
+    }
+    public ListenerRegistration observeInvitationHistory(
+            String eventId,
+            @Nullable List<String> statusFilter,
+            final InvitationHistoryListener listener
+    ) {
+        Query query = db.collection("events")
+                .document(eventId)
+                .collection("invites")
+                .orderBy("invitedAt", Query.Direction.DESCENDING);
+
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            query = query.whereIn("status", statusFilter);
+        }
+
+        return query.addSnapshotListener((snapshots, error) -> {
+            if (error != null) {
+                listener.onError(error);
+                return;
+            }
+
+            List<InvitationRecord> records = new ArrayList<>();
+
+            if (snapshots != null) {
+                for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                    String profileId = doc.getId();
+                    String name = doc.getString("name");
+                    String code = doc.getString("profileId");
+                    if (code == null) {
+                        code = profileId;
+                    }
+                    String status = doc.getString("status");
+
+                    InvitationRecord record = new InvitationRecord(
+                            profileId,
+                            name,
+                            code,
+                            status
+                    );
+                    records.add(record);
+                }
+            }
+
+            listener.onLoaded(records);
+        });
     }
 }

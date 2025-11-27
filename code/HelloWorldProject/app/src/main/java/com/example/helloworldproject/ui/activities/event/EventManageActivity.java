@@ -15,7 +15,8 @@ import androidx.databinding.DataBindingUtil;
 
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.databinding.ActivityEventManagementBinding;
-
+import com.example.helloworldproject.ui.activities.event.ChosenEntrantsActivity;
+import com.example.helloworldproject.ui.activities.event.InvitationHistoryActivity;
 public class EventManageActivity extends AppCompatActivity {
     private static final String KEY_EVENT_ID = "KEY_EVENT_ID";
 
@@ -50,5 +51,18 @@ public class EventManageActivity extends AppCompatActivity {
                 Toast.makeText(EventManageActivity.this, "for test only: " + givenEventId, Toast.LENGTH_SHORT).show();
             }
         );
+        binding.evtMgrChosenEntrants.setOnClickListener(v -> {
+            startActivity(ChosenEntrantsActivity.newIntent(
+                    EventManageActivity.this,
+                    givenEventId
+            ));
+        });
+
+        binding.evtMgtInvitationHistory.setOnClickListener(v -> {
+            startActivity(InvitationHistoryActivity.newIntent(
+                    EventManageActivity.this,
+                    givenEventId
+            ));
+        });
     }
 }
