@@ -92,10 +92,8 @@ public class ChosenEntrantsActivity extends AppCompatActivity {
 
         // Attach our adapter to the RecyclerView.
         // We pass in a listener so that long-clicks on rows can trigger "cancel entrant".
-        adapter = new ChosenEntrantAdapter(entrant -> {
-            // When the user long-presses a row, ask for confirmation first.
-            showCancelConfirmDialog(entrant);
-        });
+        // When the user long-presses a row, ask for confirmation first.
+        adapter = new ChosenEntrantAdapter(this::showCancelConfirmDialog);
         recyclerView.setAdapter(adapter);
     }
 

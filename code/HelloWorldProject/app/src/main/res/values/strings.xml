@@ -53,11 +53,11 @@
     <string name="invitation_history">Invitation history</string>
     <string name="registered_entrants_title" />
     <string name="send_notification">Send Notification</string>
-    <string name="invitation_history_title" />
+    <string name="invitation_history_title">Invitation history</string>
     <string name="entrants_map_title" />
     <string name="map_placeholder_desc" />
     <string name="map_placeholder_label" />
-    <string name="chosen_entrants_title" />
+    <string name="chosen_entrants_title">Chosen entrants</string>
     <string name="export_csv" />
     <string name="button_region" />
 </resources>
