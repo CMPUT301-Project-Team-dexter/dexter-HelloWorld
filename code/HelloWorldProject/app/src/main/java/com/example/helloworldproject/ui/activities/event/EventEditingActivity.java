@@ -22,6 +22,7 @@ import com.example.helloworldproject.ui.dialogues.event.editing.EventBeginFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.EventCapacityFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.EventEndFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.LocationFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.PosterFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.RegistrationBeginFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.RegistrationEndFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.TitleFrag;
@@ -95,6 +96,13 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             return;
         }
         binding.setEventModel(e);
+        // region Title
+//        binding.evtEdPosterClickable.setOnClickListener(
+//                v -> new PosterFrag().show(
+//                        getSupportFragmentManager(), "Edit poster"
+//                )
+//        );
+        // endregion
         // region Title
         if (givenEventId == null) {
             binding.getEventModel().setTitle("Tap to edit title...");
