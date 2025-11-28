@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8sp">
+
+    <ImageView
+        android:id="@+id/img_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/placeholder"
+        android:adjustViewBounds="true"
+        android:gravity="start|top" />
+
+    <Button
+        android:id="@+id/select_img_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Image..."/>
+
+    <Button
+        android:id="@+id/confirm_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Confirm"/>
+</LinearLayout>
