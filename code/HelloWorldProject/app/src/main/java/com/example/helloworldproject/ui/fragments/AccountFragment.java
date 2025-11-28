@@ -49,6 +49,17 @@ public class AccountFragment extends Fragment {
             );
         }
 
+        Button logOutBtn = view.findViewById(R.id.logout_button);
+        if (logOutBtn != null) {
+            logOutBtn.setOnClickListener(v -> {
+                Intent intent = LoginActivity.newIntent(requireContext());
+                intent.putExtra("skip_auto_login", true);
+                startActivity(intent);
+                requireActivity().finish();
+            }
+            );
+        }
+
         Button deleteBtn = view.findViewById(R.id.delete_account_button);
         if (deleteBtn != null) {
             deleteBtn.setOnClickListener(v ->
