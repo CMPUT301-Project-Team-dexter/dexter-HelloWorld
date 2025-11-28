@@ -3,6 +3,9 @@ package com.example.helloworldproject.util;
 import android.util.Pair;
 import java.util.Calendar;
 
+/**
+ * This class handles date and time-related manipulations (eg. querying for events that start on a specific day)
+ */
 public class DateUtils {
     public static Pair<Long, Long> getDayRange(long selectedDate) {
         Calendar cal = Calendar.getInstance();

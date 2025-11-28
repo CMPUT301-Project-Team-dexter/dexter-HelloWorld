@@ -44,7 +44,8 @@ public class Event extends BaseObservable {
     private String duplicatePolicy;    // e.g., "ONE_ENTRY_PER_PROFILE"
     private Boolean geoRequired;       // true/false
     private Integer plannedSampleSize; // e.g., 20
-    private List<String> interests;
+    private List<String> interests; // e.g., ["Running", "Swimming"]
+
 
     public Event() {  }
 
@@ -66,7 +67,6 @@ public class Event extends BaseObservable {
      */
     @Exclude
     public EventStatus getRealTimeStatus() {
-
         Timestamp now = Timestamp.now();
         if (now.compareTo(getRegistrationOpenAt()) < 0) {
             return EventStatus.NOT_OPEN;

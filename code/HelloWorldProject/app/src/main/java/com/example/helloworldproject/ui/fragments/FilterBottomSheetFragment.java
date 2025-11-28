@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
-import android.widget.Toast;
+
 import com.example.helloworldproject.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.chip.Chip;
@@ -15,6 +15,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * Presents filtering options to the user through bottom sheet dialog.
+ * It allows users to filter content by selecting a specific date and a set of interest tags
+ * @see BottomSheetDialogFragment
+ * @see FilterListener
+ */
 public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
     public interface FilterListener {
         void onFilterApplied(long selectedDate, List<String> selectedInterests);
@@ -30,7 +36,7 @@ public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_filter_sheet, container, false);
+        View view = inflater.inflate(R.layout.frag_filter_sheet, container, false);
 
         CalendarView calendar = view.findViewById(R.id.filter_calendar);
         ChipGroup chipGroup = view.findViewById(R.id.filter_chip_group);

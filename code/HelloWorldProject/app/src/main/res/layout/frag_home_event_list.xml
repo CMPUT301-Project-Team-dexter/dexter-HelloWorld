@@ -20,35 +20,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <HorizontalScrollView
-            android:id="@+id/filter_nav_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:paddingStart="16dp"
-            android:paddingTop="0dp"
-            android:paddingEnd="0dp"
-            android:paddingBottom="0dp"
-
-            app:layout_constraintTop_toBottomOf="@+id/toolbar"
-            android:background="@color/zxing_transparent">
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/filter_chip_group"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                app:selectionRequired="false"
-                app:singleSelection="true">
-            </com.google.android.material.chip.ChipGroup>
-        </HorizontalScrollView>
-
         <ListView
             android:id="@+id/event_list_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
 
-            app:layout_constraintTop_toBottomOf="@id/filter_nav_bar"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">

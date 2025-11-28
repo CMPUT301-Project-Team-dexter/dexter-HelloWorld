@@ -84,7 +84,7 @@ public class HomeEventCardListFragment extends Fragment {
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                // TODO: implement filter function later
+                // button logic for "filter"
                 if (menuItem.getItemId() == R.id.home_filter_button) {
                     FilterBottomSheetFragment filterSheet = new FilterBottomSheetFragment(new FilterBottomSheetFragment.FilterListener() {
                         @Override
@@ -146,9 +146,9 @@ public class HomeEventCardListFragment extends Fragment {
                 startActivity(EventDetailActivity.newIntent(requireActivity(), e.getId()));
             } else {
                 Toast.makeText(
-                    requireContext(),
-                    "Error loading event details: event is null",
-                    Toast.LENGTH_SHORT
+                        requireContext(),
+                        "Error loading event details: event is null",
+                        Toast.LENGTH_SHORT
                 ).show();
             }
         });
@@ -165,31 +165,21 @@ public class HomeEventCardListFragment extends Fragment {
             addEventBtn.setVisibility(View.GONE);
         }
 
-//        // Example of interests
-//        dynamicFilters.add("Running");
-//        dynamicFilters.add("Music");
-//        dynamicFilters.add("Swimming");
-//        dynamicFilters.add("Climbing");
-//        dynamicFilters.add("Community");
-//
-//
-//        setupDynamicFilters(dynamicFilters);
-
         FirebaseFirestore.getInstance().collection("events").get()
                 .addOnSuccessListener(snapshots -> {
-                    Log.d("SANITY_CHECK", "Found " + snapshots.size() + " documents.");
+                    Log.d("QUERY_RET", "Found " + snapshots.size() + " documents.");
                     for (DocumentSnapshot doc : snapshots) {
                         // Print the ID and the raw timestamp to compare
-                        Log.d("SANITY_CHECK", "Doc ID: " + doc.getId() + " | Start: " + doc.get("eventStartAt"));
+                        Log.d("QUERY_RET", "Doc ID: " + doc.getId() + " | Start: " + doc.get("eventStartAt"));
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("SANITY_CHECK", "Error fetching docs: " + e.getMessage());
+                    Log.e("QUERY_RET", "Error fetching docs: " + e.getMessage());
                 });
     }
 
     private void updateAdapterFrom(List<Event> events) {
-        adapter.clear();
+        adapter.clear(); // needed this to properly update event list after applying filters
         adapter.addAll(events);
         adapter.notifyDataSetChanged();
     }
@@ -210,95 +200,38 @@ public class HomeEventCardListFragment extends Fragment {
     private void loadEventsForOrganizer() {
         String organizerName = CurrentProfile.get().getName();
         EventCache.asyncTryGetEventsCreatedBy(
-            organizerName,
-            new EventRepository.ListCallback() {
-                @Override
-                public void onLoaded(List<Event> events) {
-                    // TODO: filter/sort events
-                    updateAdapterFrom(events);
-                }
+                organizerName,
+                new EventRepository.ListCallback() {
+                    @Override
+                    public void onLoaded(List<Event> events) {
+                        // TODO: filter/sort events
+                        updateAdapterFrom(events);
+                    }
 
-                @Override
-                public void onError(Exception e) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Failed to load events created by " + organizerName + ": " + e.getClass().getCanonicalName(),
-                        Toast.LENGTH_SHORT
-                    ).show();
+                    @Override
+                    public void onError(Exception e) {
+                        Toast.makeText(
+                                requireContext(),
+                                "Failed to load events created by " + organizerName + ": " + e.getClass().getCanonicalName(),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
                 }
-            }
         );
     }
 
     // Below are helper functions for Entrant view
     private void loadJoinableEvents() {
         EventRepository.INSTANCE.loadJoinableEvents(new EventRepository.ListCallback() {
-            @Override public void onLoaded(List<Event> events) {
+            @Override
+            public void onLoaded(List<Event> events) {
                 updateAdapterFrom(events);
             }
-            @Override public void onError(Exception e) {
+
+            @Override
+            public void onError(Exception e) {
                 Toast.makeText(requireContext(), "Failed to load events: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    private void setupDynamicFilters(List<String> filterOptions) {
-        ChipGroup chipGroup = binding.getRoot().findViewById(R.id.filter_chip_group);
-        chipGroup.removeAllViews();
-
-        LayoutInflater inflater = LayoutInflater.from(requireContext());
-
-        for (String filterName : filterOptions) {
-            Chip chip = (Chip) inflater.inflate(R.layout.item_filter_chip, chipGroup, false);
-
-            chip.setText(filterName);
-            chip.setId(View.generateViewId());
-
-            chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    applyFilter(filterName);
-                } else {
-                    applyFilter("All");
-                }
-            });
-
-            chipGroup.addView(chip);
-        }
-    }
-
-    private void applyFilter(String filterName) {
-        // for debugging purposes
-        Toast.makeText(getContext(), "Filtering by: " + filterName, Toast.LENGTH_SHORT).show();
-
-        adapter.clear();
-
-        switch (filterName) {
-            case "My Events":
-                if (CurrentProfile.isOrganizer()) {
-                    loadEventsForOrganizer();
-                } else {
-                    // loadSignedUpEvents();
-                }
-                break;
-
-            case "Waitlisted":
-                // TODO:
-                // loadWaitlistedEvents();
-                break;
-
-            case "By Interest":
-                // TODO:
-                // loadEventsByInterest();
-                break;
-
-            case "All":
-            default:
-                if (CurrentProfile.isOrganizer()) {
-                    loadEventsForOrganizer();
-                } else {
-                    loadJoinableEvents();
-                }
-                break;
-        }
     }
 }

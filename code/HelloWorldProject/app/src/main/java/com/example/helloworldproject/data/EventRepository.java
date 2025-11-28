@@ -176,16 +176,33 @@ public class EventRepository {
                 .addOnFailureListener(cb::onError);
     }
 
+    /**
+     * Fetches a list of events from Firestore based on specified filters
+     * Method queries the "events" collection and filters the results by date and/or interests
+     * <p>
+     * If a date is provided (not equal to 0), the query will filter events that start within the specified day
+     * The date is converted into a start and end timestamp for the query
+     * <p>
+     * If a list of selected interests is provided (not null or empty), the query will filter events
+     * that have at least one of the specified interests in their "interests" array field.
+     * <p>
+     * @param date The date to filter events by, represented as millisecond
+     *             If date = 0, the date filter is not applied (no specific dates chosen)
+     * @param selectedInterests A list of strings representing the interests / categories to filter by
+     *                          If it is null or empty, the interest filter is not applied
+     */
     public void loadFilteredEvents(long date, List<String> selectedInterests, ListCallback callback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Query query = db.collection("events");
 
         Pair<Long, Long> range = DateUtils.getDayRange(date);
+
+        // filtering by dates
         if (date != 0) {
             Timestamp startTimestamp = new Timestamp(new Date(range.first));
             Timestamp endTimestamp = new Timestamp(new Date(range.second));
 
-            // DEBUG LOGS
+            // For debugging in logcat
             Log.d("FILTER_DEBUG", "Filtering for Date Range: " + startTimestamp + " to " + endTimestamp);
             if (selectedInterests != null) {
                 Log.d("FILTER_DEBUG", "Filtering for Interests: " + selectedInterests.toString());
@@ -197,13 +214,13 @@ public class EventRepository {
                     .whereLessThanOrEqualTo("eventStartAt", endTimestamp);
         }
 
+        // if interest is selected to filter by
         if (selectedInterests != null && !selectedInterests.isEmpty()) {
             query = query.whereArrayContainsAny("interests", selectedInterests);
         }
 
         query.get().addOnSuccessListener(queryDocumentSnapshots -> {
-
-            // for debugging returns of query
+            // for debugging what is returned after querying (check logcat)
             Log.d("FILTER_DEBUG", "Query Finished. Total Documents Found: " + queryDocumentSnapshots.size());
 
             for (DocumentSnapshot doc : queryDocumentSnapshots) {
@@ -211,17 +228,15 @@ public class EventRepository {
                 Log.d("FILTER_DEBUG", "MATCH: ID=" + doc.getId() + ", Title=" + doc.get("title"));
             }
 
-
+            // updates the adapter with the list of filtered events
             List<Event> events = new ArrayList<>();
             for (DocumentSnapshot doc : queryDocumentSnapshots) {
                 events.add(doc.toObject(Event.class));
             }
             callback.onLoaded(events);
         }).addOnFailureListener(e -> {
-
-            // for debugging errors from query
+            // for debugging errors from query (check logcat)
             Log.e("FILTER_DEBUG", "Query FAILED: " + e.getMessage());
-
             callback.onError(e);
         });
     }
