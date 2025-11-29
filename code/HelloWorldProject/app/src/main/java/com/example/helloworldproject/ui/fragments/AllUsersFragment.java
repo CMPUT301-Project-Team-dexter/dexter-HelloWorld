@@ -1,5 +1,4 @@
 package com.example.helloworldproject.ui.fragments;
-import com.example.helloworldproject.model.UserGroup;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,6 +20,7 @@ import androidx.lifecycle.Lifecycle;
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.ProfileRepository;
 import com.example.helloworldproject.model.Profile;
+import com.example.helloworldproject.model.UserGroup;
 import com.example.helloworldproject.ui.utils.UserItemAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 

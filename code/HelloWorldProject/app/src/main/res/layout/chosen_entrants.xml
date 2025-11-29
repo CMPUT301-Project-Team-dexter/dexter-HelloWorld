@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F8F8"
-    tools:locale="en">
+    android:background="#F8F8F8">
 
     <!-- Top App Bar -->
     <com.google.android.material.appbar.MaterialToolbar
@@ -13,58 +12,63 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:title="@string/chosen_entrants_title"
-        tools:title="Chosen entrants"
-        android:titleTextColor="@android:color/white"
-        app:titleCentered="false" />
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="@string/chosen_entrants_title"
+        app:titleTextColor="@color/white" />
 
     <!-- Scrollable list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerChosen"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/topAppBar"
-        android:layout_above="@+id/bottomActionBar"
+        android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingStart="16dp"
-        android:paddingEnd="16dp"
         android:paddingTop="12dp"
+        android:paddingEnd="16dp"
         android:paddingBottom="12dp"
-        tools:listitem="@layout/item_entrant"
-        tools:itemCount="8" />
+        app:layout_constraintBottom_toTopOf="@+id/bottomActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topAppBar"
+        tools:itemCount="8"
+        tools:listitem="@layout/item_entrant" />
 
     <!-- CSV Floating Action Button (anchored above bottom bar to avoid overlap) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabExportCsv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_above="@id/bottomActionBar"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:contentDescription="@string/export_csv"
-        app:srcCompat="@drawable/ic_csv"
-        app:backgroundTint="?attr/colorSecondary" />
+        android:src="@drawable/ic_csv"
+        app:layout_constraintBottom_toBottomOf="@id/recyclerChosen"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Bottom action bar with single button -->
     <LinearLayout
         android:id="@+id/bottomActionBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:background="@android:color/white"
         android:elevation="8dp"
+        android:orientation="vertical"
         android:padding="16dp"
-        android:orientation="vertical">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRegion"
+            android:id="@+id/send_chosen_notification_btn"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="@string/button_region"
             android:contentDescription="@string/button_region"
+            android:text="@string/send_notification"
             app:cornerRadius="12dp" />
     </LinearLayout>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

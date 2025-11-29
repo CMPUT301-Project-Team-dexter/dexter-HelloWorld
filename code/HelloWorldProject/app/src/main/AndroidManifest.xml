@@ -22,6 +22,15 @@
             android:name=".ui.activities.event.EventManageActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.activities.event.ChosenEntrantsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activities.event.InvitationHistoryActivity"
+            android:exported="false" />
+
+
+        <activity
             android:name=".ui.activities.event.AdminEventListActivity"
             android:exported="false" />
         <activity
