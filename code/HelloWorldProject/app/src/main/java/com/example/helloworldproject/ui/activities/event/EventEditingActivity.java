@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import com.bumptech.glide.Glide;
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.EventRepository;
 import com.example.helloworldproject.data.ImageRepository;
@@ -37,7 +38,7 @@ import com.google.firebase.Timestamp;
 
 import java.util.Date;
 
-public class EventEditingActivity extends AppCompatActivity implements EventEditListener, ImgSelListener {
+public class EventEditingActivity extends AppCompatActivity implements EventEditListener {
     private static final String KEY_EVENT_ID = "key_event_id";
 
     public static Intent newIntent(Context context, @Nullable String eventId) {
@@ -100,6 +101,11 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             return;
         }
         binding.setEventModel(e);
+        Glide.with(this)
+                .load(e.getImgUrl())
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.placeholder)
+                .into(binding.evtEdPosterImage);
         // region Title
         binding.evtEdPosterClickable.setOnClickListener(
                 v -> new PosterFrag().show(
@@ -343,7 +349,23 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
     }
 
     @Override
-    public void onImgSelected(Uri imgUri) {
+    public void updateImgUrl(String url) {
+        binding.getEventModel().setImgUrl(url);
+
+        Glide.with(this)
+                .load(url)
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.placeholder)
+                .into(binding.evtEdPosterImage);
+    }
+
+    @Override
+    public void updateImgUrlEnable(Boolean imgUrlEnable) {
+        binding.getEventModel().setImgUrlEnable(imgUrlEnable);
+    }
+
+    @Override
+    public void updateImgUri(Uri imgUri) {
         if (imgUri == null) return;
 
         ImageRepository.INSTANCE.uploadImage(imgUri, new ImageRepository.UriCallback() {

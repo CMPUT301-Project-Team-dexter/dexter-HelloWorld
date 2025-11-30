@@ -16,16 +16,18 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.DialogFragment;
 import androidx.activity.result.PickVisualMediaRequest;
 
+import com.bumptech.glide.Glide;
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.databinding.FragPosterEditBinding;
+import com.example.helloworldproject.ui.activities.event.EventEditListener;
 
-public class PosterFrag extends DialogFragment {
+public class PosterFrag extends DialogFragment  {
 
     public PosterFrag() {}
 
     FragPosterEditBinding binding;
 
-    private ImgSelListener listener;
+    private EventEditListener listener;
     private Uri selectedImgUri;
     private ImageView imgView;
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
@@ -33,7 +35,7 @@ public class PosterFrag extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            listener = (ImgSelListener) context;
+            listener = (EventEditListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement ImageSelectionListener");
@@ -84,12 +86,36 @@ public class PosterFrag extends DialogFragment {
 
         Button btnConfirm = binding.confirmBtn;
         btnConfirm.setOnClickListener(v -> {
-            if (selectedImgUri != null) {
-                listener.onImgSelected(selectedImgUri);
-                dismiss();
-            } else {
-                Toast.makeText(getContext(), "Please select an image first.", Toast.LENGTH_SHORT).show();
+            int checkedId = binding.radioGroup.getCheckedRadioButtonId();
+            if (checkedId == -1) {
+                Toast.makeText(getContext(), "Source of image is not selected.", Toast.LENGTH_SHORT).show();
+            } else if (checkedId == R.id.disable_radio_btn) {
+                if (selectedImgUri != null) {
+                    listener.updateImgUri(selectedImgUri);
+                    listener.updateImgUrlEnable(false);
+                    dismiss();
+                } else {
+                    Toast.makeText(getContext(), "Please select an image first.", Toast.LENGTH_SHORT).show();
+                }
+            } else if (checkedId == R.id.enable_radio_btn) {
+                String value = binding.editTextInput.getText().toString().strip();
+                if (value.isEmpty()) {
+                    Toast.makeText(getContext(), "Number can not be empty", Toast.LENGTH_SHORT).show();
+                } else {
+                    listener.updateImgUrlEnable(true);
+                    listener.updateImgUrl(value);
+                }
             }
+        });
+
+        binding.disableRadioBtn.setOnClickListener(v -> {
+            binding.enableRadioBtn.setChecked(false);
+            binding.disableRadioBtn.setChecked(true);
+        });
+
+        binding.enableRadioBtn.setOnClickListener(v -> {
+            binding.disableRadioBtn.setChecked(false);
+            binding.enableRadioBtn.setChecked(true);
         });
 
         return view;

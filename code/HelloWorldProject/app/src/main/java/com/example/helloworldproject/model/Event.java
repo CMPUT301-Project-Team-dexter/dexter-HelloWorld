@@ -46,6 +46,10 @@ public class Event extends BaseObservable {
 
     private String imgId;
 
+    private String imgUrl;
+
+    private Boolean imgUrlEnable;
+
     public Event() {  }
 
     public String getId() {
@@ -178,6 +182,13 @@ public class Event extends BaseObservable {
     @Bindable
     public String getImgId() { return imgId; }
 
+    @Bindable
+    public String getImgUrl() { return imgUrl; }
+
+    @Bindable
+    public Boolean getImgUrlEnable() { return imgUrlEnable; }
+
+
     public void setId(String id) {
         this.id = id;
     }
@@ -254,4 +265,8 @@ public class Event extends BaseObservable {
     public void setImgId(String imgId) {
         this.imgId = imgId;
     }
+
+    public void setImgUrl(String imgUrl) { this.imgUrl = imgUrl; }
+
+    public void setImgUrlEnable(Boolean imgUrlEnable) { this.imgUrlEnable = imgUrlEnable; }
 }
