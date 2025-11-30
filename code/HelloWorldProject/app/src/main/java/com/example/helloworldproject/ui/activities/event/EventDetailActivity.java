@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import com.bumptech.glide.Glide;
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.EventRepository;
 import com.example.helloworldproject.data.LotteryRepository;
@@ -97,6 +98,14 @@ public class EventDetailActivity extends AppCompatActivity {
             return;
         }
         binding.setEventModel(e);
+
+        String imgUrl = e.getImgUrl();
+        Glide.with(this)
+                .load(imgUrl)
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.placeholder)
+                .into(binding.evtDtlPosterImage);
+
         if (CurrentProfile.isOrganizer()) {
             binding.evtDtlOrgEditBtn.setOnClickListener(
                 v -> startActivity(EventEditingActivity.newIntent(this, givenEventId))

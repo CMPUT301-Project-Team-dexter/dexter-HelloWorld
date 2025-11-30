@@ -9,7 +9,9 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.Glide;
 import com.example.helloworldproject.R;
+import com.example.helloworldproject.data.ImageRepository;
 import com.example.helloworldproject.databinding.ItemEventCardBinding;
 import com.example.helloworldproject.model.Event;
 
@@ -44,7 +46,24 @@ public class EventCardAdapter extends ArrayAdapter<Event> {
             throw new IllegalStateException("Event at position " + position + " is null");
         }
         cardBinding.eventName.setText(item.getTitle());
-        // TODO: set to the event poster
+        String imgUrl = item.getImgUrl();
+        Glide.with(getContext())
+                .load(imgUrl)
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.placeholder)
+                .into(cardBinding.posterImage);
+//        ImageRepository.INSTANCE.readImageIntoView(getContext(), cardBinding.posterImage, item.getImgId(), new ImageRepository.UrlCallback() {
+//            @Override
+//            public void onSuccess() {
+//                ;
+//            }
+//
+//            @Override
+//            public void onError(Exception e) {
+//
+//            }
+//        });
+
         cardBinding.posterImage.setImageResource(R.drawable.debug_card_image);
         // region Event Status
         switch (item.getRealTimeStatus()) {
