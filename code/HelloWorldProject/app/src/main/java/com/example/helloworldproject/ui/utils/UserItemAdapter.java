@@ -5,8 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.TextView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.helloworldproject.R;
 
@@ -16,6 +16,7 @@ public class UserItemAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     private final ArrayList<String> userNames;
     private final ArrayList<String> userIds;
+
     public interface OnDeleteClickListener {
         void onDeleteClick(int position);
     }
@@ -76,14 +77,14 @@ public class UserItemAdapter extends BaseAdapter {
 
         String name = userNames.get(position);
         String id = (userIds != null && userIds.size() > position)
-                ? userIds.get(position)
-                : "";
+            ? userIds.get(position)
+            : "";
 
         holder.userNameView.setText(name);
         holder.userIdView.setText(id);
         if (holder.deleteView != null && deleteClickListener != null) {
             holder.deleteView.setOnClickListener(v ->
-                    deleteClickListener.onDeleteClick(position)
+                deleteClickListener.onDeleteClick(position)
             );
         }
 

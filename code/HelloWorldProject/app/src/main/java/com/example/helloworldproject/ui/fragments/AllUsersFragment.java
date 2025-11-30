@@ -1,6 +1,4 @@
 package com.example.helloworldproject.ui.fragments;
-import com.example.helloworldproject.model.UserGroup;
-import androidx.appcompat.app.AlertDialog;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
@@ -22,6 +21,7 @@ import androidx.lifecycle.Lifecycle;
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.ProfileRepository;
 import com.example.helloworldproject.model.Profile;
+import com.example.helloworldproject.model.UserGroup;
 import com.example.helloworldproject.ui.utils.UserItemAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -71,71 +71,68 @@ public class AllUsersFragment extends Fragment {
         listView = view.findViewById(R.id.event_list_view);
 
         adapter = new UserItemAdapter(
-                requireContext(),
-                userNames,
-                userIds,
-                position -> {
-                    // Safety check
-                    if (position < 0 || position >= profiles.size()) {
-                        return;
-                    }
-
-                    Profile toDelete = profiles.get(position);
-                    if (toDelete == null) return;
-
-                    UserGroup group = toDelete.getUserGroup();
-                    if (group == UserGroup.ADMIN) {
-                        Toast.makeText(
-                                requireContext(),
-                                "Admin profiles cannot be deleted.",
-                                Toast.LENGTH_SHORT
-                        ).show();
-                        return;
-                    }
-
-                    String name = toDelete.getName();
-                    if (name == null || name.isEmpty()) {
-                        name = "this profile";
-                    }
-
-                    new AlertDialog.Builder(requireContext())
-                            .setTitle("Delete profile")
-                            .setMessage("Are you sure you want to delete " + name + "?")
-                            .setPositiveButton("Delete", (dialog, which) -> {
-                                profileRepository.deleteProfile(toDelete, new ProfileRepository.CompleteCallback() {
-                                    @Override
-                                    public void onComplete() {
-                                        requireActivity().runOnUiThread(() -> {
-                                            Toast.makeText(
-                                                    requireContext(),
-                                                    "Profile deleted.",
-                                                    Toast.LENGTH_SHORT
-                                            ).show();
-                                            loadProfiles();   // refresh list
-                                        });
-                                    }
-
-                                    @Override
-                                    public void onError(Exception e) {
-                                        requireActivity().runOnUiThread(() -> {
-                                            Toast.makeText(
-                                                    requireContext(),
-                                                    "Failed to delete profile: " + e.getMessage(),
-                                                    Toast.LENGTH_LONG
-                                            ).show();
-                                        });
-                                    }
-                                });
-                            })
-                            .setNegativeButton("Cancel", null)
-                            .show();
+            requireContext(),
+            userNames,
+            userIds,
+            position -> {
+                // Safety check
+                if (position < 0 || position >= profiles.size()) {
+                    return;
                 }
+
+                Profile toDelete = profiles.get(position);
+                if (toDelete == null) return;
+
+                UserGroup group = toDelete.getUserGroup();
+                if (group == UserGroup.ADMIN) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Admin profiles cannot be deleted.",
+                        Toast.LENGTH_SHORT
+                    ).show();
+                    return;
+                }
+
+                String name = toDelete.getName();
+                if (name == null || name.isEmpty()) {
+                    name = "this profile";
+                }
+
+                new AlertDialog.Builder(requireContext())
+                    .setTitle("Delete profile")
+                    .setMessage("Are you sure you want to delete " + name + "?")
+                    .setPositiveButton("Delete",
+                        (dialog, which) ->
+                            profileRepository.deleteProfile(toDelete, new ProfileRepository.CompleteCallback() {
+                                @Override
+                                public void onComplete() {
+                                    requireActivity().runOnUiThread(() -> {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "Profile deleted.",
+                                            Toast.LENGTH_SHORT
+                                        ).show();
+                                        loadProfiles();   // refresh list
+                                    });
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    requireActivity().runOnUiThread(
+                                        () -> Toast.makeText(
+                                            requireContext(),
+                                            "Failed to delete profile: " + e.getMessage(),
+                                            Toast.LENGTH_LONG
+                                        ).show());
+                                }
+                            })
+                    )
+                    .setNegativeButton("Cancel", null)
+                    .show();
+            }
         );
         listView.setAdapter(adapter);
-
         loadProfiles();
-
-
     }
 
     @Override
@@ -145,6 +142,7 @@ public class AllUsersFragment extends Fragment {
 
         return view;
     }
+
     private void loadProfiles() {
         profileRepository.loadAllProfiles(new ProfileRepository.ListCallback() {
             @Override
@@ -156,7 +154,6 @@ public class AllUsersFragment extends Fragment {
 
                     for (Profile p : loadedProfiles) {
                         profiles.add(p);   // keep full object
-
                         String name = p.getName() == null ? "(Unnamed)" : p.getName();
 
                         UserGroup group = p.getUserGroup();
@@ -182,7 +179,6 @@ public class AllUsersFragment extends Fragment {
                         userNames.add(name);
                         userIds.add(roleLabel);
                     }
-
                     adapter.notifyDataSetChanged();
                 });
             }
@@ -190,15 +186,13 @@ public class AllUsersFragment extends Fragment {
             @Override
             public void onError(Exception e) {
                 requireActivity().runOnUiThread(() ->
-                        Toast.makeText(
-                                requireContext(),
-                                "Failed to load profiles: " + e.getMessage(),
-                                Toast.LENGTH_LONG
-                        ).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed to load profiles: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                    ).show()
                 );
             }
         });
     }
-
-
 }

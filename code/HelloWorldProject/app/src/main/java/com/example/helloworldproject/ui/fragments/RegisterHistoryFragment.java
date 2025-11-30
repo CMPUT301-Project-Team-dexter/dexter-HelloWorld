@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,11 +23,7 @@ import com.example.helloworldproject.data.EventRepository;
 import com.example.helloworldproject.databinding.FragHomeEventListBinding;
 import com.example.helloworldproject.model.Event;
 import com.example.helloworldproject.ui.activities.event.EventDetailActivity;
-import com.example.helloworldproject.ui.activities.event.EventEditingActivity;
-import com.example.helloworldproject.ui.activities.event.EventQRCodeScanActivity;
 import com.example.helloworldproject.ui.utils.EventCardAdapter;
-import com.example.helloworldproject.util.CurrentProfile;
-import com.example.helloworldproject.util.EventCache;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;

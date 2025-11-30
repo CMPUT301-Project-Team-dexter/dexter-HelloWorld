@@ -37,7 +37,7 @@ public class HomeActivity extends AppCompatActivity {
         Profile currentUser = CurrentProfile.get();
         Snackbar.make(
             binding.homeNavView,
-            "Log in as " + currentUser.getUserGroup().name() + " " + currentUser.getName(),
+            "Logged in as " + currentUser.getUserGroup().name() + ": " + currentUser.getName(),
             Snackbar.LENGTH_LONG
         ).show();
 

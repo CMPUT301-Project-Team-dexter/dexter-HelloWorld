@@ -15,6 +15,7 @@ public class EventCache {
 
     /**
      * Cache the given event locally.
+     *
      * @param e: the event to be cached
      */
     public static void cache(@NonNull Event e) {
@@ -23,16 +24,20 @@ public class EventCache {
         }
     }
 
+    public static boolean remove(@NonNull Event e) {
+        return internalCache.remove(e.getId(), e);
+    }
+
     /**
      * Try to get a single event by its ID. If cached, return from cache immediately.
      * <p>
      * There is no need to cache the result in the callback.
      * <p>
      * <p>
-     *     Note: The function returns immediately.
-     *     The result is delivered via the provided callback.
-     *     Anything relying on the result must be done in the
-     *     {@link EventRepository.LoadCallback onLoaded} methods.
+     * Note: The function returns immediately.
+     * The result is delivered via the provided callback.
+     * Anything relying on the result must be done in the
+     * {@link EventRepository.LoadCallback onLoaded} methods.
      * </p>
      *
      * @param eventId: the ID of the event
@@ -72,10 +77,10 @@ public class EventCache {
      * There is no need to cache results in the callback.
      * <p>
      * <p>
-     *     Note: The function returns immediately.
-     *     The result is delivered via the provided callback.
-     *     Anything relying on the result must be done in the
-     *     {@link EventRepository.LoadCallback onLoaded} methods.
+     * Note: The function returns immediately.
+     * The result is delivered via the provided callback.
+     * Anything relying on the result must be done in the
+     * {@link EventRepository.LoadCallback onLoaded} methods.
      * </p>
      *
      * @param organizerName: the name of the organizer

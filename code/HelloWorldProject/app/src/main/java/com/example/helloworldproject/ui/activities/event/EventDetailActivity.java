@@ -10,9 +10,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import com.bumptech.glide.Glide;
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.EventRepository;
 import com.example.helloworldproject.data.LotteryRepository;
@@ -24,7 +26,6 @@ import com.example.helloworldproject.ui.dialogues.event.QRCodeFrag;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
 import com.google.firebase.firestore.ListenerRegistration;
-import androidx.appcompat.app.AlertDialog;
 
 
 public class EventDetailActivity extends AppCompatActivity {
@@ -97,6 +98,14 @@ public class EventDetailActivity extends AppCompatActivity {
             return;
         }
         binding.setEventModel(e);
+
+        String imgUrl = e.getImgUrl();
+        Glide.with(this)
+                .load(imgUrl)
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.placeholder)
+                .into(binding.evtDtlPosterImage);
+
         if (CurrentProfile.isOrganizer()) {
             binding.evtDtlOrgEditBtn.setOnClickListener(
                 v -> startActivity(EventEditingActivity.newIntent(this, givenEventId))
@@ -108,51 +117,52 @@ public class EventDetailActivity extends AppCompatActivity {
                 Event event = binding.getEventModel();
                 if (event == null) {
                     Toast.makeText(
-                            EventDetailActivity.this,
-                            "Event is not loaded yet.",
-                            Toast.LENGTH_SHORT
+                        EventDetailActivity.this,
+                        "Event is not loaded yet.",
+                        Toast.LENGTH_SHORT
                     ).show();
                     return;
                 }
 
                 new AlertDialog.Builder(EventDetailActivity.this)
-                        .setTitle("Delete event")
-                        .setMessage("Are you sure you want to delete this event?")
-                        .setPositiveButton("Delete", (dialog, which) -> {
-                            // prevent double-taps
-                            binding.evtDtlAdminDeleteBtn.setEnabled(false);
+                    .setTitle("Delete event")
+                    .setMessage("Are you sure you want to delete this event?")
+                    .setPositiveButton("Delete", (dialog, which) -> {
+                        // prevent double-taps
+                        binding.evtDtlAdminDeleteBtn.setEnabled(false);
 
-                            EventRepository.INSTANCE.deleteEvent(
-                                    event,
-                                    new EventRepository.CompleteCallback() {
-                                        @Override
-                                        public void onComplete() {
-                                            runOnUiThread(() -> {
-                                                Toast.makeText(
-                                                        EventDetailActivity.this,
-                                                        "Event deleted.",
-                                                        Toast.LENGTH_SHORT
-                                                ).show();
-                                                finish();  // go back to admin event list
-                                            });
-                                        }
+                        EventRepository.INSTANCE.deleteEvent(
+                            event,
+                            new EventRepository.CompleteCallback() {
+                                @Override
+                                public void onComplete() {
+                                    EventCache.remove(event);
+                                    runOnUiThread(() -> {
+                                        Toast.makeText(
+                                            EventDetailActivity.this,
+                                            "Event deleted.",
+                                            Toast.LENGTH_SHORT
+                                        ).show();
+                                        finish();  // go back to admin event list
+                                    });
+                                }
 
-                                        @Override
-                                        public void onError(Exception e) {
-                                            runOnUiThread(() -> {
-                                                binding.evtDtlAdminDeleteBtn.setEnabled(true);
-                                                Toast.makeText(
-                                                        EventDetailActivity.this,
-                                                        "Failed to delete event: " + e.getMessage(),
-                                                        Toast.LENGTH_LONG
-                                                ).show();
-                                            });
-                                        }
-                                    }
-                            );
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
+                                @Override
+                                public void onError(Exception e) {
+                                    runOnUiThread(() -> {
+                                        binding.evtDtlAdminDeleteBtn.setEnabled(true);
+                                        Toast.makeText(
+                                            EventDetailActivity.this,
+                                            "Failed to delete event: " + e.getMessage(),
+                                            Toast.LENGTH_LONG
+                                        ).show();
+                                    });
+                                }
+                            }
+                        );
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
             });
             binding.evtDtlAdminDeleteBtn.setVisibility(View.VISIBLE);
         } else {
@@ -160,7 +170,6 @@ public class EventDetailActivity extends AppCompatActivity {
             setupEntrantButtons(e);
             observeInviteStatus();
         }
-
     }
 
     @Override
@@ -168,8 +177,8 @@ public class EventDetailActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.event_detail_menu, menu);
         if (
             CurrentProfile.isOrganizer() &&
-            CurrentProfile.get().getName()
-                .contentEquals(binding.getEventModel().getCreator())
+                CurrentProfile.get().getName()
+                    .contentEquals(binding.getEventModel().getCreator())
         ) {
             MenuItem qrCodeGen = menu.findItem(R.id.evt_dtl_qr_gen_btn);
             qrCodeGen.setVisible(true);
@@ -202,11 +211,13 @@ public class EventDetailActivity extends AppCompatActivity {
             givenEventId,
             CurrentProfile.get().getId(),
             new WaitlistRepository.MembershipListener() {
-                @Override public void onResult(boolean isInWaitlist) {
+                @Override
+                public void onResult(boolean isInWaitlist) {
                     runOnUiThread(() -> updateJoinLeaveVisibility(isInWaitlist, canJoin));
                 }
 
-                @Override public void onError(Exception e) {
+                @Override
+                public void onError(Exception e) {
                     runOnUiThread(() -> Toast.makeText(
                         EventDetailActivity.this,
                         "Failed to load waitlist status: " + e.getMessage(),
@@ -222,7 +233,8 @@ public class EventDetailActivity extends AppCompatActivity {
                 givenEventId,
                 CurrentProfile.get(),
                 new WaitlistRepository.CompletionListener() {
-                    @Override public void onSuccess() {
+                    @Override
+                    public void onSuccess() {
                         runOnUiThread(() -> {
                             Toast.makeText(
                                 EventDetailActivity.this,
@@ -233,7 +245,8 @@ public class EventDetailActivity extends AppCompatActivity {
                         });
                     }
 
-                    @Override public void onError(Exception e) {
+                    @Override
+                    public void onError(Exception e) {
                         runOnUiThread(() -> {
                             binding.evtDtlJoinBtn.setEnabled(canJoin);
                             Toast.makeText(
@@ -253,7 +266,8 @@ public class EventDetailActivity extends AppCompatActivity {
                 givenEventId,
                 CurrentProfile.get().getId(),
                 new WaitlistRepository.CompletionListener() {
-                    @Override public void onSuccess() {
+                    @Override
+                    public void onSuccess() {
                         runOnUiThread(() -> {
                             Toast.makeText(
                                 EventDetailActivity.this,
@@ -264,7 +278,8 @@ public class EventDetailActivity extends AppCompatActivity {
                         });
                     }
 
-                    @Override public void onError(Exception e) {
+                    @Override
+                    public void onError(Exception e) {
                         runOnUiThread(() -> {
                             binding.evtDtlLeaveBtn.setEnabled(true);
                             Toast.makeText(
@@ -281,11 +296,13 @@ public class EventDetailActivity extends AppCompatActivity {
         waitlistCountListener = waitlistRepository.observeCount(
             givenEventId,
             new WaitlistRepository.CountListener() {
-                @Override public void onCount(int total) {
+                @Override
+                public void onCount(int total) {
                     runOnUiThread(() -> binding.evtDtlWaitListView.setText(total + " entrants on the waiting list"));
                 }
 
-                @Override public void onError(Exception e) {
+                @Override
+                public void onError(Exception e) {
                     runOnUiThread(() -> Toast.makeText(
                         EventDetailActivity.this,
                         "Failed to load waitlist count: " + e.getMessage(),
@@ -329,7 +346,8 @@ public class EventDetailActivity extends AppCompatActivity {
                 givenEventId,
                 sampleSize,
                 new LotteryRepository.DrawCallback() {
-                    @Override public void onComplete(int invitedCount) {
+                    @Override
+                    public void onComplete(int invitedCount) {
                         runOnUiThread(() -> {
                             binding.evtDtlOrgRunDrawBtn.setEnabled(true);
                             Toast.makeText(
@@ -340,7 +358,8 @@ public class EventDetailActivity extends AppCompatActivity {
                         });
                     }
 
-                    @Override public void onError(Exception e) {
+                    @Override
+                    public void onError(Exception e) {
                         runOnUiThread(() -> {
                             binding.evtDtlOrgRunDrawBtn.setEnabled(true);
                             Toast.makeText(
@@ -360,7 +379,8 @@ public class EventDetailActivity extends AppCompatActivity {
                 givenEventId,
                 1,
                 new LotteryRepository.DrawCallback() {
-                    @Override public void onComplete(int invitedCount) {
+                    @Override
+                    public void onComplete(int invitedCount) {
                         runOnUiThread(() -> {
                             binding.evtDtlOrgReplacementBtn.setEnabled(true);
                             Toast.makeText(
@@ -371,7 +391,8 @@ public class EventDetailActivity extends AppCompatActivity {
                         });
                     }
 
-                    @Override public void onError(Exception e) {
+                    @Override
+                    public void onError(Exception e) {
                         runOnUiThread(() -> {
                             binding.evtDtlOrgReplacementBtn.setEnabled(true);
                             Toast.makeText(
@@ -388,13 +409,15 @@ public class EventDetailActivity extends AppCompatActivity {
         inviteSummaryListener = lotteryRepository.observeInviteSummary(
             givenEventId,
             new LotteryRepository.InviteSummaryListener() {
-                @Override public void onLoaded(int pending, int accepted, int declined) {
+                @Override
+                public void onLoaded(int pending, int accepted, int declined) {
                     runOnUiThread(() -> binding.evtDtlOrgLotterySummary.setText(
                         "Invites – Pending: " + pending + ", Accepted: " + accepted + ", Declined: " + declined
                     ));
                 }
 
-                @Override public void onError(Exception e) {
+                @Override
+                public void onError(Exception e) {
                     runOnUiThread(() -> Toast.makeText(
                         EventDetailActivity.this,
                         "Failed to load invite summary: " + e.getMessage(),
@@ -410,11 +433,13 @@ public class EventDetailActivity extends AppCompatActivity {
             givenEventId,
             CurrentProfile.get().getId(),
             new LotteryRepository.InviteStatusListener() {
-                @Override public void onLoaded(@Nullable String status) {
+                @Override
+                public void onLoaded(@Nullable String status) {
                     runOnUiThread(() -> renderInviteStatus(status));
                 }
 
-                @Override public void onError(Exception e) {
+                @Override
+                public void onError(Exception e) {
                     runOnUiThread(() -> Toast.makeText(
                         EventDetailActivity.this,
                         "Failed to load invite status: " + e.getMessage(),
@@ -428,11 +453,13 @@ public class EventDetailActivity extends AppCompatActivity {
             givenEventId,
             CurrentProfile.get().getId(),
             new LotteryRepository.InviteStatusListener() {
-                @Override public void onLoaded(@Nullable String status) {
+                @Override
+                public void onLoaded(@Nullable String status) {
                     runOnUiThread(() -> renderInviteStatus(status));
                 }
 
-                @Override public void onError(Exception e) {
+                @Override
+                public void onError(Exception e) {
                     runOnUiThread(() -> Toast.makeText(
                         EventDetailActivity.this,
                         "Failed to load invite status: " + e.getMessage(),
@@ -448,13 +475,15 @@ public class EventDetailActivity extends AppCompatActivity {
                 givenEventId,
                 CurrentProfile.get().getId(),
                 new LotteryRepository.CompletionListener() {
-                    @Override public void onSuccess() {
+                    @Override
+                    public void onSuccess() {
                         runOnUiThread(() -> {
                             Toast.makeText(EventDetailActivity.this, "Invitation accepted", Toast.LENGTH_SHORT).show();
                         });
                     }
 
-                    @Override public void onError(Exception e) {
+                    @Override
+                    public void onError(Exception e) {
                         runOnUiThread(() -> {
                             binding.evtDtlAcceptInviteBtn.setEnabled(true);
                             Toast.makeText(
@@ -474,13 +503,15 @@ public class EventDetailActivity extends AppCompatActivity {
                 givenEventId,
                 CurrentProfile.get().getId(),
                 new LotteryRepository.CompletionListener() {
-                    @Override public void onSuccess() {
+                    @Override
+                    public void onSuccess() {
                         runOnUiThread(() -> {
                             Toast.makeText(EventDetailActivity.this, "Invitation declined", Toast.LENGTH_SHORT).show();
                         });
                     }
 
-                    @Override public void onError(Exception e) {
+                    @Override
+                    public void onError(Exception e) {
                         runOnUiThread(() -> {
                             binding.evtDtlDeclineInviteBtn.setEnabled(true);
                             Toast.makeText(

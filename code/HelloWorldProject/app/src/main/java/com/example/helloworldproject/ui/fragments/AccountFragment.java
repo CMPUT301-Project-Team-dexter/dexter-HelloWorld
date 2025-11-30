@@ -31,39 +31,39 @@ public class AccountFragment extends Fragment {
         Button profileBtn = view.findViewById(R.id.profile_button);
         if (profileBtn != null) {
             profileBtn.setOnClickListener(v ->
-                    startActivity(new Intent(requireContext(), ProfileEditActivity.class))
+                startActivity(new Intent(requireContext(), ProfileEditActivity.class))
             );
         }
 
         Button settingsBtn = view.findViewById(R.id.settings_button);
         if (settingsBtn != null) {
             settingsBtn.setOnClickListener(v ->
-                    startActivity(new Intent(requireContext(), SettingsActivity.class))
+                startActivity(new Intent(requireContext(), SettingsActivity.class))
             );
         }
 
         Button regHisBtn = view.findViewById(R.id.register_history_button1);
         if (regHisBtn != null) {
             regHisBtn.setOnClickListener(v ->
-                    startActivity(new Intent(requireContext(), RegisterHistoryActivity.class))
+                startActivity(new Intent(requireContext(), RegisterHistoryActivity.class))
             );
         }
 
         Button logOutBtn = view.findViewById(R.id.logout_button);
         if (logOutBtn != null) {
             logOutBtn.setOnClickListener(v -> {
-                Intent intent = LoginActivity.newIntent(requireContext());
-                intent.putExtra("skip_auto_login", true);
-                startActivity(intent);
-                requireActivity().finish();
-            }
+                    Intent intent = LoginActivity.newIntent(requireContext());
+                    intent.putExtra("skip_auto_login", true);
+                    startActivity(intent);
+                    requireActivity().finish();
+                }
             );
         }
 
         Button deleteBtn = view.findViewById(R.id.delete_account_button);
         if (deleteBtn != null) {
             deleteBtn.setOnClickListener(v ->
-                    deleteProfileButtonFunction()
+                deleteProfileButtonFunction()
             );
         }
 

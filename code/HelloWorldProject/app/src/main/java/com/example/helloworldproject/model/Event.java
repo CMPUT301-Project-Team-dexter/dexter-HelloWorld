@@ -11,6 +11,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Exclude;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -43,6 +44,14 @@ public class Event extends BaseObservable {
     private String duplicatePolicy;    // e.g., "ONE_ENTRY_PER_PROFILE"
     private Boolean geoRequired;       // true/false
     private Integer plannedSampleSize; // e.g., 20
+    private List<String> interests; // e.g., ["Running", "Swimming"]
+
+
+    private String imgId;
+
+    private String imgUrl;
+
+    private Boolean imgUrlEnable;
 
     public Event() {  }
 
@@ -173,6 +182,21 @@ public class Event extends BaseObservable {
         return plannedSampleSize;
     }
 
+    @Bindable
+    public List<String> getInterests() {
+        return interests;
+    }
+
+    @Bindable
+    public String getImgId() { return imgId; }
+
+    @Bindable
+    public String getImgUrl() { return imgUrl; }
+
+    @Bindable
+    public Boolean getImgUrlEnable() { return imgUrlEnable; }
+
+
     public void setId(String id) {
         this.id = id;
     }
@@ -245,4 +269,17 @@ public class Event extends BaseObservable {
         this.plannedSampleSize = plannedSampleSize;
         notifyPropertyChanged(BR.plannedSampleSize);
     }
+
+    public void setInterests(List<String> interests) {
+        this.interests = interests;
+        notifyPropertyChanged(BR.interests);
+    }
+
+    public void setImgId(String imgId) {
+        this.imgId = imgId;
+    }
+
+    public void setImgUrl(String imgUrl) { this.imgUrl = imgUrl; }
+
+    public void setImgUrlEnable(Boolean imgUrlEnable) { this.imgUrlEnable = imgUrlEnable; }
 }

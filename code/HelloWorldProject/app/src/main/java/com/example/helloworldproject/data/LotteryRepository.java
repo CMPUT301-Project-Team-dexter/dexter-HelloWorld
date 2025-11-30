@@ -1,16 +1,19 @@
 package com.example.helloworldproject.data;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.helloworldproject.model.InvitationRecord;
 import com.example.helloworldproject.model.Profile;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
@@ -34,21 +37,58 @@ public class LotteryRepository {
 
     public interface DrawCallback {
         void onComplete(int invitedCount);
+
         void onError(Exception e);
     }
 
     public interface InviteStatusListener {
         void onLoaded(@Nullable String status);
+
         void onError(Exception e);
     }
 
     public interface InviteSummaryListener {
         void onLoaded(int pending, int accepted, int declined);
+
         void onError(Exception e);
     }
 
     public interface CompletionListener {
         void onSuccess();
+
+        void onError(Exception e);
+    }
+
+    public interface AcceptedEntrantsListener {
+        /**
+         * Called whenever the accepted entrants list is loaded or updated.
+         *
+         * @param entrants A list of Profile objects corresponding to all invites
+         *                 whose status is "ACCEPTED" for the given event.
+         */
+        void onLoaded(List<Profile> entrants);
+
+        /**
+         * Called if there is any error while talking to Firestore.
+         *
+         * @param e The underlying exception from the Firestore SDK.
+         */
+        void onError(Exception e);
+    }
+
+    public interface InvitationHistoryListener {
+        /**
+         * Called when a new snapshot of invitations has been loaded.
+         *
+         * @param invitations The full list of invitations matching the current filter.
+         */
+        void onLoaded(List<InvitationRecord> invitations);
+
+        /**
+         * Called if an error happens while fetching data from Firestore.
+         *
+         * @param e The underlying exception.
+         */
         void onError(Exception e);
     }
 
@@ -178,9 +218,9 @@ public class LotteryRepository {
                     invite.put("status", "PENDING");
                     invite.put("invitedAt", now);
                     batch.set(db.collection("events")
-                            .document(eventId)
-                            .collection("invites")
-                            .document(p.getId()), invite);
+                        .document(eventId)
+                        .collection("invites")
+                        .document(p.getId()), invite);
                 }
                 Task<Void> commit = batch.commit();
                 Tasks.await(commit, 10, TimeUnit.SECONDS);
@@ -195,7 +235,9 @@ public class LotteryRepository {
         });
     }
 
-    /** Accept an invite by setting status to ACCEPTED and removing the entrant from the waitlist. */
+    /**
+     * Accept an invite by setting status to ACCEPTED and removing the entrant from the waitlist.
+     */
     public void acceptInvite(String eventId, String profileId, final CompletionListener listener) {
         Map<String, Object> patch = new HashMap<>();
         patch.put("status", "ACCEPTED");
@@ -208,16 +250,18 @@ public class LotteryRepository {
                 .document(profileId),
             patch, com.google.firebase.firestore.SetOptions.merge());
         batch.delete(db.collection("events")
-                .document(eventId)
-                .collection("waitlist")
-                .document(profileId));
+            .document(eventId)
+            .collection("waitlist")
+            .document(profileId));
 
         batch.commit()
             .addOnSuccessListener(unused -> listener.onSuccess())
             .addOnFailureListener(listener::onError);
     }
 
-    /** Decline an invite by setting status to DECLINED and removing the entrant from the waitlist. */
+    /**
+     * Decline an invite by setting status to DECLINED and removing the entrant from the waitlist.
+     */
     public void declineInvite(String eventId, String profileId, final CompletionListener listener) {
         Map<String, Object> patch = new HashMap<>();
         patch.put("status", "DECLINED");
@@ -230,16 +274,45 @@ public class LotteryRepository {
                 .document(profileId),
             patch, com.google.firebase.firestore.SetOptions.merge());
         batch.delete(db.collection("events")
-                .document(eventId)
-                .collection("waitlist")
-                .document(profileId));
+            .document(eventId)
+            .collection("waitlist")
+            .document(profileId));
 
         batch.commit()
             .addOnSuccessListener(unused -> listener.onSuccess())
             .addOnFailureListener(listener::onError);
     }
 
-    /** Observe invite status for a single profile. */
+    public void cancelAcceptedEntrant(
+        @NonNull String eventId,
+        @NonNull String profileId,
+        @Nullable final CompletionListener listener
+    ) {
+        DocumentReference ref = db.collection("events")
+            .document(eventId)
+            .collection("invites")
+            .document(profileId);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("status", "CANCELLED");
+        updates.put("cancelledAt", FieldValue.serverTimestamp());
+
+        ref.update(updates)
+            .addOnSuccessListener(unused -> {
+                if (listener != null) {
+                    listener.onSuccess();
+                }
+            })
+            .addOnFailureListener(e -> {
+                if (listener != null) {
+                    listener.onError(e);
+                }
+            });
+    }
+
+    /**
+     * Observe invite status for a single profile.
+     */
     public ListenerRegistration observeInviteStatus(
         String eventId,
         String profileId,
@@ -249,47 +322,124 @@ public class LotteryRepository {
             .document(eventId)
             .collection("invites")
             .document(profileId)
-            .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                @Override public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException error) {
-                    if (error != null) {
-                        listener.onError(error);
-                        return;
-                    }
-                    if (snapshot == null || !snapshot.exists()) {
-                        listener.onLoaded(null);
-                        return;
-                    }
-                    listener.onLoaded(snapshot.getString("status"));
+            .addSnapshotListener((snapshot, error) -> {
+                if (error != null) {
+                    listener.onError(error);
+                    return;
                 }
+                if (snapshot == null || !snapshot.exists()) {
+                    listener.onLoaded(null);
+                    return;
+                }
+                listener.onLoaded(snapshot.getString("status"));
             });
     }
 
-    /** Observe invite summary counts for organizers. */
+    /**
+     * Observe invite summary counts for organizers.
+     */
     public ListenerRegistration observeInviteSummary(String eventId, final InviteSummaryListener listener) {
         return db.collection("events")
             .document(eventId)
             .collection("invites")
-            .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                @Override public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
-                    if (error != null) {
-                        listener.onError(error);
-                        return;
-                    }
-                    int pending = 0, accepted = 0, declined = 0;
-                    if (snapshots != null) {
-                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
-                            String status = doc.getString("status");
-                            if ("ACCEPTED".equals(status)) {
-                                accepted++;
-                            } else if ("DECLINED".equals(status)) {
-                                declined++;
-                            } else {
-                                pending++;
-                            }
+            .addSnapshotListener((snapshots, error) -> {
+                if (error != null) {
+                    listener.onError(error);
+                    return;
+                }
+                int pending = 0, accepted = 0, declined = 0;
+                if (snapshots != null) {
+                    for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                        String status = doc.getString("status");
+                        if ("ACCEPTED".equals(status)) {
+                            accepted++;
+                        } else if ("DECLINED".equals(status)) {
+                            declined++;
+                        } else {
+                            pending++;
                         }
                     }
-                    listener.onLoaded(pending, accepted, declined);
                 }
+                listener.onLoaded(pending, accepted, declined);
             });
+    }
+
+    public ListenerRegistration observeAcceptedEntrants(
+        String eventId,
+        final AcceptedEntrantsListener listener
+    ) {
+        return db.collection("events")
+            .document(eventId)
+            .collection("invites")
+            .whereEqualTo("status", "ACCEPTED")
+            .addSnapshotListener((snapshots, error) -> {
+                if (error != null) {
+                    listener.onError(error);
+                    return;
+                }
+
+                List<Profile> entrants = new ArrayList<>();
+                if (snapshots != null) {
+                    for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                        String profileId = doc.getId();
+
+                        Profile p = new Profile();
+                        p.setId(profileId);
+                        p.setName(doc.getString("name"));
+                        p.setEmail(doc.getString("email"));
+                        p.setPhone(doc.getString("phone"));
+
+                        entrants.add(p);
+                    }
+                }
+
+                listener.onLoaded(entrants);
+            });
+    }
+
+    public ListenerRegistration observeInvitationHistory(
+        String eventId,
+        @Nullable List<String> statusFilter,
+        final InvitationHistoryListener listener
+    ) {
+        Query query = db.collection("events")
+            .document(eventId)
+            .collection("invites")
+            .orderBy("invitedAt", Query.Direction.DESCENDING);
+
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            query = query.whereIn("status", statusFilter);
+        }
+
+        return query.addSnapshotListener((snapshots, error) -> {
+            if (error != null) {
+                listener.onError(error);
+                return;
+            }
+
+            List<InvitationRecord> records = new ArrayList<>();
+
+            if (snapshots != null) {
+                for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                    String profileId = doc.getId();
+                    String name = doc.getString("name");
+                    String code = doc.getString("profileId");
+                    if (code == null) {
+                        code = profileId;
+                    }
+                    String status = doc.getString("status");
+
+                    InvitationRecord record = new InvitationRecord(
+                        profileId,
+                        name,
+                        code,
+                        status
+                    );
+                    records.add(record);
+                }
+            }
+
+            listener.onLoaded(records);
+        });
     }
 }
