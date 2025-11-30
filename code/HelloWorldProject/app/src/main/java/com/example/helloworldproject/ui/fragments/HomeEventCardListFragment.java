@@ -1,6 +1,7 @@
 package com.example.helloworldproject.ui.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,12 +31,29 @@ import com.example.helloworldproject.ui.utils.EventCardAdapter;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeEventCardListFragment extends Fragment {
-    ActivityResultLauncher<String> requestCamera = null;
+    // app was crashing earlier when clicking on the "Home" button in the bottom nav bar
+    private final ActivityResultLauncher<String> requestCamera = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                if (!isGranted) {
+                    Toast.makeText(
+                            requireContext(),
+                            "Camera permission is required to scan event QR codes.",
+                            Toast.LENGTH_LONG
+                    ).show();
+                } else {
+                    startActivity(EventQRCodeScanActivity.newIntent(requireContext()));
+                }
+            }
+    );
+
     FragHomeEventListBinding binding;
     ArrayList<Event> eventListBackEnd = new ArrayList<>();
     private EventCardAdapter adapter;
@@ -44,27 +62,6 @@ public class HomeEventCardListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.frag_home_event_list, container, false);
         return binding.getRoot();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (CurrentProfile.isEntrant()) {
-            requestCamera = registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                isGranted -> {
-                    if (!isGranted) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Camera permission is required to scan event QR codes.",
-                            Toast.LENGTH_LONG
-                        ).show();
-                    } else {
-                        startActivity(EventQRCodeScanActivity.newIntent(requireContext()));
-                    }
-                }
-            );
-        }
     }
 
     @Override
@@ -84,23 +81,44 @@ public class HomeEventCardListFragment extends Fragment {
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                // TODO: implement filter function later
+                // button logic for "filter"
                 if (menuItem.getItemId() == R.id.home_filter_button) {
-                    // filter not implemented yet
+                    FilterBottomSheetFragment filterSheet = new FilterBottomSheetFragment(new FilterBottomSheetFragment.FilterListener() {
+                        @Override
+                        public void onFilterApplied(long date, List<String> interests) {
+                            Toast.makeText(getContext(),
+                                    "Filter Date=" + date + ", Tags=" + interests,
+                                    Toast.LENGTH_SHORT).show();
+
+                            EventRepository.INSTANCE.loadFilteredEvents(date, interests, new EventRepository.ListCallback() {
+                                @Override
+                                public void onLoaded(List<Event> events) {
+                                    if (events.isEmpty()) {
+                                        Toast.makeText(getContext(), "No events found matching specified filters", Toast.LENGTH_SHORT).show();
+                                    }
+                                    updateAdapterFrom(events);
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Toast.makeText(getContext(), "Filter Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFilterCleared() {
+                            Toast.makeText(getContext(), "Filters Cleared", Toast.LENGTH_SHORT).show();
+                            refreshEventList();
+                        }
+                    });
+
+                    filterSheet.show(getParentFragmentManager(), "FilterSheet");
                     return true;
+
                 } else if (menuItem.getItemId() == R.id.home_scan_button) {
-                    if (requestCamera == null) {
-                        // This should only happen for non-entrants
-                        Toast.makeText(
-                            requireContext(),
-                            "Camera permission is required to scan event QR codes.",
-                            Toast.LENGTH_LONG
-                        ).show();
-                        return true;
-                    } else {
-                        requestCamera.launch(android.Manifest.permission.CAMERA);
-                        return true;
-                    }
+                    requestCamera.launch(android.Manifest.permission.CAMERA);
+                    return true;
                 }
                 return false;
             }
@@ -142,9 +160,22 @@ public class HomeEventCardListFragment extends Fragment {
         } else {
             binding.addEventFab.setVisibility(View.GONE);
         }
+
+        FirebaseFirestore.getInstance().collection("events").get()
+                .addOnSuccessListener(snapshots -> {
+                    Log.d("QUERY_RET", "Found " + snapshots.size() + " documents.");
+                    for (DocumentSnapshot doc : snapshots) {
+                        // Print the ID and the raw timestamp to compare
+                        Log.d("QUERY_RET", "Doc ID: " + doc.getId() + " | Start: " + doc.get("eventStartAt"));
+                    }
+                })
+                .addOnFailureListener(
+                    e -> Log.e("QUERY_RET", "Error fetching docs: " + e.getMessage())
+                );
     }
 
     private void updateAdapterFrom(List<Event> events) {
+        adapter.clear(); // needed this to properly update event list after applying filters
         adapter.addAll(events);
         adapter.notifyDataSetChanged();
     }
