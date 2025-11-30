@@ -2,7 +2,9 @@ package com.example.helloworldproject.ui.activities.event;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,12 +17,14 @@ import androidx.databinding.DataBindingUtil;
 
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.EventRepository;
+import com.example.helloworldproject.data.ImageRepository;
 import com.example.helloworldproject.databinding.ActivityEventEditingBinding;
 import com.example.helloworldproject.model.Event;
 import com.example.helloworldproject.ui.dialogues.event.editing.DetailFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.EventBeginFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.EventCapacityFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.EventEndFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.ImgSelListener;
 import com.example.helloworldproject.ui.dialogues.event.editing.LocationFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.PosterFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.RegistrationBeginFrag;
@@ -33,7 +37,7 @@ import com.google.firebase.Timestamp;
 
 import java.util.Date;
 
-public class EventEditingActivity extends AppCompatActivity implements EventEditListener {
+public class EventEditingActivity extends AppCompatActivity implements EventEditListener, ImgSelListener {
     private static final String KEY_EVENT_ID = "key_event_id";
 
     public static Intent newIntent(Context context, @Nullable String eventId) {
@@ -97,11 +101,11 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
         }
         binding.setEventModel(e);
         // region Title
-//        binding.evtEdPosterClickable.setOnClickListener(
-//                v -> new PosterFrag().show(
-//                        getSupportFragmentManager(), "Edit poster"
-//                )
-//        );
+        binding.evtEdPosterClickable.setOnClickListener(
+                v -> new PosterFrag().show(
+                        getSupportFragmentManager(), "Edit poster"
+                )
+        );
         // endregion
         // region Title
         if (givenEventId == null) {
@@ -336,5 +340,35 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
     @Override
     public void updateDetail(String newDetail) {
         binding.getEventModel().setDescription(newDetail);
+    }
+
+    @Override
+    public void onImgSelected(Uri imgUri) {
+        if (imgUri == null) return;
+
+        ImageRepository.INSTANCE.uploadImage(imgUri, new ImageRepository.UriCallback() {
+            @Override
+            public void onSuccess(Uri downloadUrl) {
+                binding.evtEdPosterImage.setImageURI(imgUri);
+
+                binding.getEventModel().setImgId(downloadUrl.toString());
+
+                Toast.makeText(
+                        EventEditingActivity.this,
+                        "Poster updated and saved successfully",
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // This handles the upload failures, including the 404 session termination.
+                Toast.makeText(
+                        EventEditingActivity.this,
+                        "Error uploading the poster: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                ).show();
+            }
+        });
     }
 }

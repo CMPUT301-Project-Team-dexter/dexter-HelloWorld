@@ -5,9 +5,6 @@ import android.widget.ImageView;
 
 import androidx.fragment.app.Fragment;
 
-import com.bumptech.glide.Glide;
-import com.example.helloworldproject.R;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -20,30 +17,41 @@ public class ImageRepository {
 
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
 
-    public interface CompleteCallback {
-        void onComplete();
+    public interface UriCallback {
+        void onSuccess(Uri downloadUrl);
         void onError(Exception e);
     }
 
-    public void uploadImage(Uri imgUri, CompleteCallback cb) {
-        StorageReference storageRef = storage.getReference().child("images/" + UUID.randomUUID().toString());
+    public interface CompleteCallback {
+        void onSuccess();
+        void onError(Exception e);
+    }
+
+    public void uploadImage(Uri imgUri, UriCallback cb) {
+        StorageReference storageRef = storage.getReference().child("images/" + UUID.randomUUID().toString() + ".jpg");
         if (imgUri != null) {
+            // 1. Start the upload task
             storageRef.putFile(imgUri)
-                    .addOnSuccessListener(unused -> cb.onComplete())
+                    .continueWithTask(task -> {
+                        // 2. Check for failure during the upload
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+                        // 3. Get the download URL of the successfully uploaded file
+                        return storageRef.getDownloadUrl();
+                    })
+                    .addOnSuccessListener(downloadUri -> {
+                        // 4. Report the final URL back to the caller
+                        cb.onSuccess(downloadUri);
+                    })
                     .addOnFailureListener(cb::onError);
         }
     }
 
-    public void readImageIntoView(Fragment frag, ImageView v, String imgId, CompleteCallback cb) {
+    public void readImageIntoView(Fragment frag, ImageView v, String imgId, UriCallback cb) {
         StorageReference storageRef = storage.getReference().child("images/" + imgId);
         storageRef.getDownloadUrl()
-                .addOnSuccessListener(uri -> {
-                    Glide.with(frag)
-                            .load(uri)
-                            .error(R.drawable.debug_card_image)
-                            .into(v);
-                    cb.onComplete();
-                })
+                .addOnSuccessListener(cb::onSuccess)
                 .addOnFailureListener(cb::onError);
     }
 }

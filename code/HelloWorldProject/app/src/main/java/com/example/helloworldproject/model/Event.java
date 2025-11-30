@@ -44,6 +44,8 @@ public class Event extends BaseObservable {
     private Boolean geoRequired;       // true/false
     private Integer plannedSampleSize; // e.g., 20
 
+    private String imgId;
+
     public Event() {  }
 
     public String getId() {
@@ -173,6 +175,9 @@ public class Event extends BaseObservable {
         return plannedSampleSize;
     }
 
+    @Bindable
+    public String getImgId() { return imgId; }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -244,5 +249,9 @@ public class Event extends BaseObservable {
     public void setPlannedSampleSize(Integer plannedSampleSize) {
         this.plannedSampleSize = plannedSampleSize;
         notifyPropertyChanged(BR.plannedSampleSize);
+    }
+
+    public void setImgId(String imgId) {
+        this.imgId = imgId;
     }
 }
