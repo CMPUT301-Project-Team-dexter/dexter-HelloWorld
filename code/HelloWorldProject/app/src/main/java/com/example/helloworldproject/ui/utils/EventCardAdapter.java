@@ -52,19 +52,6 @@ public class EventCardAdapter extends ArrayAdapter<Event> {
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.placeholder)
                 .into(cardBinding.posterImage);
-//        ImageRepository.INSTANCE.readImageIntoView(getContext(), cardBinding.posterImage, item.getImgId(), new ImageRepository.UrlCallback() {
-//            @Override
-//            public void onSuccess() {
-//                ;
-//            }
-//
-//            @Override
-//            public void onError(Exception e) {
-//
-//            }
-//        });
-
-        cardBinding.posterImage.setImageResource(R.drawable.debug_card_image);
         // region Event Status
         switch (item.getRealTimeStatus()) {
             case NOT_OPEN:
