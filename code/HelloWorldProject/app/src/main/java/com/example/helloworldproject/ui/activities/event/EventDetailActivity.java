@@ -24,6 +24,8 @@ import com.example.helloworldproject.ui.dialogues.event.QRCodeFrag;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
 import com.google.firebase.firestore.ListenerRegistration;
+import androidx.appcompat.app.AlertDialog;
+
 
 public class EventDetailActivity extends AppCompatActivity {
     private static final String KEY_EVENT_ID = "key_event_id";
@@ -103,7 +105,54 @@ public class EventDetailActivity extends AppCompatActivity {
             setupOrganizerLottery(e);
         } else if (CurrentProfile.isAdmin()) {
             binding.evtDtlAdminDeleteBtn.setOnClickListener(v -> {
-                // TODO: implement admin delete functionality
+                Event event = binding.getEventModel();
+                if (event == null) {
+                    Toast.makeText(
+                            EventDetailActivity.this,
+                            "Event is not loaded yet.",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                    return;
+                }
+
+                new AlertDialog.Builder(EventDetailActivity.this)
+                        .setTitle("Delete event")
+                        .setMessage("Are you sure you want to delete this event?")
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            // prevent double-taps
+                            binding.evtDtlAdminDeleteBtn.setEnabled(false);
+
+                            EventRepository.INSTANCE.deleteEvent(
+                                    event,
+                                    new EventRepository.CompleteCallback() {
+                                        @Override
+                                        public void onComplete() {
+                                            runOnUiThread(() -> {
+                                                Toast.makeText(
+                                                        EventDetailActivity.this,
+                                                        "Event deleted.",
+                                                        Toast.LENGTH_SHORT
+                                                ).show();
+                                                finish();  // go back to admin event list
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onError(Exception e) {
+                                            runOnUiThread(() -> {
+                                                binding.evtDtlAdminDeleteBtn.setEnabled(true);
+                                                Toast.makeText(
+                                                        EventDetailActivity.this,
+                                                        "Failed to delete event: " + e.getMessage(),
+                                                        Toast.LENGTH_LONG
+                                                ).show();
+                                            });
+                                        }
+                                    }
+                            );
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
             });
             binding.evtDtlAdminDeleteBtn.setVisibility(View.VISIBLE);
         } else {
@@ -111,6 +160,7 @@ public class EventDetailActivity extends AppCompatActivity {
             setupEntrantButtons(e);
             observeInviteStatus();
         }
+
     }
 
     @Override

@@ -30,6 +30,7 @@ import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
 import com.google.firebase.Timestamp;
 
+
 import java.util.Date;
 
 public class EventEditingActivity extends AppCompatActivity implements EventEditListener {

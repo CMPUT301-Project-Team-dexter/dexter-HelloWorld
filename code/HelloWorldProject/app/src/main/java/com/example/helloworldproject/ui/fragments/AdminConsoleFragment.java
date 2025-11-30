@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.helloworldproject.data.ProfileRepository;
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.databinding.FragAdminConsoleBinding;
 import com.example.helloworldproject.ui.activities.event.AdminEventListActivity;

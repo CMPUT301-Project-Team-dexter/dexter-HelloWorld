@@ -1,4 +1,8 @@
 package com.example.helloworldproject.data;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import com.example.helloworldproject.model.Event;
 import com.example.helloworldproject.util.CurrentProfile;
@@ -236,5 +240,58 @@ public class EventRepository {
                 })
                 .addOnFailureListener(cb::onError);
     }
+    /**
+     * Delete an event and clean up its subcollections (waitlist + invites).
+     *
+     * @param event the event to delete (must have its id set)
+     * @param cb    callback for completion / error
+     */
+    public void deleteEvent(Event event, final CompleteCallback cb) {
+        if (event == null || event.getId() == null) {
+            cb.onError(new IllegalArgumentException("Event or event ID is null"));
+            return;
+        }
+
+        String eventId = event.getId();
+        DocumentReference eventRef = db.collection("events").document(eventId);
+
+        // Load subcollections first
+        Task<QuerySnapshot> waitlistTask = eventRef.collection("waitlist").get();
+        Task<QuerySnapshot> invitesTask = eventRef.collection("invites").get();
+
+        Tasks.whenAllComplete(waitlistTask, invitesTask)
+                .addOnSuccessListener(tasks -> {
+                    if (!waitlistTask.isSuccessful()) {
+                        cb.onError(waitlistTask.getException());
+                        return;
+                    }
+                    if (!invitesTask.isSuccessful()) {
+                        cb.onError(invitesTask.getException());
+                        return;
+                    }
+
+                    WriteBatch batch = db.batch();
+
+                    // Delete waitlist docs
+                    for (DocumentSnapshot doc : waitlistTask.getResult().getDocuments()) {
+                        batch.delete(doc.getReference());
+                    }
+
+                    // Delete invite docs
+                    for (DocumentSnapshot doc : invitesTask.getResult().getDocuments()) {
+                        batch.delete(doc.getReference());
+                    }
+
+                    // Delete the event document itself
+                    batch.delete(eventRef);
+
+                    batch.commit()
+                            .addOnSuccessListener(unused -> cb.onComplete())
+                            .addOnFailureListener(cb::onError);
+                })
+                .addOnFailureListener(cb::onError);
+    }
+
+
 
 }
