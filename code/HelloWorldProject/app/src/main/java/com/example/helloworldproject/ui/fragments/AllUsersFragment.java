@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
@@ -34,6 +35,7 @@ public class AllUsersFragment extends Fragment {
     private UserItemAdapter adapter;
     private final ArrayList<String> userNames = new ArrayList<>();
     private final ArrayList<String> userIds = new ArrayList<>();
+    private final ArrayList<Profile> profiles = new ArrayList<>();
     private final ProfileRepository profileRepository = new ProfileRepository();
 
 
@@ -68,11 +70,69 @@ public class AllUsersFragment extends Fragment {
 
         listView = view.findViewById(R.id.event_list_view);
 
-        adapter = new UserItemAdapter(requireContext(), userNames, userIds);
+        adapter = new UserItemAdapter(
+            requireContext(),
+            userNames,
+            userIds,
+            position -> {
+                // Safety check
+                if (position < 0 || position >= profiles.size()) {
+                    return;
+                }
+
+                Profile toDelete = profiles.get(position);
+                if (toDelete == null) return;
+
+                UserGroup group = toDelete.getUserGroup();
+                if (group == UserGroup.ADMIN) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Admin profiles cannot be deleted.",
+                        Toast.LENGTH_SHORT
+                    ).show();
+                    return;
+                }
+
+                String name = toDelete.getName();
+                if (name == null || name.isEmpty()) {
+                    name = "this profile";
+                }
+
+                new AlertDialog.Builder(requireContext())
+                    .setTitle("Delete profile")
+                    .setMessage("Are you sure you want to delete " + name + "?")
+                    .setPositiveButton("Delete",
+                        (dialog, which) ->
+                            profileRepository.deleteProfile(toDelete, new ProfileRepository.CompleteCallback() {
+                                @Override
+                                public void onComplete() {
+                                    requireActivity().runOnUiThread(() -> {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "Profile deleted.",
+                                            Toast.LENGTH_SHORT
+                                        ).show();
+                                        loadProfiles();   // refresh list
+                                    });
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    requireActivity().runOnUiThread(
+                                        () -> Toast.makeText(
+                                            requireContext(),
+                                            "Failed to delete profile: " + e.getMessage(),
+                                            Toast.LENGTH_LONG
+                                        ).show());
+                                }
+                            })
+                    )
+                    .setNegativeButton("Cancel", null)
+                    .show();
+            }
+        );
         listView.setAdapter(adapter);
-
         loadProfiles();
-
     }
 
     @Override
@@ -82,15 +142,18 @@ public class AllUsersFragment extends Fragment {
 
         return view;
     }
+
     private void loadProfiles() {
         profileRepository.loadAllProfiles(new ProfileRepository.ListCallback() {
             @Override
-            public void onLoaded(List<Profile> profiles) {
+            public void onLoaded(List<Profile> loadedProfiles) {
                 requireActivity().runOnUiThread(() -> {
+                    profiles.clear();
                     userNames.clear();
                     userIds.clear();
 
-                    for (Profile p : profiles) {
+                    for (Profile p : loadedProfiles) {
+                        profiles.add(p);   // keep full object
                         String name = p.getName() == null ? "(Unnamed)" : p.getName();
 
                         UserGroup group = p.getUserGroup();
@@ -116,8 +179,6 @@ public class AllUsersFragment extends Fragment {
                         userNames.add(name);
                         userIds.add(roleLabel);
                     }
-
-
                     adapter.notifyDataSetChanged();
                 });
             }
@@ -125,14 +186,13 @@ public class AllUsersFragment extends Fragment {
             @Override
             public void onError(Exception e) {
                 requireActivity().runOnUiThread(() ->
-                        Toast.makeText(
-                                requireContext(),
-                                "Failed to load profiles: " + e.getMessage(),
-                                Toast.LENGTH_LONG
-                        ).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed to load profiles: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                    ).show()
                 );
             }
         });
     }
-
 }
