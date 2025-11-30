@@ -1,5 +1,7 @@
 package com.example.helloworldproject.ui.activities.event;
 
+import java.util.List;
+
 public interface EventEditListener {
     void updateTitle(String newTitle);
     void updateLocation(String newLocation);
@@ -10,4 +12,5 @@ public interface EventEditListener {
     void updateEventCapacity(int newCapacity);
     void updateWaitingListCapacity(int newCapacity);
     void updateDetail(String newDetail);
+    void updateTags(List<String> newTags);
 }

@@ -24,13 +24,18 @@ import com.example.helloworldproject.ui.dialogues.event.editing.EventEndFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.LocationFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.RegistrationBeginFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.RegistrationEndFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.TagsFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.TitleFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.WaitingListCapacityFrag;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.Timestamp;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class EventEditingActivity extends AppCompatActivity implements EventEditListener {
     private static final String KEY_EVENT_ID = "key_event_id";
@@ -183,6 +188,20 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
         binding.evtEdDescTitleView.setOnClickListener(descClickCallback);
         binding.evtEdDescTextView.setOnClickListener(descClickCallback);
         // endregion
+
+        if (binding.getEventModel().getInterests() == null) {
+            binding.getEventModel().setInterests(new ArrayList<>());
+        }
+
+        refreshTagChips();
+
+        View tagsButton = findViewById(R.id.evt_ed_tags_button);
+        if (tagsButton != null) {
+            tagsButton.setOnClickListener(v -> {
+                new TagsFrag(binding.getEventModel().getInterests())
+                        .show(getSupportFragmentManager(), "EditTags");
+            });
+        }
     }
 
     @Override
@@ -328,5 +347,28 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
     @Override
     public void updateDetail(String newDetail) {
         binding.getEventModel().setDescription(newDetail);
+    }
+
+    @Override public void updateTags(List<String>newTags) {
+        binding.getEventModel().setInterests(newTags);
+        refreshTagChips();
+    }
+
+    private void refreshTagChips() {
+        ChipGroup chipGroup = findViewById(R.id.evt_ed_chip_group);
+        if (chipGroup == null) return;
+
+        chipGroup.removeAllViews();
+        List<String> currentTags = binding.getEventModel().getInterests();
+
+        if (currentTags != null) {
+            for (String tag : currentTags) {
+                Chip chip = new Chip(this);
+                chip.setText(tag);
+                chip.setClickable(false);
+                chip.setCheckable(false);
+                chipGroup.addView(chip);
+            }
+        }
     }
 }
