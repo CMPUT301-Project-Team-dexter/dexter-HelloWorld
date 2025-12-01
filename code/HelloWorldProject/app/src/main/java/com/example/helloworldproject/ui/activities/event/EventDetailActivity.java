@@ -53,7 +53,7 @@ public class EventDetailActivity extends AppCompatActivity {
     private ListenerRegistration waitlistCountListener;
     private ListenerRegistration inviteStatusListener;
     private ListenerRegistration inviteSummaryListener;
-    private final ActivityResultLauncher<Intent> editingLauncher = getLauncherForEdit();
+    private final ActivityResultLauncher<Intent> editingLauncher = getEditLauncher();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,9 +63,6 @@ public class EventDetailActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            binding.evtDtlToolbar.setNavigationOnClickListener(
-                v -> getOnBackPressedDispatcher().onBackPressed()
-            );
         }
         givenEventId = getIntent().getStringExtra(KEY_EVENT_ID);
         if (givenEventId == null) {
@@ -164,6 +161,7 @@ public class EventDetailActivity extends AppCompatActivity {
                                             "Event deleted.",
                                             Toast.LENGTH_SHORT
                                         ).show();
+                                        setResult(RESULT_OK);
                                         finish();  // go back to admin event list
                                     });
                                 }
@@ -602,7 +600,14 @@ public class EventDetailActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private ActivityResultLauncher<Intent> getLauncherForEdit() {
+    @Override
+    public boolean onSupportNavigateUp() {
+        setResult(RESULT_OK);
+        finish();
+        return true;
+    }
+
+    private ActivityResultLauncher<Intent> getEditLauncher() {
         return registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
