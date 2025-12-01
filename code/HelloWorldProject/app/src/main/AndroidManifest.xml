@@ -4,7 +4,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +18,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorldProject">
+        <activity
+            android:name=".ui.activities.event.EventManageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.event.ChosenEntrantsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activities.event.InvitationHistoryActivity"
+            android:exported="false" />
+
+
+        <activity
+            android:name=".ui.activities.event.AdminEventListActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.activities.event.EventQRCodeScanActivity"
             android:exported="false" />
@@ -47,6 +65,18 @@
             android:name=".ui.activities.ProfileEditActivity"
             android:exported="false"
             android:label="Edit Profile" />
+        <activity
+            android:name=".ui.activities.RegisterHistoryActivity"
+            android:exported="false"
+            android:label="Register History" />
+        <activity
+            android:name=".ui.activities.AllImagesActivity"
+            android:exported="false"
+            android:label="All Images" />
+        <activity
+            android:name=".ui.activities.ImageDetailActivity"
+            android:exported="false"
+            android:label="All Images" />
     </application>
 
 </manifest>

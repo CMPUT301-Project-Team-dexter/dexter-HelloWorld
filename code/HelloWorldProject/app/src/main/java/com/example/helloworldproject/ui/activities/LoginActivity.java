@@ -1,5 +1,7 @@
 package com.example.helloworldproject.ui.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -23,6 +25,10 @@ import com.example.helloworldproject.util.DeviceId;
 /** Create/Update profile in a single screen. */
 public class LoginActivity extends AppCompatActivity {
 
+    public static Intent newIntent(Context context) {
+        return new Intent(context, LoginActivity.class);
+    }
+
     private EditText etName, etEmail, etPhone;
     private Spinner userGroupSpinner;
     private Button btnSave;
@@ -35,6 +41,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        boolean skipAutoLogin = getIntent().getBooleanExtra("skip_auto_login", false);
 
         etName = findViewById(R.id.et_name);
         etEmail = findViewById(R.id.et_email);
@@ -65,8 +73,10 @@ public class LoginActivity extends AppCompatActivity {
                             etPhone.setText(p.getPhone());
                             userGroupSpinner.setSelection(p.getUserGroup().ordinal());
                             CurrentProfile.init(p);
-                            startActivity(HomeActivity.newIntent(LoginActivity.this));
-                            finish();
+                            if (!skipAutoLogin) {
+                                startActivity(HomeActivity.newIntent(LoginActivity.this));
+                                finish();
+                            }
                             return;
                         }
                         Toast.makeText(

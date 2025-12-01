@@ -27,7 +27,7 @@ public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
         void onFilterCleared();
     }
 
-    private FilterListener listener;
+    private final FilterListener listener;
     private long selectedDate = 0;
 
     public FilterBottomSheetFragment(FilterListener listener) {

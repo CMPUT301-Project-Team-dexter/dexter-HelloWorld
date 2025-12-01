@@ -11,6 +11,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Exclude;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -47,7 +48,48 @@ public class Event extends BaseObservable {
     private List<String> interests; // e.g., ["Running", "Swimming"]
 
 
-    public Event() {  }
+    private String imgId;
+
+    private String imgUrl;
+
+    private Boolean imgUrlEnable;
+
+    public Event() {
+    }
+
+    /**
+     * Copy constructor.
+     *
+     * @param other the event to copy
+     */
+    public Event(Event other) {
+        this.id = other.id;
+        this.createdAt = other.createdAt;
+        this.creator = other.creator;
+        this.title = other.title;
+        this.description = other.description;
+        this.venue = other.venue;
+        this.registrationOpenAt = other.registrationOpenAt;
+        this.registrationCloseAt = other.registrationCloseAt;
+        this.eventStartAt = other.eventStartAt;
+        this.eventEndAt = other.eventEndAt;
+        this.capacity = other.capacity;
+        this.selectionMethod = other.selectionMethod;
+        this.seedPolicy = other.seedPolicy;
+        this.duplicatePolicy = other.duplicatePolicy;
+        this.geoRequired = other.geoRequired;
+        this.plannedSampleSize = other.plannedSampleSize;
+        if (other.interests == null) {
+            this.interests = null;
+        } else {
+            this.interests = new ArrayList<>();
+            this.interests.addAll(other.interests);
+        }
+        this.imgId = other.imgId;
+        this.imgUrl = other.imgUrl;
+        this.imgUrlEnable = other.imgUrlEnable;
+        this.qrCodeBitmap = null;
+    }
 
     public String getId() {
         return id;
@@ -63,27 +105,37 @@ public class Event extends BaseObservable {
 
     /**
      * Get the real-time status of the event based on current time.
+     *
      * @return the EventStatus enum representing the current status
      */
     @Exclude
     public EventStatus getRealTimeStatus() {
         Timestamp now = Timestamp.now();
-        if (now.compareTo(getRegistrationOpenAt()) < 0) {
+
+        Timestamp registrationOpenAt = getRegistrationOpenAt();
+        Timestamp registrationCloseAt = getRegistrationCloseAt();
+        Timestamp eventStartAt = getEventStartAt();
+        Timestamp eventEndAt = getEventEndAt();
+
+        // 🔒 Null-safety for older / incomplete events:
+        // If any of the key timestamps are missing, don't try to compare them.
+        // Just fall back to a safe default so the UI can still render.
+        if (registrationOpenAt == null ||
+            registrationCloseAt == null ||
+            eventStartAt == null ||
+            eventEndAt == null) {
+
+            // Using NOT_OPEN is safe for admin views.
             return EventStatus.NOT_OPEN;
-        } else if (
-            now.compareTo(getRegistrationOpenAt()) >= 0
-                && now.compareTo(getRegistrationCloseAt()) < 0
-        ) {
+        }
+
+        if (now.compareTo(registrationOpenAt) < 0) {
+            return EventStatus.NOT_OPEN;
+        } else if (now.compareTo(registrationCloseAt) <= 0) {
             return EventStatus.REGISTRATION_OPEN;
-        } else if (
-            now.compareTo(getRegistrationCloseAt()) >= 0
-                && now.compareTo(getEventStartAt()) < 0
-        ) {
+        } else if (now.compareTo(eventStartAt) < 0) {
             return EventStatus.REGISTRATION_CLOSED;
-        } else if (
-            now.compareTo(getEventStartAt()) >= 0
-                && now.compareTo(getEventEndAt()) < 0
-        ) {
+        } else if (now.compareTo(eventEndAt) <= 0) {
             return EventStatus.ONGOING;
         } else {
             return EventStatus.ENDED;
@@ -91,10 +143,11 @@ public class Event extends BaseObservable {
     }
 
     @Exclude
-    Bitmap qrCodeBitmap = null;
+    private Bitmap qrCodeBitmap = null;
 
     /**
      * Get the QR code bitmap representing the event ID.
+     *
      * @return Bitmap of the QR code
      */
     @Exclude
@@ -172,6 +225,22 @@ public class Event extends BaseObservable {
         return interests;
     }
 
+    @Bindable
+    public String getImgId() {
+        return imgId;
+    }
+
+    @Bindable
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    @Bindable
+    public Boolean getImgUrlEnable() {
+        return imgUrlEnable;
+    }
+
+
     public void setId(String id) {
         this.id = id;
     }
@@ -213,6 +282,7 @@ public class Event extends BaseObservable {
         this.eventStartAt = eventStartAt;
         notifyPropertyChanged(BR.eventStartAt);
     }
+
     public void setEventEndAt(Timestamp eventEndAt) {
         this.eventEndAt = eventEndAt;
         notifyPropertyChanged(BR.eventEndAt);
@@ -247,7 +317,18 @@ public class Event extends BaseObservable {
 
     public void setInterests(List<String> interests) {
         this.interests = interests;
-
         notifyPropertyChanged(BR.interests);
+    }
+
+    public void setImgId(String imgId) {
+        this.imgId = imgId;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public void setImgUrlEnable(Boolean imgUrlEnable) {
+        this.imgUrlEnable = imgUrlEnable;
     }
 }

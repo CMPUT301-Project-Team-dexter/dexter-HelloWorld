@@ -11,7 +11,7 @@ import com.example.helloworldproject.R;
 import com.example.helloworldproject.databinding.ActivityHomeBinding;
 import com.example.helloworldproject.model.Profile;
 import com.example.helloworldproject.ui.fragments.AccountFragment;
-import com.example.helloworldproject.ui.fragments.AllEventsFragment;
+import com.example.helloworldproject.ui.fragments.AdminConsoleFragment;
 import com.example.helloworldproject.ui.fragments.HomeEventCardListFragment;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.google.android.material.snackbar.Snackbar;
@@ -26,7 +26,12 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        if (!CurrentProfile.isInitialized()) {
+            startActivity(LoginActivity.newIntent(this));
+            finish();
+            return;
+        }
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
 
         Profile currentUser = CurrentProfile.get();
@@ -39,16 +44,21 @@ public class HomeActivity extends AppCompatActivity {
         binding.homeNavView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
-                getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new HomeEventCardListFragment())
-                    .commit();
+                if (CurrentProfile.isAdmin()) {
+                    getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new AdminConsoleFragment())
+                        .commit();
+                } else {
+                    getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new HomeEventCardListFragment())
+                        .commit();
+                }
                 return true;
-            } else if (id == R.id.nav_events) {
-                // TODO: move to admin console
-                getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new AllEventsFragment())
-                    .commit();
-                return true;
+//            } else if (id == R.id.nav_events) {
+//                getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.fragment_container, new AllEventsFragment())
+//                    .commit();
+//                return true;
             } else if (id == R.id.nav_account) {
                 getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new AccountFragment())

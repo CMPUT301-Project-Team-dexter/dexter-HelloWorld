@@ -2,6 +2,7 @@ package com.example.helloworldproject.ui.activities.event;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,11 +11,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import com.bumptech.glide.Glide;
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.EventRepository;
+import com.example.helloworldproject.data.ImageRepository;
 import com.example.helloworldproject.databinding.ActivityEventEditingBinding;
 import com.example.helloworldproject.model.Event;
 import com.example.helloworldproject.ui.dialogues.event.editing.DetailFrag;
@@ -22,6 +26,7 @@ import com.example.helloworldproject.ui.dialogues.event.editing.EventBeginFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.EventCapacityFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.EventEndFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.LocationFrag;
+import com.example.helloworldproject.ui.dialogues.event.editing.PosterFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.RegistrationBeginFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.RegistrationEndFrag;
 import com.example.helloworldproject.ui.dialogues.event.editing.TagsFrag;
@@ -54,6 +59,10 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_event_editing);
         setSupportActionBar(binding.evtEdToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         givenEventId = getIntent().getStringExtra(KEY_EVENT_ID);
         // givenEventId being null means that we are creating new event
         if (givenEventId != null) {
@@ -62,7 +71,7 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
                 new EventRepository.LoadCallback() {
                     @Override
                     public void onLoaded(Event e) {
-                        onCreateContinued(e);
+                        onCreateContinued(new Event(e));
                     }
 
                     @Override
@@ -100,6 +109,18 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
             return;
         }
         binding.setEventModel(e);
+        Glide.with(this)
+            .load(e.getImgUrl())
+            .placeholder(R.drawable.placeholder)
+            .error(R.drawable.placeholder)
+            .into(binding.evtEdPosterImage);
+        // region Poster
+        binding.evtEdPosterClickable.setOnClickListener(
+            v -> new PosterFrag().show(
+                getSupportFragmentManager(), "Edit poster"
+            )
+        );
+        // endregion
         // region Title
         if (givenEventId == null) {
             binding.getEventModel().setTitle("Tap to edit title...");
@@ -213,11 +234,15 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.save_button) {
+            Event e = binding.getEventModel();
             EventRepository.INSTANCE.saveOrUpdate(
-                binding.getEventModel(),
+                e,
                 new EventRepository.CompleteCallback() {
                     @Override
                     public void onComplete() {
+                        EventCache.refresh(e);
+                        binding.setEventModel(new Event(e));
+                        binding.executePendingBindings();
                         Toast.makeText(
                             EventEditingActivity.this,
                             "Event uploaded successfully",
@@ -370,5 +395,59 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
                 chipGroup.addView(chip);
             }
         }
+    }
+
+    @Override
+    public void updateImgUrl(String url) {
+        binding.getEventModel().setImgUrl(url);
+
+        Glide.with(this)
+            .load(url)
+            .placeholder(R.drawable.placeholder)
+            .error(R.drawable.placeholder)
+            .into(binding.evtEdPosterImage);
+    }
+
+    @Override
+    public void updateImgUrlEnable(Boolean imgUrlEnable) {
+        binding.getEventModel().setImgUrlEnable(imgUrlEnable);
+    }
+
+    @Override
+    public void updateImgUri(Uri imgUri) {
+        if (imgUri == null) return;
+
+        ImageRepository.INSTANCE.uploadImage(imgUri, new ImageRepository.UriCallback() {
+            @Override
+            public void onSuccess(Uri downloadUrl) {
+                binding.evtEdPosterImage.setImageURI(imgUri);
+
+                binding.getEventModel().setImgId(downloadUrl.toString());
+
+                Toast.makeText(
+                    EventEditingActivity.this,
+                    "Poster updated and saved successfully",
+                    Toast.LENGTH_SHORT
+                ).show();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // This handles the upload failures, including the 404 session termination.
+                Toast.makeText(
+                    EventEditingActivity.this,
+                    "Error uploading the poster: " + e.getMessage(),
+                    Toast.LENGTH_LONG
+                ).show();
+            }
+        });
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        Event e = binding.getEventModel();
+        setResult(RESULT_OK, EventDetailActivity.newResultIntent(e.getId()));
+        finish();
+        return true;
     }
 }

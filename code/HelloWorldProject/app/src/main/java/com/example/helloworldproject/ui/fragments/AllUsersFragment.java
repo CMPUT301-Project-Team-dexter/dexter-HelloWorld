@@ -8,23 +8,36 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 
 import com.example.helloworldproject.R;
+import com.example.helloworldproject.data.ProfileRepository;
+import com.example.helloworldproject.model.Profile;
+import com.example.helloworldproject.model.UserGroup;
 import com.example.helloworldproject.ui.utils.UserItemAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
+import java.util.List;
+
 
 public class AllUsersFragment extends Fragment {
 
     private ListView listView;
+    private UserItemAdapter adapter;
+    private final ArrayList<String> userNames = new ArrayList<>();
+    private final ArrayList<String> userIds = new ArrayList<>();
+    private final ArrayList<Profile> profiles = new ArrayList<>();
+    private final ProfileRepository profileRepository = new ProfileRepository();
+
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -56,18 +69,70 @@ public class AllUsersFragment extends Fragment {
 
 
         listView = view.findViewById(R.id.event_list_view);
-        ArrayList<String> userNames = new ArrayList<>();
-        userNames.add("AlphaBravo");
-        userNames.add("TestName2");
-        userNames.add("Chill");
 
-        ArrayList<String> userIds = new ArrayList<>();
-        userIds.add("id1");
-        userIds.add("id2");
-        userIds.add("id3");
+        adapter = new UserItemAdapter(
+            requireContext(),
+            userNames,
+            userIds,
+            position -> {
+                // Safety check
+                if (position < 0 || position >= profiles.size()) {
+                    return;
+                }
 
-        UserItemAdapter adapter = new UserItemAdapter(requireContext(), userNames, userIds);
+                Profile toDelete = profiles.get(position);
+                if (toDelete == null) return;
+
+                UserGroup group = toDelete.getUserGroup();
+                if (group == UserGroup.ADMIN) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Admin profiles cannot be deleted.",
+                        Toast.LENGTH_SHORT
+                    ).show();
+                    return;
+                }
+
+                String name = toDelete.getName();
+                if (name == null || name.isEmpty()) {
+                    name = "this profile";
+                }
+
+                new AlertDialog.Builder(requireContext())
+                    .setTitle("Delete profile")
+                    .setMessage("Are you sure you want to delete " + name + "?")
+                    .setPositiveButton("Delete",
+                        (dialog, which) ->
+                            profileRepository.deleteProfile(toDelete, new ProfileRepository.CompleteCallback() {
+                                @Override
+                                public void onComplete() {
+                                    requireActivity().runOnUiThread(() -> {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "Profile deleted.",
+                                            Toast.LENGTH_SHORT
+                                        ).show();
+                                        loadProfiles();   // refresh list
+                                    });
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    requireActivity().runOnUiThread(
+                                        () -> Toast.makeText(
+                                            requireContext(),
+                                            "Failed to delete profile: " + e.getMessage(),
+                                            Toast.LENGTH_LONG
+                                        ).show());
+                                }
+                            })
+                    )
+                    .setNegativeButton("Cancel", null)
+                    .show();
+            }
+        );
         listView.setAdapter(adapter);
+        loadProfiles();
     }
 
     @Override
@@ -76,5 +141,58 @@ public class AllUsersFragment extends Fragment {
         listView = view.findViewById(R.id.event_list_view);
 
         return view;
+    }
+
+    private void loadProfiles() {
+        profileRepository.loadAllProfiles(new ProfileRepository.ListCallback() {
+            @Override
+            public void onLoaded(List<Profile> loadedProfiles) {
+                requireActivity().runOnUiThread(() -> {
+                    profiles.clear();
+                    userNames.clear();
+                    userIds.clear();
+
+                    for (Profile p : loadedProfiles) {
+                        profiles.add(p);   // keep full object
+                        String name = p.getName() == null ? "(Unnamed)" : p.getName();
+
+                        UserGroup group = p.getUserGroup();
+                        String roleLabel;
+                        if (group == null) {
+                            roleLabel = "Unknown";
+                        } else {
+                            switch (group) {
+                                case ADMIN:
+                                    roleLabel = "Admin";
+                                    break;
+                                case ORGANIZER:
+                                    roleLabel = "Organizer";
+                                    break;
+                                case ENTRANT:
+                                    roleLabel = "Entrant";
+                                    break;
+                                default:
+                                    roleLabel = group.name();
+                            }
+                        }
+
+                        userNames.add(name);
+                        userIds.add(roleLabel);
+                    }
+                    adapter.notifyDataSetChanged();
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                requireActivity().runOnUiThread(() ->
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed to load profiles: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                    ).show()
+                );
+            }
+        });
     }
 }

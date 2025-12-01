@@ -31,9 +31,6 @@ import com.example.helloworldproject.ui.utils.EventCardAdapter;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -70,7 +67,6 @@ public class HomeEventCardListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        List<String> dynamicFilters = new ArrayList<>();
 
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
@@ -79,7 +75,8 @@ public class HomeEventCardListFragment extends Fragment {
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menuInflater.inflate(R.menu.home_event_list_menu, menu);
                 MenuItem qrScanItem = menu.findItem(R.id.home_scan_button);
-                qrScanItem.setVisible(!CurrentProfile.isOrganizer());
+                // Only entrant can see the scan button
+                qrScanItem.setVisible(CurrentProfile.isEntrant());
             }
 
             @Override
@@ -127,7 +124,7 @@ public class HomeEventCardListFragment extends Fragment {
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
-        // remove the title text in the top bar
+        // Top bar title
         ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(true);
@@ -146,23 +143,22 @@ public class HomeEventCardListFragment extends Fragment {
                 startActivity(EventDetailActivity.newIntent(requireActivity(), e.getId()));
             } else {
                 Toast.makeText(
-                        requireContext(),
-                        "Error loading event details: event is null",
-                        Toast.LENGTH_SHORT
+                    requireContext(),
+                    "Error loading event details: event is null",
+                    Toast.LENGTH_SHORT
                 ).show();
             }
         });
 
         refreshEventList();
 
-        FloatingActionButton addEventBtn = view.findViewById(R.id.add_event_fab);
         if (CurrentProfile.isOrganizer()) {
-            addEventBtn.setVisibility(View.VISIBLE);
-            addEventBtn.setOnClickListener(v -> {
-                startActivity(EventEditingActivity.newIntent(getContext(), null));
-            });
+            binding.addEventFab.setVisibility(View.VISIBLE);
+            binding.addEventFab.setOnClickListener(v ->
+                startActivity(EventEditingActivity.newIntent(getContext(), null))
+            );
         } else {
-            addEventBtn.setVisibility(View.GONE);
+            binding.addEventFab.setVisibility(View.GONE);
         }
 
         FirebaseFirestore.getInstance().collection("events").get()
@@ -173,9 +169,9 @@ public class HomeEventCardListFragment extends Fragment {
                         Log.d("QUERY_RET", "Doc ID: " + doc.getId() + " | Start: " + doc.get("eventStartAt"));
                     }
                 })
-                .addOnFailureListener(e -> {
-                    Log.e("QUERY_RET", "Error fetching docs: " + e.getMessage());
-                });
+                .addOnFailureListener(
+                    e -> Log.e("QUERY_RET", "Error fetching docs: " + e.getMessage())
+                );
     }
 
     private void updateAdapterFrom(List<Event> events) {
@@ -189,7 +185,7 @@ public class HomeEventCardListFragment extends Fragment {
         adapter.clear();
         if (CurrentProfile.isOrganizer()) {
             loadEventsForOrganizer();
-        } else {
+        } else if (CurrentProfile.isEntrant()) {
             loadJoinableEvents();
         }
     }
@@ -200,38 +196,44 @@ public class HomeEventCardListFragment extends Fragment {
     private void loadEventsForOrganizer() {
         String organizerName = CurrentProfile.get().getName();
         EventCache.asyncTryGetEventsCreatedBy(
-                organizerName,
-                new EventRepository.ListCallback() {
-                    @Override
-                    public void onLoaded(List<Event> events) {
-                        // TODO: filter/sort events
-                        updateAdapterFrom(events);
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        Toast.makeText(
-                                requireContext(),
-                                "Failed to load events created by " + organizerName + ": " + e.getClass().getCanonicalName(),
-                                Toast.LENGTH_SHORT
-                        ).show();
-                    }
+            organizerName,
+            new EventRepository.ListCallback() {
+                @Override
+                public void onLoaded(List<Event> events) {
+                    // TODO: filter/sort events
+                    updateAdapterFrom(events);
                 }
+
+                @Override
+                public void onError(Exception e) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed to load events created by " + organizerName + ": " + e.getClass().getCanonicalName(),
+                        Toast.LENGTH_SHORT
+                    ).show();
+                }
+            }
         );
     }
 
-    // Below are helper functions for Entrant view
+    // Entrant view: only joinable events
     private void loadJoinableEvents() {
-        EventRepository.INSTANCE.loadJoinableEvents(new EventRepository.ListCallback() {
-            @Override
-            public void onLoaded(List<Event> events) {
-                updateAdapterFrom(events);
-            }
+        EventRepository.INSTANCE.loadJoinableEvents(
+            new EventRepository.ListCallback() {
+                @Override
+                public void onLoaded(List<Event> events) {
+                    updateAdapterFrom(events);
+                }
 
-            @Override
-            public void onError(Exception e) {
-                Toast.makeText(requireContext(), "Failed to load events: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                @Override
+                public void onError(Exception e) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Failed to load events: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                    ).show();
+                }
             }
-        });
+        );
     }
 }
