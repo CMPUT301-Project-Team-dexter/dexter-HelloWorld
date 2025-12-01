@@ -222,6 +222,8 @@ public class EventEditingActivity extends AppCompatActivity implements EventEdit
                     @Override
                     public void onComplete() {
                         EventCache.refresh(e);
+                        binding.setEventModel(new Event(e));
+                        binding.executePendingBindings();
                         Toast.makeText(
                             EventEditingActivity.this,
                             "Event uploaded successfully",

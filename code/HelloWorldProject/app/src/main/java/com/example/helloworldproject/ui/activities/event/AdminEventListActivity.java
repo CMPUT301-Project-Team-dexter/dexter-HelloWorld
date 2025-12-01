@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -31,6 +33,8 @@ public class AdminEventListActivity extends AppCompatActivity {
     ActivityAdminEventListBinding binding;
     ArrayList<Event> eventListBackEnd = new ArrayList<>();
     EventCardAdapter adapter;
+    private final ActivityResultLauncher<Intent> eventDetailLauncher = getEventDetailLauncher();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +65,12 @@ public class AdminEventListActivity extends AppCompatActivity {
             (parent, view, position, id) -> {
                 Event e = adapter.getItem(position);
                 if (e != null) {
-                    startActivity(EventDetailActivity.newIntent(AdminEventListActivity.this, e.getId()));
+                    eventDetailLauncher.launch(
+                        EventDetailActivity.newIntent(
+                            AdminEventListActivity.this,
+                            e.getId()
+                        )
+                    );
                 } else {
                     Toast.makeText(
                         AdminEventListActivity.this,
@@ -74,22 +83,8 @@ public class AdminEventListActivity extends AppCompatActivity {
         loadEventsForAdmin();
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.filter_menu, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        if (item.getItemId() == R.id.filter_button) {
-//            // TODO: implement filter event
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
     private void updateAdapterFrom(List<Event> events) {
+        adapter.clear();
         adapter.addAll(events);
         adapter.notifyDataSetChanged();
     }
@@ -110,6 +105,18 @@ public class AdminEventListActivity extends AppCompatActivity {
                         "Failed to load events: " + e.getMessage(),
                         Toast.LENGTH_LONG
                     ).show();
+                }
+            }
+        );
+    }
+
+    private ActivityResultLauncher<Intent> getEventDetailLauncher() {
+        return registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    System.out.println("!!!!Event detail activity result OK");
+                    loadEventsForAdmin();
                 }
             }
         );
