@@ -3,12 +3,10 @@ package com.example.helloworldproject.ui.activities.event;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -50,6 +48,13 @@ public class AdminEventListActivity extends AppCompatActivity {
             return;
         }
         setSupportActionBar(binding.adminConsEvtToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            binding.adminConsEvtToolbar.setNavigationOnClickListener(
+                v -> getOnBackPressedDispatcher().onBackPressed()
+            );
+        }
         adapter = new EventCardAdapter(this, eventListBackEnd);
         binding.adminConsEvtList.setAdapter(adapter);
         binding.adminConsEvtList.setOnItemClickListener(
@@ -69,20 +74,20 @@ public class AdminEventListActivity extends AppCompatActivity {
         loadEventsForAdmin();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.filter_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.filter_button) {
-            // TODO: implement filter event
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.filter_menu, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        if (item.getItemId() == R.id.filter_button) {
+//            // TODO: implement filter event
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     private void updateAdapterFrom(List<Event> events) {
         adapter.addAll(events);

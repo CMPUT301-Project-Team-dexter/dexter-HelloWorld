@@ -8,8 +8,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -37,6 +40,12 @@ public class EventDetailActivity extends AppCompatActivity {
         return i;
     }
 
+    public static Intent newResultIntent(@NonNull String eventId) {
+        Intent i = new Intent();
+        i.putExtra(KEY_EVENT_ID, eventId);
+        return i;
+    }
+
     ActivityEventDetailBinding binding;
     String givenEventId;
     private final WaitlistRepository waitlistRepository = new WaitlistRepository();
@@ -44,12 +53,20 @@ public class EventDetailActivity extends AppCompatActivity {
     private ListenerRegistration waitlistCountListener;
     private ListenerRegistration inviteStatusListener;
     private ListenerRegistration inviteSummaryListener;
+    private final ActivityResultLauncher<Intent> editingLauncher = getLauncherForEdit();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_event_detail);
         setSupportActionBar(binding.evtDtlToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            binding.evtDtlToolbar.setNavigationOnClickListener(
+                v -> getOnBackPressedDispatcher().onBackPressed()
+            );
+        }
         givenEventId = getIntent().getStringExtra(KEY_EVENT_ID);
         if (givenEventId == null) {
             Toast.makeText(this, "Event id is null", Toast.LENGTH_SHORT).show();
@@ -107,9 +124,13 @@ public class EventDetailActivity extends AppCompatActivity {
                 .into(binding.evtDtlPosterImage);
 
         if (CurrentProfile.isOrganizer()) {
-            binding.evtDtlOrgEditBtn.setOnClickListener(
-                v -> startActivity(EventEditingActivity.newIntent(this, givenEventId))
-            );
+            binding.evtDtlOrgEditBtn.setOnClickListener(v -> {
+                editingLauncher.launch(
+                    EventEditingActivity.newIntent(
+                        EventDetailActivity.this, givenEventId
+                    )
+                );
+            });
             binding.evtDtlOrgEditBtn.setVisibility(View.VISIBLE);
             setupOrganizerLottery(e);
         } else if (CurrentProfile.isAdmin()) {
@@ -579,5 +600,48 @@ public class EventDetailActivity extends AppCompatActivity {
             inviteSummaryListener.remove();
         }
         super.onDestroy();
+    }
+
+    private ActivityResultLauncher<Intent> getLauncherForEdit() {
+        return registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    Intent i = result.getData();
+                    if (i != null) {
+                        String eventId = i.getStringExtra(KEY_EVENT_ID);
+                        EventCache.asyncTryGetSingle(
+                            eventId,
+                            new EventRepository.LoadCallback() {
+                                @Override
+                                public void onLoaded(Event e) {
+                                    binding.setEventModel(e);
+                                    binding.executePendingBindings();
+                                }
+
+                                @Override
+                                public void onNotFound() {
+                                    Toast.makeText(
+                                        EventDetailActivity.this,
+                                        "Edited event " + eventId + " not found",
+                                        Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Toast.makeText(
+                                        EventDetailActivity.this,
+                                        "Error occurs when try to load edited event: "
+                                            + e.getClass().getCanonicalName(),
+                                        Toast.LENGTH_SHORT
+                                    ).show();
+                                }
+                            }
+                        );
+                    }
+                }
+            }
+        );
     }
 }

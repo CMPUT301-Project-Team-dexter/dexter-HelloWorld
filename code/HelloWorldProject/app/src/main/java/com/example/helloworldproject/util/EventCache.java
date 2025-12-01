@@ -14,14 +14,12 @@ public class EventCache {
     private static final HashMap<String, Event> internalCache = new HashMap<>(64);
 
     /**
-     * Cache the given event locally.
+     * Refresh the cache with a new event.
      *
-     * @param e: the event to be cached
+     * @param e the event to refresh
      */
-    public static void cache(@NonNull Event e) {
-        if (!internalCache.containsKey(e.getId())) {
-            internalCache.put(e.getId(), e);
-        }
+    public static void refresh(@NonNull Event e) {
+        internalCache.put(e.getId(), e);
     }
 
     public static boolean remove(@NonNull Event e) {
@@ -53,7 +51,7 @@ public class EventCache {
             new EventRepository.LoadCallback() {
                 @Override
                 public void onLoaded(Event e) {
-                    cache(e);
+                    refresh(e);
                     cb.onLoaded(e);
                 }
 
@@ -96,7 +94,7 @@ public class EventCache {
             new EventRepository.ListCallback() {
                 @Override
                 public void onLoaded(List<Event> events) {
-                    events.forEach(EventCache::cache);
+                    events.forEach(EventCache::refresh);
                     cachedEvents.addAll(events);
                     cb.onLoaded(cachedEvents);
                 }

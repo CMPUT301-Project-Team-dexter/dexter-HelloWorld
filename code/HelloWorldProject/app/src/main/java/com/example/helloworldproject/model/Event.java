@@ -11,6 +11,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Exclude;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -53,7 +54,42 @@ public class Event extends BaseObservable {
 
     private Boolean imgUrlEnable;
 
-    public Event() {  }
+    public Event() {
+    }
+
+    /**
+     * Copy constructor.
+     *
+     * @param other the event to copy
+     */
+    public Event(Event other) {
+        this.id = other.id;
+        this.createdAt = other.createdAt;
+        this.creator = other.creator;
+        this.title = other.title;
+        this.description = other.description;
+        this.venue = other.venue;
+        this.registrationOpenAt = other.registrationOpenAt;
+        this.registrationCloseAt = other.registrationCloseAt;
+        this.eventStartAt = other.eventStartAt;
+        this.eventEndAt = other.eventEndAt;
+        this.capacity = other.capacity;
+        this.selectionMethod = other.selectionMethod;
+        this.seedPolicy = other.seedPolicy;
+        this.duplicatePolicy = other.duplicatePolicy;
+        this.geoRequired = other.geoRequired;
+        this.plannedSampleSize = other.plannedSampleSize;
+        if (other.interests == null) {
+            this.interests = null;
+        } else {
+            this.interests = new ArrayList<>();
+            this.interests.addAll(other.interests);
+        }
+        this.imgId = other.imgId;
+        this.imgUrl = other.imgUrl;
+        this.imgUrlEnable = other.imgUrlEnable;
+        this.qrCodeBitmap = null;
+    }
 
     public String getId() {
         return id;
@@ -69,6 +105,7 @@ public class Event extends BaseObservable {
 
     /**
      * Get the real-time status of the event based on current time.
+     *
      * @return the EventStatus enum representing the current status
      */
     @Exclude
@@ -84,9 +121,9 @@ public class Event extends BaseObservable {
         // If any of the key timestamps are missing, don't try to compare them.
         // Just fall back to a safe default so the UI can still render.
         if (registrationOpenAt == null ||
-                registrationCloseAt == null ||
-                eventStartAt == null ||
-                eventEndAt == null) {
+            registrationCloseAt == null ||
+            eventStartAt == null ||
+            eventEndAt == null) {
 
             // Using NOT_OPEN is safe for admin views.
             return EventStatus.NOT_OPEN;
@@ -106,10 +143,11 @@ public class Event extends BaseObservable {
     }
 
     @Exclude
-    Bitmap qrCodeBitmap = null;
+    private Bitmap qrCodeBitmap = null;
 
     /**
      * Get the QR code bitmap representing the event ID.
+     *
      * @return Bitmap of the QR code
      */
     @Exclude
@@ -188,13 +226,19 @@ public class Event extends BaseObservable {
     }
 
     @Bindable
-    public String getImgId() { return imgId; }
+    public String getImgId() {
+        return imgId;
+    }
 
     @Bindable
-    public String getImgUrl() { return imgUrl; }
+    public String getImgUrl() {
+        return imgUrl;
+    }
 
     @Bindable
-    public Boolean getImgUrlEnable() { return imgUrlEnable; }
+    public Boolean getImgUrlEnable() {
+        return imgUrlEnable;
+    }
 
 
     public void setId(String id) {
@@ -238,6 +282,7 @@ public class Event extends BaseObservable {
         this.eventStartAt = eventStartAt;
         notifyPropertyChanged(BR.eventStartAt);
     }
+
     public void setEventEndAt(Timestamp eventEndAt) {
         this.eventEndAt = eventEndAt;
         notifyPropertyChanged(BR.eventEndAt);
@@ -279,7 +324,11 @@ public class Event extends BaseObservable {
         this.imgId = imgId;
     }
 
-    public void setImgUrl(String imgUrl) { this.imgUrl = imgUrl; }
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
 
-    public void setImgUrlEnable(Boolean imgUrlEnable) { this.imgUrlEnable = imgUrlEnable; }
+    public void setImgUrlEnable(Boolean imgUrlEnable) {
+        this.imgUrlEnable = imgUrlEnable;
+    }
 }
