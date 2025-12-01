@@ -38,18 +38,18 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(
-        @NonNull ViewGroup parent,
-        int viewType
+            @NonNull ViewGroup parent,
+            int viewType
     ) {
         View view = LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.item_notification, parent, false);
+                .inflate(R.layout.item_notification, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(
-        @NonNull ViewHolder holder,
-        int position
+            @NonNull ViewHolder holder,
+            int position
     ) {
         NotificationRecord record = items.get(position);
 
@@ -59,10 +59,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         if (NotificationRecordTypeHelper.isLotteryNotChosen(record)) {
             // "You were not chosen" message for this event.
             String eventTitle = record.getEventTitle() != null
-                ? record.getEventTitle()
-                : "this event";
+                    ? record.getEventTitle()
+                    : "this event";
             title = "Lottery result";
             message = "You were not chosen for \"" + eventTitle + "\".";
+        } else if (NotificationRecordTypeHelper.isLotteryChosen(record)) {
+            String eventTitle = record.getEventTitle() != null
+                    ? record.getEventTitle()
+                    : "this event";
+            title = "Lottery result";
+            message = "You were selected for \"" + eventTitle + "\". Please respond.";
         } else {
             // Generic fallback message.
             title = "Notification";
@@ -75,8 +81,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         // Optional: show createdAt as a short date/time.
         if (record.getCreatedAt() != null) {
             String time = DateFormat.getDateTimeInstance(
-                DateFormat.SHORT,
-                DateFormat.SHORT
+                    DateFormat.SHORT,
+                    DateFormat.SHORT
             ).format(new Date(record.getCreatedAt().getSeconds() * 1000));
             holder.timeView.setText(time);
         } else {
@@ -96,6 +102,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         static boolean isLotteryNotChosen(NotificationRecord record) {
             return "LOTTERY_NOT_CHOSEN".equals(record.getType());
         }
+
+        static boolean isLotteryChosen(NotificationRecord record) {
+            return "LOTTERY_CHOSEN".equals(record.getType());
+        }
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -111,4 +121,3 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
     }
 }
-

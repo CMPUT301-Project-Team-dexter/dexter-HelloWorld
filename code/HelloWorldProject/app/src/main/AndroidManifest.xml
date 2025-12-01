@@ -29,6 +29,10 @@
             android:name=".ui.activities.event.InvitationHistoryActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.activities.NotificationListActivity"
+            android:exported="false"
+            android:label="@string/notifications_title" />
 
         <activity
             android:name=".ui.activities.event.AdminEventListActivity"

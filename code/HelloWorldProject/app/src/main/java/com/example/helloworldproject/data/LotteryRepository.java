@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class LotteryRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final NotificationRepository notificationRepository = new NotificationRepository();
 
     public interface DrawCallback {
         void onComplete(int invitedCount);
@@ -98,23 +99,23 @@ public class LotteryRepository {
      * render the latest known state.
      */
     public void fetchInviteStatus(
-        String eventId,
-        String profileId,
-        final InviteStatusListener listener
+            String eventId,
+            String profileId,
+            final InviteStatusListener listener
     ) {
         db.collection("events")
-            .document(eventId)
-            .collection("invites")
-            .document(profileId)
-            .get()
-            .addOnSuccessListener(snapshot -> {
-                if (snapshot == null || !snapshot.exists()) {
-                    listener.onLoaded(null);
-                } else {
-                    listener.onLoaded(snapshot.getString("status"));
-                }
-            })
-            .addOnFailureListener(listener::onError);
+                .document(eventId)
+                .collection("invites")
+                .document(profileId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot == null || !snapshot.exists()) {
+                        listener.onLoaded(null);
+                    } else {
+                        listener.onLoaded(snapshot.getString("status"));
+                    }
+                })
+                .addOnFailureListener(listener::onError);
     }
 
     /**
@@ -125,16 +126,16 @@ public class LotteryRepository {
         executor.execute(() -> {
             try {
                 Task<DocumentSnapshot> eventTask = db.collection("events")
-                    .document(eventId)
-                    .get();
+                        .document(eventId)
+                        .get();
                 Task<QuerySnapshot> waitlistTask = db.collection("events")
-                    .document(eventId)
-                    .collection("waitlist")
-                    .get();
+                        .document(eventId)
+                        .collection("waitlist")
+                        .get();
                 Task<QuerySnapshot> invitesTask = db.collection("events")
-                    .document(eventId)
-                    .collection("invites")
-                    .get();
+                        .document(eventId)
+                        .collection("invites")
+                        .get();
                 Tasks.await(eventTask, 10, TimeUnit.SECONDS);
                 Tasks.await(waitlistTask, 10, TimeUnit.SECONDS);
                 Tasks.await(invitesTask, 10, TimeUnit.SECONDS);
@@ -154,6 +155,7 @@ public class LotteryRepository {
 
                 // Determine remaining capacity. If capacity is missing, fall back to requested size.
                 DocumentSnapshot eventDoc = eventTask.getResult();
+                String eventTitle = eventDoc != null ? eventDoc.getString("title") : null;
                 int capacity = Integer.MAX_VALUE;
                 if (eventDoc != null && eventDoc.exists()) {
                     Number capNumber = eventDoc.getLong("capacity");
@@ -178,8 +180,8 @@ public class LotteryRepository {
                 }
 
                 int availableSlots = capacity == Integer.MAX_VALUE
-                    ? requestedSampleSize
-                    : Math.max(0, capacity - acceptedCount - pendingCount);
+                        ? requestedSampleSize
+                        : Math.max(0, capacity - acceptedCount - pendingCount);
                 int drawSize = Math.min(requestedSampleSize, availableSlots);
                 if (drawSize <= 0) {
                     cb.onComplete(0);
@@ -218,13 +220,31 @@ public class LotteryRepository {
                     invite.put("status", "PENDING");
                     invite.put("invitedAt", now);
                     batch.set(db.collection("events")
-                        .document(eventId)
-                        .collection("invites")
-                        .document(p.getId()), invite);
+                            .document(eventId)
+                            .collection("invites")
+                            .document(p.getId()), invite);
                 }
                 Task<Void> commit = batch.commit();
                 Tasks.await(commit, 10, TimeUnit.SECONDS);
                 if (commit.isSuccessful()) {
+                    String safeEventTitle = eventTitle == null ? "this event" : eventTitle;
+                    for (int i = 0; i < inviteCount; i++) {
+                        Profile p = candidates.get(i);
+                        notificationRepository.createLotteryChosenNotification(
+                                p.getId(),
+                                eventId,
+                                safeEventTitle
+                        );
+                    }
+
+                    for (int i = inviteCount; i < candidates.size(); i++) {
+                        Profile p = candidates.get(i);
+                        notificationRepository.createLotteryNotChosenNotification(
+                                p.getId(),
+                                eventId,
+                                safeEventTitle
+                        );
+                    }
                     cb.onComplete(inviteCount);
                 } else {
                     cb.onError(commit.getException());
@@ -245,18 +265,18 @@ public class LotteryRepository {
 
         WriteBatch batch = db.batch();
         batch.set(db.collection("events")
-                .document(eventId)
-                .collection("invites")
-                .document(profileId),
-            patch, com.google.firebase.firestore.SetOptions.merge());
+                        .document(eventId)
+                        .collection("invites")
+                        .document(profileId),
+                patch, com.google.firebase.firestore.SetOptions.merge());
         batch.delete(db.collection("events")
-            .document(eventId)
-            .collection("waitlist")
-            .document(profileId));
+                .document(eventId)
+                .collection("waitlist")
+                .document(profileId));
 
         batch.commit()
-            .addOnSuccessListener(unused -> listener.onSuccess())
-            .addOnFailureListener(listener::onError);
+                .addOnSuccessListener(unused -> listener.onSuccess())
+                .addOnFailureListener(listener::onError);
     }
 
     /**
@@ -269,70 +289,70 @@ public class LotteryRepository {
 
         WriteBatch batch = db.batch();
         batch.set(db.collection("events")
-                .document(eventId)
-                .collection("invites")
-                .document(profileId),
-            patch, com.google.firebase.firestore.SetOptions.merge());
+                        .document(eventId)
+                        .collection("invites")
+                        .document(profileId),
+                patch, com.google.firebase.firestore.SetOptions.merge());
         batch.delete(db.collection("events")
-            .document(eventId)
-            .collection("waitlist")
-            .document(profileId));
+                .document(eventId)
+                .collection("waitlist")
+                .document(profileId));
 
         batch.commit()
-            .addOnSuccessListener(unused -> listener.onSuccess())
-            .addOnFailureListener(listener::onError);
+                .addOnSuccessListener(unused -> listener.onSuccess())
+                .addOnFailureListener(listener::onError);
     }
 
     public void cancelAcceptedEntrant(
-        @NonNull String eventId,
-        @NonNull String profileId,
-        @Nullable final CompletionListener listener
+            @NonNull String eventId,
+            @NonNull String profileId,
+            @Nullable final CompletionListener listener
     ) {
         DocumentReference ref = db.collection("events")
-            .document(eventId)
-            .collection("invites")
-            .document(profileId);
+                .document(eventId)
+                .collection("invites")
+                .document(profileId);
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("status", "CANCELLED");
         updates.put("cancelledAt", FieldValue.serverTimestamp());
 
         ref.update(updates)
-            .addOnSuccessListener(unused -> {
-                if (listener != null) {
-                    listener.onSuccess();
-                }
-            })
-            .addOnFailureListener(e -> {
-                if (listener != null) {
-                    listener.onError(e);
-                }
-            });
+                .addOnSuccessListener(unused -> {
+                    if (listener != null) {
+                        listener.onSuccess();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (listener != null) {
+                        listener.onError(e);
+                    }
+                });
     }
 
     /**
      * Observe invite status for a single profile.
      */
     public ListenerRegistration observeInviteStatus(
-        String eventId,
-        String profileId,
-        final InviteStatusListener listener
+            String eventId,
+            String profileId,
+            final InviteStatusListener listener
     ) {
         return db.collection("events")
-            .document(eventId)
-            .collection("invites")
-            .document(profileId)
-            .addSnapshotListener((snapshot, error) -> {
-                if (error != null) {
-                    listener.onError(error);
-                    return;
-                }
-                if (snapshot == null || !snapshot.exists()) {
-                    listener.onLoaded(null);
-                    return;
-                }
-                listener.onLoaded(snapshot.getString("status"));
-            });
+                .document(eventId)
+                .collection("invites")
+                .document(profileId)
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null) {
+                        listener.onError(error);
+                        return;
+                    }
+                    if (snapshot == null || !snapshot.exists()) {
+                        listener.onLoaded(null);
+                        return;
+                    }
+                    listener.onLoaded(snapshot.getString("status"));
+                });
     }
 
     /**
@@ -340,72 +360,72 @@ public class LotteryRepository {
      */
     public ListenerRegistration observeInviteSummary(String eventId, final InviteSummaryListener listener) {
         return db.collection("events")
-            .document(eventId)
-            .collection("invites")
-            .addSnapshotListener((snapshots, error) -> {
-                if (error != null) {
-                    listener.onError(error);
-                    return;
-                }
-                int pending = 0, accepted = 0, declined = 0;
-                if (snapshots != null) {
-                    for (DocumentSnapshot doc : snapshots.getDocuments()) {
-                        String status = doc.getString("status");
-                        if ("ACCEPTED".equals(status)) {
-                            accepted++;
-                        } else if ("DECLINED".equals(status)) {
-                            declined++;
-                        } else {
-                            pending++;
+                .document(eventId)
+                .collection("invites")
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        listener.onError(error);
+                        return;
+                    }
+                    int pending = 0, accepted = 0, declined = 0;
+                    if (snapshots != null) {
+                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                            String status = doc.getString("status");
+                            if ("ACCEPTED".equals(status)) {
+                                accepted++;
+                            } else if ("DECLINED".equals(status)) {
+                                declined++;
+                            } else {
+                                pending++;
+                            }
                         }
                     }
-                }
-                listener.onLoaded(pending, accepted, declined);
-            });
+                    listener.onLoaded(pending, accepted, declined);
+                });
     }
 
     public ListenerRegistration observeAcceptedEntrants(
-        String eventId,
-        final AcceptedEntrantsListener listener
+            String eventId,
+            final AcceptedEntrantsListener listener
     ) {
         return db.collection("events")
-            .document(eventId)
-            .collection("invites")
-            .whereEqualTo("status", "ACCEPTED")
-            .addSnapshotListener((snapshots, error) -> {
-                if (error != null) {
-                    listener.onError(error);
-                    return;
-                }
-
-                List<Profile> entrants = new ArrayList<>();
-                if (snapshots != null) {
-                    for (DocumentSnapshot doc : snapshots.getDocuments()) {
-                        String profileId = doc.getId();
-
-                        Profile p = new Profile();
-                        p.setId(profileId);
-                        p.setName(doc.getString("name"));
-                        p.setEmail(doc.getString("email"));
-                        p.setPhone(doc.getString("phone"));
-
-                        entrants.add(p);
+                .document(eventId)
+                .collection("invites")
+                .whereEqualTo("status", "ACCEPTED")
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        listener.onError(error);
+                        return;
                     }
-                }
 
-                listener.onLoaded(entrants);
-            });
+                    List<Profile> entrants = new ArrayList<>();
+                    if (snapshots != null) {
+                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                            String profileId = doc.getId();
+
+                            Profile p = new Profile();
+                            p.setId(profileId);
+                            p.setName(doc.getString("name"));
+                            p.setEmail(doc.getString("email"));
+                            p.setPhone(doc.getString("phone"));
+
+                            entrants.add(p);
+                        }
+                    }
+
+                    listener.onLoaded(entrants);
+                });
     }
 
     public ListenerRegistration observeInvitationHistory(
-        String eventId,
-        @Nullable List<String> statusFilter,
-        final InvitationHistoryListener listener
+            String eventId,
+            @Nullable List<String> statusFilter,
+            final InvitationHistoryListener listener
     ) {
         Query query = db.collection("events")
-            .document(eventId)
-            .collection("invites")
-            .orderBy("invitedAt", Query.Direction.DESCENDING);
+                .document(eventId)
+                .collection("invites")
+                .orderBy("invitedAt", Query.Direction.DESCENDING);
 
         if (statusFilter != null && !statusFilter.isEmpty()) {
             query = query.whereIn("status", statusFilter);
@@ -430,10 +450,10 @@ public class LotteryRepository {
                     String status = doc.getString("status");
 
                     InvitationRecord record = new InvitationRecord(
-                        profileId,
-                        name,
-                        code,
-                        status
+                            profileId,
+                            name,
+                            code,
+                            status
                     );
                     records.add(record);
                 }

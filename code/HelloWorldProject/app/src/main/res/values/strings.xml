@@ -60,4 +60,6 @@
     <string name="chosen_entrants_title">Chosen entrants</string>
     <string name="export_csv" />
     <string name="button_region" />
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_empty">No notifications yet.</string>
 </resources>

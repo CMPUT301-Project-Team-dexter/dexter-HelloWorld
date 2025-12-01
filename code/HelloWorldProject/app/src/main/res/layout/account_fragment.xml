@@ -46,6 +46,23 @@
             android:background="#BDBDBD" />
 
         <Button
+            android:id="@+id/notifications_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawableEnd="@drawable/outline_chevron_right_24"
+            android:gravity="start"
+            android:text="@string/notifications_title"
+            android:textColor="@android:color/primary_text_light"
+            android:textSize="20sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginHorizontal="8dp"
+            android:background="#BDBDBD" />
+
+        <Button
             android:id="@+id/settings_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
