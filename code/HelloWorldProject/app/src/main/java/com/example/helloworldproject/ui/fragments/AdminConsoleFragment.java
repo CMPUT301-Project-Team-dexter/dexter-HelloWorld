@@ -38,6 +38,15 @@ public class AdminConsoleFragment extends Fragment {
                 .addToBackStack(null)
                 .commit()
         );
+        binding.adminConsAllImagesButton.setOnClickListener(
+                v -> requireActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, new AllImagesFragment())
+                        .addToBackStack(null)
+                        .commit()
+        );
+
         // TODO: bind onclick for other buttons
         binding.adminConsAllEventsButton.setOnClickListener(
             v -> startActivity(AdminEventListActivity.newIntent(getContext()))
