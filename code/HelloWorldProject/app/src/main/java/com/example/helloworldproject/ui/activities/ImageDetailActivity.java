@@ -21,6 +21,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 public class ImageDetailActivity extends AppCompatActivity {
     private static final String ARG_EVENT_ID = "arg_event_id";
     private static final String ARG_IMAGE_URL = "arg_image_url";
+    private String eventId;
+    private String imageUrl;
 
     public static Intent newIntent(Context context, @Nullable String eventId, @Nullable String imageUrl) {
         Intent i = new Intent(context, ImageDetailActivity.class);
@@ -28,9 +30,6 @@ public class ImageDetailActivity extends AppCompatActivity {
         i.putExtra(ARG_IMAGE_URL, imageUrl);
         return i;
     }
-
-    private String eventId;
-    private String imageUrl;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

@@ -35,6 +35,22 @@ import java.util.List;
 public class InvitationHistoryActivity extends AppCompatActivity {
 
     private static final String EXTRA_EVENT_ID = "EXTRA_EVENT_ID";
+    // Repository that talks to Firestore.
+    private final LotteryRepository lotteryRepository = new LotteryRepository();
+    // Firestore listener for the invitation history snapshot.
+    @Nullable
+    private ListenerRegistration invitationListener = null;
+    // RecyclerView adapter showing the invitations.
+    private InvitationHistoryAdapter adapter;
+    // Event id passed from the EventManageActivity.
+    private String eventId;
+    /**
+     * Optional filter on invitation status.
+     * When null or empty, all invitations are shown.
+     * When set to ["DECLINED","CANCELLED"], only rejected/cancelled invites are shown.
+     */
+    @Nullable
+    private List<String> currentStatusFilter = null;
 
     /**
      * Helper method to construct an Intent for starting this Activity.
@@ -47,27 +63,6 @@ public class InvitationHistoryActivity extends AppCompatActivity {
         i.putExtra(EXTRA_EVENT_ID, eventId);
         return i;
     }
-
-    // Repository that talks to Firestore.
-    private final LotteryRepository lotteryRepository = new LotteryRepository();
-
-    // Firestore listener for the invitation history snapshot.
-    @Nullable
-    private ListenerRegistration invitationListener = null;
-
-    // RecyclerView adapter showing the invitations.
-    private InvitationHistoryAdapter adapter;
-
-    // Event id passed from the EventManageActivity.
-    private String eventId;
-
-    /**
-     * Optional filter on invitation status.
-     * When null or empty, all invitations are shown.
-     * When set to ["DECLINED","CANCELLED"], only rejected/cancelled invites are shown.
-     */
-    @Nullable
-    private List<String> currentStatusFilter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

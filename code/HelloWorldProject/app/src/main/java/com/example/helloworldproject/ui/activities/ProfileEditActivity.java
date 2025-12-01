@@ -59,7 +59,8 @@ public class ProfileEditActivity extends AppCompatActivity {
 
         setLoading(true);
         repo.loadByDeviceId(deviceId, new ProfileRepository.LoadCallback() {
-            @Override public void onLoaded(Profile p) {
+            @Override
+            public void onLoaded(Profile p) {
                 setLoading(false);
                 if (p == null) {
                     Toast.makeText(ProfileEditActivity.this, "Profile is null.", Toast.LENGTH_LONG).show();
@@ -74,11 +75,15 @@ public class ProfileEditActivity extends AppCompatActivity {
                     userGroupSpinner.setSelection(p.getUserGroup().ordinal());
                 }
             }
-            @Override public void onNotFound() {
+
+            @Override
+            public void onNotFound() {
                 setLoading(false);
                 workingProfile = new Profile(deviceId, deviceId, "", "", null, UserGroup.ENTRANT);
             }
-            @Override public void onError(Exception e) {
+
+            @Override
+            public void onError(Exception e) {
                 setLoading(false);
                 Toast.makeText(ProfileEditActivity.this, "Failed to load: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 finish();
@@ -109,14 +114,17 @@ public class ProfileEditActivity extends AppCompatActivity {
             workingProfile.setPhone(TextUtils.isEmpty(phone) ? null : phone);
             workingProfile.setUserGroup(UserGroup.valueOf(spinnerAdapter.getItem(userGroupSpinner.getSelectedItemPosition())));
             repo.saveOrUpdate(workingProfile, new ProfileRepository.CompleteCallback() {
-                @Override public void onComplete() {
+                @Override
+                public void onComplete() {
                     setLoading(false);
                     CurrentProfile.init(workingProfile);
                     Toast.makeText(ProfileEditActivity.this, "Saved", Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
                     finish();
                 }
-                @Override public void onError(Exception e) {
+
+                @Override
+                public void onError(Exception e) {
                     setLoading(false);
                     Toast.makeText(ProfileEditActivity.this, "Save failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }

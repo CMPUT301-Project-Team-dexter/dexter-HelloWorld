@@ -24,25 +24,14 @@ import java.util.Map;
  */
 public class NotificationRepository {
 
-    private static final String COLLECTION_PROFILES = "profiles";
-    private static final String SUBCOLLECTION_NOTIFICATIONS = "notifications";
-    private static final String TAG = "NotificationRepo";
-
     // Type constant used for "lottery not chosen" notifications.
     public static final String TYPE_LOTTERY_NOT_CHOSEN = "LOTTERY_NOT_CHOSEN";
     // Type constant used for "lottery chosen" notifications.
     public static final String TYPE_LOTTERY_CHOSEN = "LOTTERY_CHOSEN";
-
+    private static final String COLLECTION_PROFILES = "profiles";
+    private static final String SUBCOLLECTION_NOTIFICATIONS = "notifications";
+    private static final String TAG = "NotificationRepo";
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-    /**
-     * Listener that receives updates for a user's notification list.
-     */
-    public interface NotificationListListener {
-        void onLoaded(List<NotificationRecord> notifications);
-
-        void onError(Exception e);
-    }
 
     /**
      * Observe all notifications for the given profile, ordered by most recent.
@@ -216,5 +205,14 @@ public class NotificationRepository {
                     .addOnFailureListener(e -> Log.w(TAG, "Failed to write notification for " + profileId, e));
             })
             .addOnFailureListener(e -> Log.w(TAG, "Failed to load profile " + profileId + " for notifications", e));
+    }
+
+    /**
+     * Listener that receives updates for a user's notification list.
+     */
+    public interface NotificationListListener {
+        void onLoaded(List<NotificationRecord> notifications);
+
+        void onError(Exception e);
     }
 }

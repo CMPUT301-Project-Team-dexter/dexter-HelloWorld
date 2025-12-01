@@ -33,6 +33,14 @@ import com.google.firebase.firestore.ListenerRegistration;
 
 public class EventDetailActivity extends AppCompatActivity {
     private static final String KEY_EVENT_ID = "key_event_id";
+    private final WaitlistRepository waitlistRepository = new WaitlistRepository();
+    private final LotteryRepository lotteryRepository = new LotteryRepository();
+    ActivityEventDetailBinding binding;
+    private final ActivityResultLauncher<Intent> editingLauncher = getEditLauncher();
+    String givenEventId;
+    private ListenerRegistration waitlistCountListener;
+    private ListenerRegistration inviteStatusListener;
+    private ListenerRegistration inviteSummaryListener;
 
     public static Intent newIntent(Context context, @NonNull String eventId) {
         Intent i = new Intent(context, EventDetailActivity.class);
@@ -45,15 +53,6 @@ public class EventDetailActivity extends AppCompatActivity {
         i.putExtra(KEY_EVENT_ID, eventId);
         return i;
     }
-
-    ActivityEventDetailBinding binding;
-    String givenEventId;
-    private final WaitlistRepository waitlistRepository = new WaitlistRepository();
-    private final LotteryRepository lotteryRepository = new LotteryRepository();
-    private ListenerRegistration waitlistCountListener;
-    private ListenerRegistration inviteStatusListener;
-    private ListenerRegistration inviteSummaryListener;
-    private final ActivityResultLauncher<Intent> editingLauncher = getEditLauncher();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -115,10 +114,10 @@ public class EventDetailActivity extends AppCompatActivity {
 
         String imgUrl = e.getImgUrl();
         Glide.with(this)
-                .load(imgUrl)
-                .placeholder(R.drawable.placeholder)
-                .error(R.drawable.placeholder)
-                .into(binding.evtDtlPosterImage);
+            .load(imgUrl)
+            .placeholder(R.drawable.placeholder)
+            .error(R.drawable.placeholder)
+            .into(binding.evtDtlPosterImage);
 
         if (CurrentProfile.isOrganizer()) {
             binding.evtDtlOrgEditBtn.setOnClickListener(v -> {

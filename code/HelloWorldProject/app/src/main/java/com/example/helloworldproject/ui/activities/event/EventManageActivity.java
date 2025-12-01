@@ -18,15 +18,14 @@ import com.example.helloworldproject.databinding.ActivityEventManagementBinding;
 
 public class EventManageActivity extends AppCompatActivity {
     private static final String KEY_EVENT_ID = "KEY_EVENT_ID";
+    ActivityEventManagementBinding binding;
+    String givenEventId;
 
     public static Intent newIntent(Context context, @NonNull String eventId) {
         Intent i = new Intent(context, EventManageActivity.class);
         i.putExtra(KEY_EVENT_ID, eventId);
         return i;
     }
-
-    ActivityEventManagementBinding binding;
-    String givenEventId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

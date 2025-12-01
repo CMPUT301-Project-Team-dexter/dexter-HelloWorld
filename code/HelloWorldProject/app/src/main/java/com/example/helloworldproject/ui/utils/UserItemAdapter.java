@@ -16,11 +16,6 @@ public class UserItemAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     private final ArrayList<String> userNames;
     private final ArrayList<String> userIds;
-
-    public interface OnDeleteClickListener {
-        void onDeleteClick(int position);
-    }
-
     private final OnDeleteClickListener deleteClickListener;
 
     public UserItemAdapter(Context context,
@@ -90,6 +85,10 @@ public class UserItemAdapter extends BaseAdapter {
 
 
         return convertView;
+    }
+
+    public interface OnDeleteClickListener {
+        void onDeleteClick(int position);
     }
 
     private static class ViewHolder {

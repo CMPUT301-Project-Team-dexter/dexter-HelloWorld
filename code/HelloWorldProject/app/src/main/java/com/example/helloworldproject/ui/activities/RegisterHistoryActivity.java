@@ -22,8 +22,8 @@ public class RegisterHistoryActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container_view, new RegisterHistoryFragment())
-                    .commit();
+                .replace(R.id.fragment_container_view, new RegisterHistoryFragment())
+                .commit();
         }
     }
 }

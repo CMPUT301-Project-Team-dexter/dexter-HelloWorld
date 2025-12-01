@@ -22,17 +22,16 @@ import java.util.List;
 
 
 public class AllUsersActivity extends AppCompatActivity {
-    public static Intent newIntent(Context context) {
-        return new Intent(context, AllUsersActivity.class);
-    }
-
-    private ListView listView;
-    private UserItemAdapter adapter;
     private final ArrayList<String> userNames = new ArrayList<>();
     private final ArrayList<String> userIds = new ArrayList<>();
     private final ArrayList<Profile> profiles = new ArrayList<>();
     private final ProfileRepository profileRepository = new ProfileRepository();
+    private ListView listView;
+    private UserItemAdapter adapter;
 
+    public static Intent newIntent(Context context) {
+        return new Intent(context, AllUsersActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

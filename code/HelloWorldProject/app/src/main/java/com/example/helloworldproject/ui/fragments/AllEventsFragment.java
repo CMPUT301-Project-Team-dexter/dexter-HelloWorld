@@ -58,7 +58,7 @@ public class AllEventsFragment extends Fragment {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-         // Dummy data
+        // Dummy data
         //listView = view.findViewById(R.id.event_list_view);
         //ArrayList<String> userNames = new ArrayList<>();
         //userNames.add("AlphaBravo");
@@ -84,10 +84,10 @@ public class AllEventsFragment extends Fragment {
 
 // Hook up adapter first (empty list to start)
         EventItemAdapter adapter = new EventItemAdapter(
-                requireContext(),
-                userNames,
-                userIds,
-                eventNames
+            requireContext(),
+            userNames,
+            userIds,
+            eventNames
         );
         listView.setAdapter(adapter);
 
@@ -109,7 +109,7 @@ public class AllEventsFragment extends Fragment {
                     // userId     = event id
                     String title = e.getTitle() != null ? e.getTitle() : "(Untitled event)";
                     String venue = e.getVenue() != null ? e.getVenue() : "No venue";
-                    String id    = e.getId()    != null ? e.getId()    : "";
+                    String id = e.getId() != null ? e.getId() : "";
 
                     userNames.add(venue);
                     userIds.add(id);
@@ -122,9 +122,9 @@ public class AllEventsFragment extends Fragment {
             @Override
             public void onError(Exception e) {
                 Toast.makeText(
-                        requireContext(),
-                        "Failed to load events: " + e.getMessage(),
-                        Toast.LENGTH_LONG
+                    requireContext(),
+                    "Failed to load events: " + e.getMessage(),
+                    Toast.LENGTH_LONG
                 ).show();
             }
         });

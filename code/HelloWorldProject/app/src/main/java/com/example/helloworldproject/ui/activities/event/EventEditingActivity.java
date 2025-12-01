@@ -39,15 +39,14 @@ import java.util.Date;
 
 public class EventEditingActivity extends AppCompatActivity implements EventEditListener {
     private static final String KEY_EVENT_ID = "key_event_id";
+    ActivityEventEditingBinding binding;
+    String givenEventId;
 
     public static Intent newIntent(Context context, @Nullable String eventId) {
         Intent i = new Intent(context, EventEditingActivity.class);
         i.putExtra(KEY_EVENT_ID, eventId);
         return i;
     }
-
-    ActivityEventEditingBinding binding;
-    String givenEventId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

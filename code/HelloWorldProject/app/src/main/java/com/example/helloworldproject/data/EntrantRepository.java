@@ -17,12 +17,6 @@ import java.util.List;
  */
 public class EntrantRepository {
 
-    public interface ListenCallback {
-        void onChanged(List<Entrant> entrants);
-
-        void onError(Exception e);
-    }
-
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ListenerRegistration currentReg;
 
@@ -121,5 +115,11 @@ public class EntrantRepository {
             currentReg.remove();
             currentReg = null;
         }
+    }
+
+    public interface ListenCallback {
+        void onChanged(List<Entrant> entrants);
+
+        void onError(Exception e);
     }
 }

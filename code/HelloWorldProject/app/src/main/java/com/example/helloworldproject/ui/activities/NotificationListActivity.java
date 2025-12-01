@@ -62,23 +62,23 @@ public class NotificationListActivity extends AppCompatActivity {
     private void listenForNotifications() {
         String profileId = CurrentProfile.get().getId();
         notificationListener = notificationRepository.observeNotifications(
-                profileId,
-                new NotificationRepository.NotificationListListener() {
-                    @Override
-                    public void onLoaded(List<NotificationRecord> notifications) {
-                        adapter.setItems(notifications);
-                        updateEmptyState(notifications.isEmpty());
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        Toast.makeText(
-                                NotificationListActivity.this,
-                                "Failed to load notifications: " + e.getMessage(),
-                                Toast.LENGTH_LONG
-                        ).show();
-                    }
+            profileId,
+            new NotificationRepository.NotificationListListener() {
+                @Override
+                public void onLoaded(List<NotificationRecord> notifications) {
+                    adapter.setItems(notifications);
+                    updateEmptyState(notifications.isEmpty());
                 }
+
+                @Override
+                public void onError(Exception e) {
+                    Toast.makeText(
+                        NotificationListActivity.this,
+                        "Failed to load notifications: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                    ).show();
+                }
+            }
         );
     }
 

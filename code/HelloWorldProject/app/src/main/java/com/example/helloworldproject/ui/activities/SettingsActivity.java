@@ -15,9 +15,9 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    private final ProfileRepository repo = new ProfileRepository();
     private SwitchMaterial switchOptOut;
     private View progress;
-    private final ProfileRepository repo = new ProfileRepository();
     private Profile workingProfile;
 
     @Override
@@ -39,7 +39,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         setLoading(true);
         repo.loadByDeviceId(cp.getDeviceId(), new ProfileRepository.LoadCallback() {
-            @Override public void onLoaded(Profile profile) {
+            @Override
+            public void onLoaded(Profile profile) {
                 setLoading(false);
                 if (profile == null) {
                     Toast.makeText(SettingsActivity.this, "Profile is null.", Toast.LENGTH_LONG).show();
@@ -51,12 +52,16 @@ public class SettingsActivity extends AppCompatActivity {
                 switchOptOut.setChecked(optOut);
                 bindSwitch();
             }
-            @Override public void onNotFound() {
+
+            @Override
+            public void onNotFound() {
                 setLoading(false);
                 Toast.makeText(SettingsActivity.this, "Profile not found. Please register first.", Toast.LENGTH_LONG).show();
                 finish();
             }
-            @Override public void onError(Exception e) {
+
+            @Override
+            public void onError(Exception e) {
                 setLoading(false);
                 Toast.makeText(SettingsActivity.this, "Failed to load profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 finish();
@@ -70,12 +75,15 @@ public class SettingsActivity extends AppCompatActivity {
             setLoading(true);
             workingProfile.setNotificationOptOut(isChecked);
             repo.saveOrUpdate(workingProfile, new ProfileRepository.CompleteCallback() {
-                @Override public void onComplete() {
+                @Override
+                public void onComplete() {
                     setLoading(false);
                     CurrentProfile.init(workingProfile);
                     Toast.makeText(SettingsActivity.this, isChecked ? "Notifications turned OFF." : "Notifications turned ON.", Toast.LENGTH_SHORT).show();
                 }
-                @Override public void onError(Exception e) {
+
+                @Override
+                public void onError(Exception e) {
                     setLoading(false);
                     switchOptOut.setOnCheckedChangeListener(null);
                     switchOptOut.setChecked(!isChecked);

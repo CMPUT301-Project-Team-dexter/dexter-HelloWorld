@@ -26,15 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdminEventListActivity extends AppCompatActivity {
-    public static Intent newIntent(Context context) {
-        return new Intent(context, AdminEventListActivity.class);
-    }
-
     ActivityAdminEventListBinding binding;
     ArrayList<Event> eventListBackEnd = new ArrayList<>();
     EventCardAdapter adapter;
     private final ActivityResultLauncher<Intent> eventDetailLauncher = getEventDetailLauncher();
 
+    public static Intent newIntent(Context context) {
+        return new Intent(context, AdminEventListActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

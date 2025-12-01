@@ -38,60 +38,61 @@ public class Profile implements Serializable {
         return id;
     }
 
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public UserGroup getUserGroup() {
-        return userGroup;
-    }
-
-    public Boolean getNotificationOptOut() {
-        return notificationOptOut;
-    }
-
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
     }
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
     public void setPhone(String phone) {
         this.phone = phone;
     }
 
-    public void setNotificationOptOut(Boolean notificationOptOut) {
-        this.notificationOptOut = notificationOptOut;
+    public UserGroup getUserGroup() {
+        return userGroup;
     }
 
     public void setUserGroup(UserGroup userGroup) {
         this.userGroup = userGroup;
     }
 
+    public Boolean getNotificationOptOut() {
+        return notificationOptOut;
+    }
+
+    public void setNotificationOptOut(Boolean notificationOptOut) {
+        this.notificationOptOut = notificationOptOut;
+    }
+
     /**
      * Create a blank event with default settings.
+     *
      * @return a new Event object with default values
      */
     public Event createBlankEvent() {

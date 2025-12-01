@@ -39,6 +39,13 @@ import java.util.List;
 public class ChosenEntrantsActivity extends AppCompatActivity {
 
     private static final String EXTRA_EVENT_ID = "EXTRA_EVENT_ID";
+    // Repository used for all lottery / invitation operations.
+    private final LotteryRepository lotteryRepository = new LotteryRepository();
+    // Firestore listener for accepted entrants.
+    @Nullable
+    private ListenerRegistration acceptedListener = null;
+    private String eventId;
+    private ChosenEntrantAdapter adapter;
 
     /**
      * Helper method to build an Intent for starting this Activity.
@@ -51,16 +58,6 @@ public class ChosenEntrantsActivity extends AppCompatActivity {
         i.putExtra(EXTRA_EVENT_ID, eventId);
         return i;
     }
-
-    // Repository used for all lottery / invitation operations.
-    private final LotteryRepository lotteryRepository = new LotteryRepository();
-
-    // Firestore listener for accepted entrants.
-    @Nullable
-    private ListenerRegistration acceptedListener = null;
-
-    private String eventId;
-    private ChosenEntrantAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

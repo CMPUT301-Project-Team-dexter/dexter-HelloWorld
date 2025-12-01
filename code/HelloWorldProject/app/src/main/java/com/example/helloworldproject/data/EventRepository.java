@@ -31,33 +31,12 @@ import java.util.stream.Collectors;
  * Repository for managing Event data in Firestore.
  */
 public class EventRepository {
+    public static final EventRepository INSTANCE = new EventRepository();
+    private static final int BATCH_SIZE = 30;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
     private EventRepository() {
     }
-
-    public static final EventRepository INSTANCE = new EventRepository();
-
-    public interface LoadCallback {
-        void onLoaded(Event e);
-
-        void onNotFound();
-
-        void onError(Exception e);
-    }
-
-    public interface ListCallback {
-        void onLoaded(List<Event> events);
-
-        void onError(Exception e);
-    }
-
-
-    public interface CompleteCallback {
-        void onComplete();
-
-        void onError(Exception e);
-    }
-
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     /**
      * Load a single event by its ID asynchronously.
@@ -98,8 +77,6 @@ public class EventRepository {
             .addOnSuccessListener(unused -> cb.onComplete())
             .addOnFailureListener(cb::onError);
     }
-
-    private static final int BATCH_SIZE = 30;
 
     /**
      * Load events created by a specific organizer, excluding those already cached.
@@ -303,7 +280,6 @@ public class EventRepository {
             .addOnFailureListener(cb::onError);
     }
 
-
     /**
      * Fetches a list of events from Firestore based on specified filters
      * Method queries the "events" collection and filters the results by date and/or interests
@@ -368,5 +344,26 @@ public class EventRepository {
             Log.e("FILTER_DEBUG", "Query FAILED: " + e.getMessage());
             callback.onError(e);
         });
+    }
+
+    public interface LoadCallback {
+        void onLoaded(Event e);
+
+        void onNotFound();
+
+        void onError(Exception e);
+    }
+
+    public interface ListCallback {
+        void onLoaded(List<Event> events);
+
+        void onError(Exception e);
+    }
+
+
+    public interface CompleteCallback {
+        void onComplete();
+
+        void onError(Exception e);
     }
 }

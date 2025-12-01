@@ -6,9 +6,10 @@ import com.example.helloworldproject.model.Profile;
 import com.example.helloworldproject.model.UserGroup;
 
 public class CurrentProfile {
-    private CurrentProfile() {  }
-
     private static Profile currentUser = null;
+
+    private CurrentProfile() {
+    }
 
     public static boolean isInitialized() {
         return currentUser != null;

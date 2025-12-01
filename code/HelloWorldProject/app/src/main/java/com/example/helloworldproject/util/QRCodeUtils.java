@@ -8,7 +8,8 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 public class QRCodeUtils {
-    private QRCodeUtils() {  }
+    private QRCodeUtils() {
+    }
 
     public static Bitmap generate(String text, int size) {
         QRCodeWriter writer = new QRCodeWriter();

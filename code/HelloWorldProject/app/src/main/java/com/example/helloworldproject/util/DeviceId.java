@@ -7,18 +7,20 @@ import com.google.firebase.installations.FirebaseInstallations;
  */
 public class DeviceId {
 
-    public interface DeviceIdCallback {
-        void onSuccess(String deviceId);
-        void onError(Exception e);
-    }
-
     /**
      * Get the Firebase Installation ID asynchronously.
+     *
      * @param callback: Callback to receive the device ID or error.
      */
     public static void get(final DeviceIdCallback callback) {
         FirebaseInstallations.getInstance().getId()
             .addOnSuccessListener(callback::onSuccess)
             .addOnFailureListener(callback::onError);
+    }
+
+    public interface DeviceIdCallback {
+        void onSuccess(String deviceId);
+
+        void onError(Exception e);
     }
 }

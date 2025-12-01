@@ -17,11 +17,11 @@ import com.example.helloworldproject.util.CurrentProfile;
 import com.google.android.material.snackbar.Snackbar;
 
 public class HomeActivity extends AppCompatActivity {
+    ActivityHomeBinding binding;
+
     public static Intent newIntent(Context context) {
         return new Intent(context, HomeActivity.class);
     }
-
-    ActivityHomeBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

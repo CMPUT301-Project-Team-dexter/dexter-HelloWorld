@@ -15,50 +15,36 @@ import com.google.firebase.firestore.WriteBatch;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Firestore repository for Profile. */
+/**
+ * Firestore repository for Profile.
+ */
 public class ProfileRepository {
-    /** Callback for loading a list of profiles (for admin browse). */
-    public interface ListCallback {
-        void onLoaded(List<Profile> profiles);
-        void onError(Exception e);
-    }
-
-
-    public interface LoadCallback {
-        void onLoaded(Profile profile);
-        void onNotFound(); // document does not exist
-        void onError(Exception e);
-    }
-
-    public interface CompleteCallback {
-        void onComplete();
-        void onError(Exception e);
-    }
-
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public void loadByDeviceId(String deviceId, final LoadCallback cb) {
         db.collection("profiles").document(deviceId).get()
-                .addOnSuccessListener(ds -> {
-                    if (ds.exists()) {
-                        Profile p = ds.toObject(Profile.class);
-                        cb.onLoaded(p);
-                    } else {
-                        cb.onNotFound();
-                    }
-                })
-                .addOnFailureListener(cb::onError);
+            .addOnSuccessListener(ds -> {
+                if (ds.exists()) {
+                    Profile p = ds.toObject(Profile.class);
+                    cb.onLoaded(p);
+                } else {
+                    cb.onNotFound();
+                }
+            })
+            .addOnFailureListener(cb::onError);
     }
 
-    /** Create or update (merge) the profile by deviceId. */
+    /**
+     * Create or update (merge) the profile by deviceId.
+     */
     public void saveOrUpdate(Profile profile, final CompleteCallback cb) {
         String docId = profile.getDeviceId();
         profile.setId(docId);
         db.collection("profiles")
-                .document(docId)
-                .set(profile, SetOptions.merge())
-                .addOnSuccessListener(unused -> cb.onComplete())
-                .addOnFailureListener(cb::onError);
+            .document(docId)
+            .set(profile, SetOptions.merge())
+            .addOnSuccessListener(unused -> cb.onComplete())
+            .addOnFailureListener(cb::onError);
     }
 
     public void deleteProfile(Profile profile, final CompleteCallback cb) {
@@ -72,60 +58,60 @@ public class ProfileRepository {
 
         // 2. Get all 'events' documents to process deletions
         db.collection("events")
-                .get()
-                .addOnSuccessListener(snap -> {
-                    List<Task<QuerySnapshot>> subcollectionTasks = new ArrayList<>();
+            .get()
+            .addOnSuccessListener(snap -> {
+                List<Task<QuerySnapshot>> subcollectionTasks = new ArrayList<>();
 
-                    for (QueryDocumentSnapshot eventDoc : snap) {
-                        DocumentReference eventRef = eventDoc.getReference();
+                for (QueryDocumentSnapshot eventDoc : snap) {
+                    DocumentReference eventRef = eventDoc.getReference();
 
-                        String creator = eventDoc.getString("creator");
-                        boolean isCreator = thisName.equals(creator);
+                    String creator = eventDoc.getString("creator");
+                    boolean isCreator = thisName.equals(creator);
 
-                        if (isCreator) {
-                            // If the profile is the creator, mark the whole event document for deletion
-                            batch.delete(eventRef);
+                    if (isCreator) {
+                        // If the profile is the creator, mark the whole event document for deletion
+                        batch.delete(eventRef);
 
-                            Task<QuerySnapshot> waitlistTask = eventRef.collection("waitlist").get();
+                        Task<QuerySnapshot> waitlistTask = eventRef.collection("waitlist").get();
 
-                            Task<QuerySnapshot> invitesTask = eventRef.collection("invites").get();
+                        Task<QuerySnapshot> invitesTask = eventRef.collection("invites").get();
 
-                            subcollectionTasks.add(waitlistTask);
-                            subcollectionTasks.add(invitesTask);
-                        } else {
-                            Query waitlistQuery = eventRef.collection("waitlist").whereEqualTo("profileId", thisId);
-                            Task<QuerySnapshot> waitlistTask = waitlistQuery.get();
+                        subcollectionTasks.add(waitlistTask);
+                        subcollectionTasks.add(invitesTask);
+                    } else {
+                        Query waitlistQuery = eventRef.collection("waitlist").whereEqualTo("profileId", thisId);
+                        Task<QuerySnapshot> waitlistTask = waitlistQuery.get();
 
-                            Query invitesQuery = eventRef.collection("invites").whereEqualTo("profileId", thisId);
-                            Task<QuerySnapshot> invitesTask = invitesQuery.get();
+                        Query invitesQuery = eventRef.collection("invites").whereEqualTo("profileId", thisId);
+                        Task<QuerySnapshot> invitesTask = invitesQuery.get();
 
-                            subcollectionTasks.add(waitlistTask);
-                            subcollectionTasks.add(invitesTask);
+                        subcollectionTasks.add(waitlistTask);
+                        subcollectionTasks.add(invitesTask);
+                    }
+                }
+
+                // 3. Wait for all subcollection fetches to complete
+                Tasks.whenAllComplete(subcollectionTasks).addOnSuccessListener(completedTasks -> {
+
+                    for (Task<?> t : completedTasks) {
+                        if (!t.isSuccessful()) {
+                            cb.onError(t.getException());
+                            return;
+                        }
+
+                        QuerySnapshot subSnap = (QuerySnapshot) t.getResult();
+
+                        for (DocumentSnapshot subDoc : subSnap.getDocuments()) {
+                            batch.delete(subDoc.getReference());
                         }
                     }
 
-                    // 3. Wait for all subcollection fetches to complete
-                    Tasks.whenAllComplete(subcollectionTasks).addOnSuccessListener(completedTasks -> {
+                    batch.commit().addOnSuccessListener(unused -> cb.onComplete())
+                        .addOnFailureListener(cb::onError);
 
-                        for (Task<?> t : completedTasks) {
-                            if (!t.isSuccessful()) {
-                                cb.onError(t.getException());
-                                return;
-                            }
-
-                            QuerySnapshot subSnap = (QuerySnapshot) t.getResult();
-
-                            for (DocumentSnapshot subDoc : subSnap.getDocuments()) {
-                                batch.delete(subDoc.getReference());
-                            }
-                        }
-
-                        batch.commit().addOnSuccessListener(unused -> cb.onComplete())
-                                .addOnFailureListener(cb::onError);
-
-                    }).addOnFailureListener(cb::onError);
-                })
-                .addOnFailureListener(cb::onError);
+                }).addOnFailureListener(cb::onError);
+            })
+            .addOnFailureListener(cb::onError);
     }
 
     /**
@@ -133,20 +119,43 @@ public class ProfileRepository {
      */
     public void loadAllProfiles(final ListCallback cb) {
         db.collection("profiles")
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<Profile> result = new ArrayList<>();
-                    querySnapshot.getDocuments().forEach(doc -> {
-                        Profile p = doc.toObject(Profile.class);
-                        if (p != null) {
-                            // Ensure the in-memory model has its ID set to the document ID
-                            p.setId(doc.getId());
-                            result.add(p);
-                        }
-                    });
-                    cb.onLoaded(result);
-                })
-                .addOnFailureListener(cb::onError);
+            .get()
+            .addOnSuccessListener(querySnapshot -> {
+                List<Profile> result = new ArrayList<>();
+                querySnapshot.getDocuments().forEach(doc -> {
+                    Profile p = doc.toObject(Profile.class);
+                    if (p != null) {
+                        // Ensure the in-memory model has its ID set to the document ID
+                        p.setId(doc.getId());
+                        result.add(p);
+                    }
+                });
+                cb.onLoaded(result);
+            })
+            .addOnFailureListener(cb::onError);
+    }
+
+    /**
+     * Callback for loading a list of profiles (for admin browse).
+     */
+    public interface ListCallback {
+        void onLoaded(List<Profile> profiles);
+
+        void onError(Exception e);
+    }
+
+    public interface LoadCallback {
+        void onLoaded(Profile profile);
+
+        void onNotFound(); // document does not exist
+
+        void onError(Exception e);
+    }
+
+    public interface CompleteCallback {
+        void onComplete();
+
+        void onError(Exception e);
     }
 
 }

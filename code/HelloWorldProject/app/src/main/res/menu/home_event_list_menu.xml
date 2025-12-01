@@ -12,5 +12,5 @@
         android:id="@+id/home_filter_button"
         android:icon="@drawable/outline_filter_alt_128"
         android:title="filter"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 </menu>

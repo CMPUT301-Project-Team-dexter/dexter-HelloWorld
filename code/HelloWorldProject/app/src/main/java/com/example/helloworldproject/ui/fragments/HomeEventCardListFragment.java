@@ -40,18 +40,18 @@ import java.util.List;
 public class HomeEventCardListFragment extends Fragment {
     // app was crashing earlier when clicking on the "Home" button in the bottom nav bar
     private final ActivityResultLauncher<String> requestCamera = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(),
-            isGranted -> {
-                if (!isGranted) {
-                    Toast.makeText(
-                            requireContext(),
-                            "Camera permission is required to scan event QR codes.",
-                            Toast.LENGTH_LONG
-                    ).show();
-                } else {
-                    startActivity(EventQRCodeScanActivity.newIntent(requireContext()));
-                }
+        new ActivityResultContracts.RequestPermission(),
+        isGranted -> {
+            if (!isGranted) {
+                Toast.makeText(
+                    requireContext(),
+                    "Camera permission is required to scan event QR codes.",
+                    Toast.LENGTH_LONG
+                ).show();
+            } else {
+                startActivity(EventQRCodeScanActivity.newIntent(requireContext()));
             }
+        }
     );
 
     FragHomeEventListBinding binding;
@@ -87,8 +87,8 @@ public class HomeEventCardListFragment extends Fragment {
                         @Override
                         public void onFilterApplied(long date, List<String> interests) {
                             Toast.makeText(getContext(),
-                                    "Filter Date=" + date + ", Tags=" + interests,
-                                    Toast.LENGTH_SHORT).show();
+                                "Filter Date=" + date + ", Tags=" + interests,
+                                Toast.LENGTH_SHORT).show();
 
                             EventRepository.INSTANCE.loadFilteredEvents(date, interests, new EventRepository.ListCallback() {
                                 @Override
@@ -162,16 +162,16 @@ public class HomeEventCardListFragment extends Fragment {
         }
 
         FirebaseFirestore.getInstance().collection("events").get()
-                .addOnSuccessListener(snapshots -> {
-                    Log.d("QUERY_RET", "Found " + snapshots.size() + " documents.");
-                    for (DocumentSnapshot doc : snapshots) {
-                        // Print the ID and the raw timestamp to compare
-                        Log.d("QUERY_RET", "Doc ID: " + doc.getId() + " | Start: " + doc.get("eventStartAt"));
-                    }
-                })
-                .addOnFailureListener(
-                    e -> Log.e("QUERY_RET", "Error fetching docs: " + e.getMessage())
-                );
+            .addOnSuccessListener(snapshots -> {
+                Log.d("QUERY_RET", "Found " + snapshots.size() + " documents.");
+                for (DocumentSnapshot doc : snapshots) {
+                    // Print the ID and the raw timestamp to compare
+                    Log.d("QUERY_RET", "Doc ID: " + doc.getId() + " | Start: " + doc.get("eventStartAt"));
+                }
+            })
+            .addOnFailureListener(
+                e -> Log.e("QUERY_RET", "Error fetching docs: " + e.getMessage())
+            );
     }
 
     private void updateAdapterFrom(List<Event> events) {

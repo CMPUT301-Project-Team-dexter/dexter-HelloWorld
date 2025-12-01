@@ -47,10 +47,10 @@ public class EventCardAdapter extends ArrayAdapter<Event> {
         cardBinding.eventName.setText(item.getTitle());
         String imgUrl = item.getImgUrl();
         Glide.with(getContext())
-                .load(imgUrl)
-                .placeholder(R.drawable.placeholder)
-                .error(R.drawable.placeholder)
-                .into(cardBinding.posterImage);
+            .load(imgUrl)
+            .placeholder(R.drawable.placeholder)
+            .error(R.drawable.placeholder)
+            .into(cardBinding.posterImage);
         // region Event Status
         switch (item.getRealTimeStatus()) {
             case NOT_OPEN:

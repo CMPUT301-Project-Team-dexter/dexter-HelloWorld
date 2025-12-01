@@ -21,14 +21,14 @@ import com.google.android.material.appbar.MaterialToolbar;
 import java.util.ArrayList;
 
 public class AllImagesActivity extends AppCompatActivity {
+    private final ArrayList<Event> imageEvents = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private AllImagesFragmentAdapter adapter;
+    private final ActivityResultLauncher<Intent> imageDetailLauncher = getImageDetailLauncher();
+
     public static Intent newIntent(Context context) {
         return new Intent(context, AllImagesActivity.class);
     }
-
-    private RecyclerView recyclerView;
-    private AllImagesFragmentAdapter adapter;
-    private final ArrayList<Event> imageEvents = new ArrayList<>();
-    private final ActivityResultLauncher<Intent> imageDetailLauncher = getImageDetailLauncher();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

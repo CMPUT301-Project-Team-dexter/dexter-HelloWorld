@@ -12,12 +12,12 @@ import com.example.helloworldproject.R;
 import com.example.helloworldproject.databinding.ActivityEventQrcodeScanBinding;
 
 public class EventQRCodeScanActivity extends AppCompatActivity {
+    ActivityEventQrcodeScanBinding binding;
+    boolean scanned = false;
+
     public static Intent newIntent(Context context) {
         return new Intent(context, EventQRCodeScanActivity.class);
     }
-
-    ActivityEventQrcodeScanBinding binding;
-    boolean scanned = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

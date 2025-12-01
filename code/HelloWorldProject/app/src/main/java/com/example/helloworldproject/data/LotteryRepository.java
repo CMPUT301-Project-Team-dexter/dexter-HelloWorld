@@ -32,66 +32,9 @@ import java.util.concurrent.TimeUnit;
  * Repository for lottery draws and invite status.
  */
 public class LotteryRepository {
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final NotificationRepository notificationRepository = new NotificationRepository();
-
-    public interface DrawCallback {
-        void onComplete(int invitedCount);
-
-        void onError(Exception e);
-    }
-
-    public interface InviteStatusListener {
-        void onLoaded(@Nullable String status);
-
-        void onError(Exception e);
-    }
-
-    public interface InviteSummaryListener {
-        void onLoaded(int pending, int accepted, int declined);
-
-        void onError(Exception e);
-    }
-
-    public interface CompletionListener {
-        void onSuccess();
-
-        void onError(Exception e);
-    }
-
-    public interface AcceptedEntrantsListener {
-        /**
-         * Called whenever the accepted entrants list is loaded or updated.
-         *
-         * @param entrants A list of Profile objects corresponding to all invites
-         *                 whose status is "ACCEPTED" for the given event.
-         */
-        void onLoaded(List<Profile> entrants);
-
-        /**
-         * Called if there is any error while talking to Firestore.
-         *
-         * @param e The underlying exception from the Firestore SDK.
-         */
-        void onError(Exception e);
-    }
-
-    public interface InvitationHistoryListener {
-        /**
-         * Called when a new snapshot of invitations has been loaded.
-         *
-         * @param invitations The full list of invitations matching the current filter.
-         */
-        void onLoaded(List<InvitationRecord> invitations);
-
-        /**
-         * Called if an error happens while fetching data from Firestore.
-         *
-         * @param e The underlying exception.
-         */
-        void onError(Exception e);
-    }
 
     /**
      * Fetch the current invite status once. This is useful for cases where a snapshot listener might
@@ -461,5 +404,62 @@ public class LotteryRepository {
 
             listener.onLoaded(records);
         });
+    }
+
+    public interface DrawCallback {
+        void onComplete(int invitedCount);
+
+        void onError(Exception e);
+    }
+
+    public interface InviteStatusListener {
+        void onLoaded(@Nullable String status);
+
+        void onError(Exception e);
+    }
+
+    public interface InviteSummaryListener {
+        void onLoaded(int pending, int accepted, int declined);
+
+        void onError(Exception e);
+    }
+
+    public interface CompletionListener {
+        void onSuccess();
+
+        void onError(Exception e);
+    }
+
+    public interface AcceptedEntrantsListener {
+        /**
+         * Called whenever the accepted entrants list is loaded or updated.
+         *
+         * @param entrants A list of Profile objects corresponding to all invites
+         *                 whose status is "ACCEPTED" for the given event.
+         */
+        void onLoaded(List<Profile> entrants);
+
+        /**
+         * Called if there is any error while talking to Firestore.
+         *
+         * @param e The underlying exception from the Firestore SDK.
+         */
+        void onError(Exception e);
+    }
+
+    public interface InvitationHistoryListener {
+        /**
+         * Called when a new snapshot of invitations has been loaded.
+         *
+         * @param invitations The full list of invitations matching the current filter.
+         */
+        void onLoaded(List<InvitationRecord> invitations);
+
+        /**
+         * Called if an error happens while fetching data from Firestore.
+         *
+         * @param e The underlying exception.
+         */
+        void onError(Exception e);
     }
 }

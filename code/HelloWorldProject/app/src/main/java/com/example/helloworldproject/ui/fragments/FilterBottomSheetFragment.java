@@ -18,18 +18,13 @@ import java.util.List;
 /**
  * Presents filtering options to the user through bottom sheet dialog.
  * It allows users to filter content by selecting a specific date and a set of interest tags
+ *
  * @see BottomSheetDialogFragment
  * @see FilterListener
  */
 public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
-    public interface FilterListener {
-        void onFilterApplied(long selectedDate, List<String> selectedInterests);
-        void onFilterCleared();
-    }
-
     private final FilterListener listener;
     private long selectedDate = 0;
-
     public FilterBottomSheetFragment(FilterListener listener) {
         this.listener = listener;
     }
@@ -77,5 +72,11 @@ public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
         });
 
         return view;
+    }
+
+    public interface FilterListener {
+        void onFilterApplied(long selectedDate, List<String> selectedInterests);
+
+        void onFilterCleared();
     }
 }

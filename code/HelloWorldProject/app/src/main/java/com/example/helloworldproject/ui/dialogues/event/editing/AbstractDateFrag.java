@@ -18,6 +18,7 @@ import java.util.Objects;
 
 public abstract class AbstractDateFrag extends AbstractEditFrag {
     private final String preSetTimestamp;
+
     public AbstractDateFrag(String title, String preSetTimestamp) {
         super(title);
         this.preSetTimestamp = preSetTimestamp;
@@ -39,7 +40,8 @@ public abstract class AbstractDateFrag extends AbstractEditFrag {
             date = Objects.requireNonNull(
                 Event.DATE_FORMATTER.parse(preSetTimestamp)
             ).getTime();
-        } catch (Exception ignored) {  }
+        } catch (Exception ignored) {
+        }
         datePicker.setDate(date);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder

@@ -22,20 +22,21 @@ import com.example.helloworldproject.model.UserGroup;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.DeviceId;
 
-/** Create/Update profile in a single screen. */
+/**
+ * Create/Update profile in a single screen.
+ */
 public class LoginActivity extends AppCompatActivity {
-
-    public static Intent newIntent(Context context) {
-        return new Intent(context, LoginActivity.class);
-    }
 
     private EditText etName, etEmail, etPhone;
     private Spinner userGroupSpinner;
     private Button btnSave;
     private ProgressBar progress;
-
     private ProfileRepository repo;
     private String deviceId; // document ID
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, LoginActivity.class);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,11 +62,13 @@ public class LoginActivity extends AppCompatActivity {
 
         setLoading(true);
         DeviceId.get(new DeviceId.DeviceIdCallback() {
-            @Override public void onSuccess(String id) {
+            @Override
+            public void onSuccess(String id) {
                 deviceId = id;
                 // Try to load existing profile (for update).
                 repo.loadByDeviceId(deviceId, new ProfileRepository.LoadCallback() {
-                    @Override public void onLoaded(Profile p) {
+                    @Override
+                    public void onLoaded(Profile p) {
                         setLoading(false);
                         if (p != null) {
                             etName.setText(p.getName());
@@ -86,12 +89,14 @@ public class LoginActivity extends AppCompatActivity {
                         ).show();
                     }
 
-                    @Override public void onNotFound() {
+                    @Override
+                    public void onNotFound() {
                         btnSave.setText("Register");
                         setLoading(false); // new user: keep fields empty
                     }
 
-                    @Override public void onError(Exception e) {
+                    @Override
+                    public void onError(Exception e) {
                         setLoading(false);
                         Toast.makeText(
                             LoginActivity.this,
@@ -102,7 +107,8 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
 
-            @Override public void onError(Exception e) {
+            @Override
+            public void onError(Exception e) {
                 setLoading(false);
                 Toast.makeText(
                     LoginActivity.this,
@@ -137,14 +143,16 @@ public class LoginActivity extends AppCompatActivity {
                 )
             );
             repo.saveOrUpdate(p, new ProfileRepository.CompleteCallback() {
-                @Override public void onComplete() {
+                @Override
+                public void onComplete() {
                     setLoading(false);
                     CurrentProfile.init(p);
                     startActivity(HomeActivity.newIntent(LoginActivity.this));
                     finish();
                 }
 
-                @Override public void onError(Exception e) {
+                @Override
+                public void onError(Exception e) {
                     setLoading(false);
                     Toast.makeText(
                         LoginActivity.this,

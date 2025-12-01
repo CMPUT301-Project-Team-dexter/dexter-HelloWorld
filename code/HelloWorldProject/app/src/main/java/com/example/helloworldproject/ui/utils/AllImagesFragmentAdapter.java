@@ -17,30 +17,15 @@ import java.util.ArrayList;
 
 public class AllImagesFragmentAdapter extends RecyclerView.Adapter<AllImagesFragmentAdapter.ViewHolder> {
 
-    public interface OnImageClickListener {
-        void onImageClick(Event event);
-    }
-
     private final Context context;
     private final ArrayList<Event> events;
     private final OnImageClickListener clickListener;
-
     public AllImagesFragmentAdapter(Context context,
                                     ArrayList<Event> events,
                                     OnImageClickListener clickListener) {
         this.context = context;
         this.events = events;
         this.clickListener = clickListener;
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        ImageView imgView;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            imgView = itemView.findViewById(R.id.image);
-        }
     }
 
     @NonNull
@@ -67,10 +52,10 @@ public class AllImagesFragmentAdapter extends RecyclerView.Adapter<AllImagesFrag
         }
 
         Glide.with(context)
-                .load(url)
-                .placeholder(R.drawable.placeholder)
-                .error(R.drawable.placeholder)
-                .into(holder.imgView);
+            .load(url)
+            .placeholder(R.drawable.placeholder)
+            .error(R.drawable.placeholder)
+            .into(holder.imgView);
 
         holder.imgView.setOnClickListener(v -> {
             if (clickListener != null) {
@@ -82,5 +67,19 @@ public class AllImagesFragmentAdapter extends RecyclerView.Adapter<AllImagesFrag
     @Override
     public int getItemCount() {
         return events.size();
+    }
+
+    public interface OnImageClickListener {
+        void onImageClick(Event event);
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        ImageView imgView;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            imgView = itemView.findViewById(R.id.image);
+        }
     }
 }

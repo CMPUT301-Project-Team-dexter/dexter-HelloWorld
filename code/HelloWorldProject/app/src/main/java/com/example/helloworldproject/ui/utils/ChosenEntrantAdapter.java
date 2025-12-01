@@ -30,23 +30,8 @@ import java.util.List;
  */
 public class ChosenEntrantAdapter extends RecyclerView.Adapter<ChosenEntrantAdapter.ViewHolder> {
 
-    /**
-     * Listener interface that allows the host Activity/Fragment to react
-     * to user actions on a specific entrant row.
-     */
-    public interface OnEntrantActionListener {
-        /**
-         * Called when the user performs a long-click on a chosen entrant row.
-         * Typical usage is to ask the organizer if they want to cancel this entrant.
-         *
-         * @param entrant The corresponding {@link Profile} object.
-         */
-        void onEntrantLongClick(Profile entrant);
-    }
-
     // In-memory list of accepted entrants for the current event.
     private final List<Profile> entrants = new ArrayList<>();
-
     // Optional action listener for row events (long-click to cancel).
     private final OnEntrantActionListener actionListener;
 
@@ -115,6 +100,20 @@ public class ChosenEntrantAdapter extends RecyclerView.Adapter<ChosenEntrantAdap
     @Override
     public int getItemCount() {
         return entrants.size();
+    }
+
+    /**
+     * Listener interface that allows the host Activity/Fragment to react
+     * to user actions on a specific entrant row.
+     */
+    public interface OnEntrantActionListener {
+        /**
+         * Called when the user performs a long-click on a chosen entrant row.
+         * Typical usage is to ask the organizer if they want to cancel this entrant.
+         *
+         * @param entrant The corresponding {@link Profile} object.
+         */
+        void onEntrantLongClick(Profile entrant);
     }
 
     /**

@@ -20,16 +20,16 @@ import com.example.helloworldproject.R;
 import com.example.helloworldproject.databinding.FragPosterEditBinding;
 import com.example.helloworldproject.ui.activities.event.EventEditListener;
 
-public class PosterFrag extends DialogFragment  {
-
-    public PosterFrag() {}
+public class PosterFrag extends DialogFragment {
 
     FragPosterEditBinding binding;
-
     private EventEditListener listener;
     private Uri selectedImgUri;
     private ImageView imgView;
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
+    public PosterFrag() {
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -37,7 +37,7 @@ public class PosterFrag extends DialogFragment  {
             listener = (EventEditListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement ImageSelectionListener");
+                + " must implement ImageSelectionListener");
         }
     }
 
@@ -79,8 +79,8 @@ public class PosterFrag extends DialogFragment  {
         Button btnChoose = binding.selectImgBtn;
         btnChoose.setOnClickListener(v -> {
             pickMedia.launch(new PickVisualMediaRequest.Builder()
-                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                    .build());
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build());
         });
 
         Button btnConfirm = binding.confirmBtn;
