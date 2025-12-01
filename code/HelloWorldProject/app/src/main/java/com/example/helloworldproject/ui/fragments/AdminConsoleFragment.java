@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.databinding.FragAdminConsoleBinding;
+import com.example.helloworldproject.ui.activities.AllImagesActivity;
 import com.example.helloworldproject.ui.activities.event.AdminEventListActivity;
 
 
@@ -38,18 +39,14 @@ public class AdminConsoleFragment extends Fragment {
                 .addToBackStack(null)
                 .commit()
         );
-        binding.adminConsAllImagesButton.setOnClickListener(
-                v -> requireActivity()
-                        .getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragment_container, new AllImagesFragment())
-                        .addToBackStack(null)
-                        .commit()
-        );
 
-        // TODO: bind onclick for other buttons
+
         binding.adminConsAllEventsButton.setOnClickListener(
             v -> startActivity(AdminEventListActivity.newIntent(getContext()))
+        );
+
+        binding.adminConsAllImagesButton.setOnClickListener(
+            v -> startActivity(AllImagesActivity.newIntent(getContext()))
         );
     }
 }

@@ -69,6 +69,14 @@
             android:name=".ui.activities.RegisterHistoryActivity"
             android:exported="false"
             android:label="Register History" />
+        <activity
+            android:name=".ui.activities.AllImagesActivity"
+            android:exported="false"
+            android:label="All Images" />
+        <activity
+            android:name=".ui.activities.ImageDetailActivity"
+            android:exported="false"
+            android:label="All Images" />
     </application>
 
 </manifest>

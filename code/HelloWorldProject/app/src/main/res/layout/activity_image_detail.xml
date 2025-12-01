@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/img_dtl_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIconTint="@color/white"
+            app:title="Image Detail"
+            app:titleTextColor="@color/white" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:padding="24sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/img_dtl_toolbar">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="367dp"
+                android:layout_margin="20dp"
+                android:adjustViewBounds="true"
+                android:maxHeight="400dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/debug_wide_img"
+
+                app:layout_constraintHeight_percent="0.7">
+
+            </ImageView>
+
+            <TextView
+                android:id="@+id/uploader_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Uploader: "
+                android:textSize="20sp"
+                android:visibility="gone"></TextView>
+
+            <TextView
+                android:id="@+id/uploader_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AlphaBravo"
+                android:textSize="20sp"
+                android:visibility="gone"></TextView>
+
+            <TextView
+                android:id="@+id/uploader_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="alpha #27"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="20sp"
+                android:visibility="gone"></TextView>
+
+            <Button
+                android:id="@+id/delete_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:maxHeight="200dp"
+                android:text="Delete"
+
+                ></Button>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

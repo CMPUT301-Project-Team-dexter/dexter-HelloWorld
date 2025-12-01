@@ -11,7 +11,6 @@ import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.example.helloworldproject.R;
-import com.example.helloworldproject.data.ImageRepository;
 import com.example.helloworldproject.databinding.ItemEventCardBinding;
 import com.example.helloworldproject.model.Event;
 

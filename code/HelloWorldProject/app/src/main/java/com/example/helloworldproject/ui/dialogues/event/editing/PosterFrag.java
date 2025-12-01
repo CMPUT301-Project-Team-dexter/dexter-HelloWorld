@@ -12,11 +12,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.DialogFragment;
-import androidx.activity.result.PickVisualMediaRequest;
 
-import com.bumptech.glide.Glide;
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.databinding.FragPosterEditBinding;
 import com.example.helloworldproject.ui.activities.event.EventEditListener;
