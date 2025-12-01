@@ -10,9 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import com.example.helloworldproject.R;
 import com.example.helloworldproject.databinding.FragAdminConsoleBinding;
 import com.example.helloworldproject.ui.activities.AllImagesActivity;
+import com.example.helloworldproject.ui.activities.AllUsersActivity;
 import com.example.helloworldproject.ui.activities.event.AdminEventListActivity;
 
 
@@ -32,12 +32,7 @@ public class AdminConsoleFragment extends Fragment {
         activity.setSupportActionBar(binding.adminConsToolbar);
         // bind onclick for All Users
         binding.adminConsAllUsersButton.setOnClickListener(
-            v -> requireActivity()
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, new AllUsersFragment())
-                .addToBackStack(null)
-                .commit()
+            v -> startActivity(AllUsersActivity.newIntent(getContext()))
         );
 
 
