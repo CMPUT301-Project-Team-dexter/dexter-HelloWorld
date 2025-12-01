@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import com.example.helloworldproject.data.ProfileRepository;
 import com.example.helloworldproject.databinding.AccountFragmentBinding;
 import com.example.helloworldproject.ui.activities.LoginActivity;
+import com.example.helloworldproject.ui.activities.NotificationListActivity;
 import com.example.helloworldproject.ui.activities.ProfileEditActivity;
 import com.example.helloworldproject.ui.activities.RegisterHistoryActivity;
 import com.example.helloworldproject.ui.activities.SettingsActivity;
@@ -34,6 +35,10 @@ public class AccountFragment extends Fragment {
 
         binding.profileButton.setOnClickListener(v ->
             profileLauncher.launch(new Intent(requireContext(), ProfileEditActivity.class))
+        );
+
+        binding.notificationsButton.setOnClickListener(v ->
+            startActivity(new Intent(requireContext(), NotificationListActivity.class))
         );
 
         binding.settingsButton.setOnClickListener(v ->

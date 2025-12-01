@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class LotteryRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final NotificationRepository notificationRepository = new NotificationRepository();
 
     public interface DrawCallback {
         void onComplete(int invitedCount);
@@ -154,6 +155,7 @@ public class LotteryRepository {
 
                 // Determine remaining capacity. If capacity is missing, fall back to requested size.
                 DocumentSnapshot eventDoc = eventTask.getResult();
+                String eventTitle = eventDoc != null ? eventDoc.getString("title") : null;
                 int capacity = Integer.MAX_VALUE;
                 if (eventDoc != null && eventDoc.exists()) {
                     Number capNumber = eventDoc.getLong("capacity");
@@ -225,6 +227,24 @@ public class LotteryRepository {
                 Task<Void> commit = batch.commit();
                 Tasks.await(commit, 10, TimeUnit.SECONDS);
                 if (commit.isSuccessful()) {
+                    String safeEventTitle = eventTitle == null ? "this event" : eventTitle;
+                    for (int i = 0; i < inviteCount; i++) {
+                        Profile p = candidates.get(i);
+                        notificationRepository.createLotteryChosenNotification(
+                            p.getId(),
+                            eventId,
+                            safeEventTitle
+                        );
+                    }
+
+                    for (int i = inviteCount; i < candidates.size(); i++) {
+                        Profile p = candidates.get(i);
+                        notificationRepository.createLotteryNotChosenNotification(
+                            p.getId(),
+                            eventId,
+                            safeEventTitle
+                        );
+                    }
                     cb.onComplete(inviteCount);
                 } else {
                     cb.onError(commit.getException());

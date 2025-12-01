@@ -63,6 +63,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 : "this event";
             title = "Lottery result";
             message = "You were not chosen for \"" + eventTitle + "\".";
+        } else if (NotificationRecordTypeHelper.isLotteryChosen(record)) {
+            String eventTitle = record.getEventTitle() != null
+                ? record.getEventTitle()
+                : "this event";
+            title = "Lottery result";
+            message = "You were selected for \"" + eventTitle + "\". Please respond.";
         } else {
             // Generic fallback message.
             title = "Notification";
@@ -96,9 +102,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         static boolean isLotteryNotChosen(NotificationRecord record) {
             return "LOTTERY_NOT_CHOSEN".equals(record.getType());
         }
+
+        static boolean isLotteryChosen(NotificationRecord record) {
+            return "LOTTERY_CHOSEN".equals(record.getType());
+        }
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         final TextView titleView;
         final TextView messageView;
         final TextView timeView;
@@ -111,4 +121,3 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
     }
 }
-
