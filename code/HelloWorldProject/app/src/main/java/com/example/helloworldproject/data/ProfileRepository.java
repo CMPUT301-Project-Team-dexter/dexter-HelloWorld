@@ -13,6 +13,15 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.example.helloworldproject.model.UserGroup;
+import com.google.firebase.firestore.Query;
+
+import java.util.HashMap;
+import java.util.Map;
+
 
 /** Firestore repository for Profile. */
 public class ProfileRepository {
@@ -31,6 +40,10 @@ public class ProfileRepository {
 
     public interface CompleteCallback {
         void onComplete();
+        void onError(Exception e);
+    }
+    public interface ProfileListener {
+        void onLoaded(Profile profile);
         void onError(Exception e);
     }
 
@@ -117,6 +130,40 @@ public class ProfileRepository {
                     cb.onLoaded(result);
                 })
                 .addOnFailureListener(cb::onError);
+    }
+
+    public void loadProfileById(@NonNull String profileId,
+                                @NonNull final ProfileListener listener) {
+        db.collection("profiles")
+                .document(profileId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        Profile p = fromDoc(doc);
+                        listener.onLoaded(p);
+                    } else {
+                        listener.onError(new IllegalStateException(
+                                "Profile not found for id: " + profileId));
+                    }
+                })
+                .addOnFailureListener(listener::onError);
+    }
+
+    private Profile fromDoc(DocumentSnapshot doc) {
+        Profile p = new Profile();
+        p.setId(doc.getId());
+        p.setName(doc.getString("name"));
+        // other fields...
+        p.setDeviceId(doc.getString("deviceId")); // <<< new line
+        return p;
+    }
+
+    private Map<String, Object> toMap(Profile profile) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", profile.getName());
+        // other fields...
+        map.put("deviceId", profile.getDeviceId()); // <<< new line
+        return map;
     }
 
 }
