@@ -1,0 +1,11 @@
+com.example.helloworldproject
+com.example.helloworldproject.data
+com.example.helloworldproject.model
+com.example.helloworldproject.ui.activities
+com.example.helloworldproject.ui.activities.event
+com.example.helloworldproject.ui.dialogues.event
+com.example.helloworldproject.ui.dialogues.event.editing
+com.example.helloworldproject.ui.event
+com.example.helloworldproject.ui.fragments
+com.example.helloworldproject.ui.utils
+com.example.helloworldproject.util
