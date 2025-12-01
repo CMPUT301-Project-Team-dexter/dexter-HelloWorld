@@ -77,6 +77,10 @@
             android:name=".ui.activities.ImageDetailActivity"
             android:exported="false"
             android:label="All Images" />
+        <activity
+            android:name=".ui.activities.AllUsersActivity"
+            android:exported="false"
+            android:label="All Users" />
     </application>
 
 </manifest>

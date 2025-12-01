@@ -113,6 +113,7 @@ public class ProfileEditActivity extends AppCompatActivity {
                     setLoading(false);
                     CurrentProfile.init(workingProfile);
                     Toast.makeText(ProfileEditActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
                     finish();
                 }
                 @Override public void onError(Exception e) {

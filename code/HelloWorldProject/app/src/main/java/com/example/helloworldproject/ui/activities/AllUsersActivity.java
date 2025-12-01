@@ -1,22 +1,14 @@
-package com.example.helloworldproject.ui.fragments;
+package com.example.helloworldproject.ui.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.MenuProvider;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
 
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.data.ProfileRepository;
@@ -29,7 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AllUsersFragment extends Fragment {
+public class AllUsersActivity extends AppCompatActivity {
+    public static Intent newIntent(Context context) {
+        return new Intent(context, AllUsersActivity.class);
+    }
 
     private ListView listView;
     private UserItemAdapter adapter;
@@ -40,38 +35,26 @@ public class AllUsersFragment extends Fragment {
 
 
     @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.filter_menu_list_base);
 
-
-        // This part is to minimally associate menu/filter_menu.xml with register_history_fragment.xml.
-        // So that the menu on this page can function properly.
-        MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
-        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.filter_menu, menu);
-            }
-
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                return false;
-            }
-        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
-
-
-        // This part is to remove the title text in the top bar
-        ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setTitle("All Users");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(
+                v -> getOnBackPressedDispatcher().onBackPressed()
+            );
         }
 
 
-        listView = view.findViewById(R.id.event_list_view);
+        listView = findViewById(R.id.event_list_view);
 
         adapter = new UserItemAdapter(
-            requireContext(),
+            this,
             userNames,
             userIds,
             position -> {
@@ -86,7 +69,7 @@ public class AllUsersFragment extends Fragment {
                 UserGroup group = toDelete.getUserGroup();
                 if (group == UserGroup.ADMIN) {
                     Toast.makeText(
-                        requireContext(),
+                        this,
                         "Admin profiles cannot be deleted.",
                         Toast.LENGTH_SHORT
                     ).show();
@@ -98,7 +81,7 @@ public class AllUsersFragment extends Fragment {
                     name = "this profile";
                 }
 
-                new AlertDialog.Builder(requireContext())
+                new AlertDialog.Builder(this)
                     .setTitle("Delete profile")
                     .setMessage("Are you sure you want to delete " + name + "?")
                     .setPositiveButton("Delete",
@@ -106,9 +89,9 @@ public class AllUsersFragment extends Fragment {
                             profileRepository.deleteProfile(toDelete, new ProfileRepository.CompleteCallback() {
                                 @Override
                                 public void onComplete() {
-                                    requireActivity().runOnUiThread(() -> {
+                                    runOnUiThread(() -> {
                                         Toast.makeText(
-                                            requireContext(),
+                                            AllUsersActivity.this,
                                             "Profile deleted.",
                                             Toast.LENGTH_SHORT
                                         ).show();
@@ -118,9 +101,9 @@ public class AllUsersFragment extends Fragment {
 
                                 @Override
                                 public void onError(Exception e) {
-                                    requireActivity().runOnUiThread(
+                                    runOnUiThread(
                                         () -> Toast.makeText(
-                                            requireContext(),
+                                            AllUsersActivity.this,
                                             "Failed to delete profile: " + e.getMessage(),
                                             Toast.LENGTH_LONG
                                         ).show());
@@ -135,19 +118,12 @@ public class AllUsersFragment extends Fragment {
         loadProfiles();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.filter_menu_list_base, container, false);
-        listView = view.findViewById(R.id.event_list_view);
-
-        return view;
-    }
 
     private void loadProfiles() {
         profileRepository.loadAllProfiles(new ProfileRepository.ListCallback() {
             @Override
             public void onLoaded(List<Profile> loadedProfiles) {
-                requireActivity().runOnUiThread(() -> {
+                runOnUiThread(() -> {
                     profiles.clear();
                     userNames.clear();
                     userIds.clear();
@@ -185,9 +161,9 @@ public class AllUsersFragment extends Fragment {
 
             @Override
             public void onError(Exception e) {
-                requireActivity().runOnUiThread(() ->
+                runOnUiThread(() ->
                     Toast.makeText(
-                        requireContext(),
+                        AllUsersActivity.this,
                         "Failed to load profiles: " + e.getMessage(),
                         Toast.LENGTH_LONG
                     ).show()
