@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -15,7 +19,29 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorldProject">
         <activity
-            android:name=".ui.activities.EventEditingActivity"
+            android:name=".ui.activities.event.EventManageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.event.ChosenEntrantsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activities.event.InvitationHistoryActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activities.NotificationListActivity"
+            android:exported="false"
+            android:label="@string/notifications_title" />
+
+        <activity
+            android:name=".ui.activities.event.AdminEventListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.event.EventQRCodeScanActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.event.EventEditingActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activities.LoginActivity"
@@ -32,9 +58,47 @@
             android:label="Profile"
             android:parentActivityName=".ui.activities.LoginActivity" />
         <activity
-            android:name=".ui.event.EventDetailActivity_old"
+            android:name=".ui.activities.event.EventDetailActivity"
             android:exported="false"
             android:label="Event Detail" />
+        <activity
+            android:name=".ui.activities.SettingsActivity"
+            android:exported="false"
+            android:label="Settings" />
+        <activity
+            android:name=".ui.activities.ProfileEditActivity"
+            android:exported="false"
+            android:label="Edit Profile" />
+        <activity
+            android:name=".ui.activities.RegisterHistoryActivity"
+            android:exported="false"
+            android:label="Register History" />
+        <activity
+            android:name=".ui.activities.AllImagesActivity"
+            android:exported="false"
+            android:label="All Images" />
+        <activity
+            android:name=".ui.activities.ImageDetailActivity"
+            android:exported="false"
+            android:label="All Images" />
+        <activity
+            android:name=".ui.activities.AllUsersActivity"
+            android:exported="false"
+            android:label="All Users" />
+        <activity
+            android:name=".ui.activities.event.RegisteredEntrantsActivity"
+            android:exported="false"
+            android:label="Registered Entrants" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
     </application>
 
 </manifest>

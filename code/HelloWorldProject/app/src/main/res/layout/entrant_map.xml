@@ -14,16 +14,16 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:title="@string/entrants_map_title"
-        tools:title="Entrants Map"
         android:titleTextColor="@android:color/white"
-        app:titleCentered="false" />
+        app:titleCentered="false"
+        tools:title="Entrants Map" />
 
     <!-- Map placeholder (for now just a visual box) -->
     <FrameLayout
         android:id="@+id/mapPlaceholder"
-        android:layout_below="@id/topAppBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/topAppBar"
         android:layout_margin="16dp"
         android:background="#DDDDDD"
         android:gravity="center">
@@ -32,24 +32,24 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <ImageView
                 android:layout_width="64dp"
                 android:layout_height="64dp"
+                android:contentDescription="@string/map_placeholder_desc"
                 android:src="@drawable/ic_map_marker"
-                app:tint="#9E9E9E"
-                android:contentDescription="@string/map_placeholder_desc" />
+                app:tint="#9E9E9E" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/map_placeholder_label"
-                tools:text="Map Placeholder"
-                android:textColor="#9E9E9E"
                 android:layout_marginTop="8dp"
-                android:textSize="16sp" />
+                android:text="@string/map_placeholder_label"
+                android:textColor="#9E9E9E"
+                android:textSize="16sp"
+                tools:text="Map Placeholder" />
         </LinearLayout>
     </FrameLayout>
 

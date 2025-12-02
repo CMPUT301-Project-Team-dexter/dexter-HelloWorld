@@ -5,17 +5,43 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import com.example.helloworldproject.R;
+import com.example.helloworldproject.databinding.FragAdminConsoleBinding;
+import com.example.helloworldproject.ui.activities.AllImagesActivity;
+import com.example.helloworldproject.ui.activities.AllUsersActivity;
+import com.example.helloworldproject.ui.activities.event.AdminEventListActivity;
+
 
 public class AdminConsoleFragment extends Fragment {
-
+    FragAdminConsoleBinding binding;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.admin_console_fragment, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragAdminConsoleBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
 
-        return view;
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        AppCompatActivity activity = (AppCompatActivity) requireActivity();
+        activity.setSupportActionBar(binding.adminConsToolbar);
+        // bind onclick for All Users
+        binding.adminConsAllUsersButton.setOnClickListener(
+            v -> startActivity(AllUsersActivity.newIntent(getContext()))
+        );
+
+
+        binding.adminConsAllEventsButton.setOnClickListener(
+            v -> startActivity(AdminEventListActivity.newIntent(getContext()))
+        );
+
+        binding.adminConsAllImagesButton.setOnClickListener(
+            v -> startActivity(AllImagesActivity.newIntent(getContext()))
+        );
     }
 }

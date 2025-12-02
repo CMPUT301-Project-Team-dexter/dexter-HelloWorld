@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -10,42 +9,40 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/outline_close_128"
         android:scaleType="centerInside"
+        android:src="@drawable/outline_close_128"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-     <TextView
-         android:id="@+id/username"
-         android:layout_width="wrap_content"
-         android:layout_height="0dp"
-         android:paddingStart="20dp"
-         android:paddingEnd="20dp"
-         android:gravity="center_vertical"
-         android:text="AlphaBravo"
-         android:textSize="20sp"
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="AlphaBravo"
+        android:textSize="20sp"
 
-         app:layout_constraintStart_toEndOf="@id/delete_button"
-         app:layout_constraintTop_toTopOf="@+id/delete_button"
-         app:layout_constraintBottom_toBottomOf="@+id/delete_button">
-     </TextView>
+        app:layout_constraintBottom_toBottomOf="@+id/delete_button"
+        app:layout_constraintStart_toEndOf="@id/delete_button"
+        app:layout_constraintTop_toTopOf="@+id/delete_button"></TextView>
 
     <TextView
         android:id="@+id/userid"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+        android:gravity="center_vertical"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:gravity="center_vertical"
         android:text="alpha #27"
-        android:textSize="20sp"
         android:textColor="@android:color/darker_gray"
+        android:textSize="20sp"
 
+        app:layout_constraintBottom_toBottomOf="@+id/delete_button"
         app:layout_constraintStart_toEndOf="@id/username"
-        app:layout_constraintTop_toTopOf="@+id/delete_button"
-        app:layout_constraintBottom_toBottomOf="@+id/delete_button">
-    </TextView>
-    
+        app:layout_constraintTop_toTopOf="@+id/delete_button"></TextView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

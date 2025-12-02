@@ -5,17 +5,17 @@
         android:id="@+id/delete_button"
         android:icon="@drawable/outline_delete_128"
         android:title="delete"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/select_button"
         android:icon="@drawable/outline_check_box_128"
         android:title="select"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/filter_button"
         android:icon="@drawable/outline_filter_alt_128"
         android:title="filter"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 </menu>

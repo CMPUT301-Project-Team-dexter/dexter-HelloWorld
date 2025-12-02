@@ -1,14 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Single entrant row: Name (bold) on the left, code on the right -->
+<?xml version="1.0" encoding="utf-8"?><!-- Single entrant row: Name (bold) on the left, code on the right -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="56dp"
-    android:orientation="horizontal"
+    android:background="@android:color/white"
     android:gravity="center_vertical"
+    android:orientation="horizontal"
     android:paddingStart="12dp"
-    android:paddingEnd="12dp"
-    android:background="@android:color/white">
+    android:paddingEnd="12dp">
 
     <!-- Entrant name -->
     <TextView
@@ -16,9 +15,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textStyle="bold"
         android:textColor="#222222"
         android:textSize="16sp"
+        android:textStyle="bold"
         tools:text="Alpha Bravo" />
 
     <!-- Entrant code -->

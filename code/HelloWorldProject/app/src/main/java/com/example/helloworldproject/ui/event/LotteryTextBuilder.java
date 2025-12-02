@@ -6,7 +6,9 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.example.helloworldproject.model.Event;
 
-/** Builds human-readable lottery guidelines for the details screen. */
+/**
+ * Builds human-readable lottery guidelines for the details screen.
+ */
 public class LotteryTextBuilder {
 
     public static String build(Event e, int currentWaitlistCount) {
@@ -30,9 +32,9 @@ public class LotteryTextBuilder {
 
     public static void showDialog(Context context, String msg) {
         new AlertDialog.Builder(context)
-                .setTitle("Lottery rules")
-                .setMessage(msg)
-                .setPositiveButton("OK", null)
-                .show();
+            .setTitle("Lottery rules")
+            .setMessage(msg)
+            .setPositiveButton("OK", null)
+            .show();
     }
 }

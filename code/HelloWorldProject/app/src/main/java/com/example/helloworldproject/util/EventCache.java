@@ -1,73 +1,109 @@
 package com.example.helloworldproject.util;
 
-import android.content.Context;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.example.helloworldproject.data.EventRepository;
 import com.example.helloworldproject.model.Event;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class EventCache {
-    private static final EventRepository repo = new EventRepository();
     private static final HashMap<String, Event> internalCache = new HashMap<>(64);
 
-    public static void cache(@NonNull Event e) {
-        if (!internalCache.containsKey(e.getId())) {
-            internalCache.put(e.getId(), e);
-        }
+    /**
+     * Refresh the cache with a new event.
+     *
+     * @param e the event to refresh
+     */
+    public static void refresh(@NonNull Event e) {
+        internalCache.put(e.getId(), e);
     }
 
-    @Nullable
-    public static Event tryGet(String eventId, Context context) {
+    public static boolean remove(@NonNull Event e) {
+        return internalCache.remove(e.getId(), e);
+    }
+
+    /**
+     * Try to get a single event by its ID. If cached, return from cache immediately.
+     * <p>
+     * There is no need to cache the result in the callback.
+     * <p>
+     * <p>
+     * Note: The function returns immediately.
+     * The result is delivered via the provided callback.
+     * Anything relying on the result must be done in the
+     * {@link EventRepository.LoadCallback onLoaded} methods.
+     * </p>
+     *
+     * @param eventId: the ID of the event
+     * @param cb:      the callback to handle the result
+     */
+    public static void asyncTryGetSingle(String eventId, EventRepository.LoadCallback cb) {
         if (internalCache.containsKey(eventId)) {
-            return internalCache.get(eventId);
+            cb.onLoaded(internalCache.get(eventId));
+            return;
         }
-        final Event[] loadedEvent = {null};
-        repo.loadById(eventId, new EventRepository.LoadCallback() {
-            @Override
-            public void onLoaded(Event e) {
-                loadedEvent[0] = e;
-            }
+        EventRepository.INSTANCE.asyncLoadById(
+            eventId,
+            new EventRepository.LoadCallback() {
+                @Override
+                public void onLoaded(Event e) {
+                    refresh(e);
+                    cb.onLoaded(e);
+                }
 
-            @Override
-            public void onNotFound() {  }
+                @Override
+                public void onNotFound() {
+                    cb.onNotFound();
+                }
 
-            @Override
-            public void onError(Exception e) {
-                Toast.makeText(
-                    context,
-                    "Exception occurs when loading event: " + e.getMessage(),
-                    Toast.LENGTH_SHORT
-                ).show();
+                @Override
+                public void onError(Exception e) {
+                    cb.onError(e);
+                }
             }
-        });
-        Event result = loadedEvent[0];
-        if (result != null) {
-            cache(result);
-        }
-        return result;
+        );
     }
 
-    public static boolean tryUpload(@NonNull Event e, Context context) {
-        final boolean[] result = {false};
-        repo.saveOrUpdate(e, new EventRepository.CompleteCallback() {
-            @Override
-            public void onComplete() {
-                result[0] = true;
-            }
+    /**
+     * Try to get events created by a specific organizer.
+     * Always attempt to load uncached events from the repository.
+     * <p>
+     * There is no need to cache results in the callback.
+     * <p>
+     * <p>
+     * Note: The function returns immediately.
+     * The result is delivered via the provided callback.
+     * Anything relying on the result must be done in the
+     * {@link EventRepository.LoadCallback onLoaded} methods.
+     * </p>
+     *
+     * @param organizerName: the name of the organizer
+     * @param cb:            the callback to handle the result
+     */
+    public static void asyncTryGetEventsCreatedBy(String organizerName, EventRepository.ListCallback cb) {
+        ArrayList<Event> cachedEvents = internalCache.values().stream()
+            .filter(e -> organizerName.equals(e.getCreator()))
+            .collect(Collectors.toCollection(ArrayList::new));
+        EventRepository.INSTANCE.asyncLoadUncachedEventsCreatedBy(
+            organizerName,
+            cachedEvents,
+            new EventRepository.ListCallback() {
+                @Override
+                public void onLoaded(List<Event> events) {
+                    events.forEach(EventCache::refresh);
+                    cachedEvents.addAll(events);
+                    cb.onLoaded(cachedEvents);
+                }
 
-            @Override
-            public void onError(Exception e) {
-                Toast.makeText(context, "Event upload failed. Cause: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                @Override
+                public void onError(Exception e) {
+                    cb.onError(e);
+                }
             }
-        });
-        if (result[0]) {
-            cache(e);
-        }
-        return result[0];
+        );
     }
 }

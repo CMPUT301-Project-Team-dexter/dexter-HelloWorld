@@ -5,5 +5,5 @@
         android:id="@+id/filter_button"
         android:icon="@drawable/outline_filter_alt_128"
         android:title="filter"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 </menu>

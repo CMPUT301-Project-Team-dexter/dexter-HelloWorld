@@ -1,32 +1,26 @@
 package com.example.helloworldproject.util;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.installations.FirebaseInstallations;
 
-import androidx.annotation.NonNull;
-
-/** Helper to retrieve the Firebase Installation ID for device identification. */
+/**
+ * Utility class to get the device's Firebase Installation ID.
+ */
 public class DeviceId {
+
+    /**
+     * Get the Firebase Installation ID asynchronously.
+     *
+     * @param callback: Callback to receive the device ID or error.
+     */
+    public static void get(final DeviceIdCallback callback) {
+        FirebaseInstallations.getInstance().getId()
+            .addOnSuccessListener(callback::onSuccess)
+            .addOnFailureListener(callback::onError);
+    }
 
     public interface DeviceIdCallback {
         void onSuccess(String deviceId);
-        void onError(Exception e);
-    }
 
-    public static void getOrFetch(Context context, final DeviceIdCallback callback) {
-        FirebaseInstallations.getInstance().getId()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        callback.onSuccess(task.getResult());
-                    } else {
-                        Exception e = task.getException();
-                        Log.e("DeviceId", "Failed to get installation id", e);
-                        callback.onError(e);
-                    }
-                });
+        void onError(Exception e);
     }
 }

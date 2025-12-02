@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/evt_dtl_qr_gen_btn"
+        android:icon="@drawable/ic_qr_code"
+        android:title="QR code generate"
+        android:visible="false"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/evt_dtl_manage_btn"
+        android:icon="@drawable/ic_menu"
+        android:title="event management"
+        android:visible="false"
+        app:showAsAction="always" />
+</menu>

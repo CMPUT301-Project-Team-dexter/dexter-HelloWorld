@@ -11,9 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:title="@string/events_title"
-        android:titleTextColor="@android:color/white"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:titleTextColor="@android:color/white">
 
         <!-- QR btn (≥48dp touch target) -->
         <ImageButton
@@ -21,10 +21,10 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="start|center_vertical"
-            android:padding="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_qr_code"
             android:contentDescription="@string/scan_qr"
+            android:padding="8dp"
+            android:src="@drawable/ic_qr_code"
             app:tint="@android:color/white" />
 
         <!-- Filter btn (≥48dp touch target) -->
@@ -33,10 +33,10 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="end|center_vertical"
-            android:padding="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_filter"
             android:contentDescription="@string/filter_events"
+            android:padding="8dp"
+            android:src="@drawable/ic_filter"
             app:tint="@android:color/white" />
 
     </androidx.appcompat.widget.Toolbar>
@@ -44,10 +44,10 @@
     <!-- scrollable Event list -->
     <ScrollView
         android:id="@+id/eventScrollView"
-        android:layout_below="@id/topAppBar"
-        android:layout_above="@+id/addEventButton"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/addEventButton"
+        android:layout_below="@id/topAppBar"
         android:padding="12dp">
 
         <LinearLayout
@@ -67,18 +67,18 @@
                     android:id="@+id/posterImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/debug_card_image"
                     android:contentDescription="@null"
-                    android:importantForAccessibility="no" />
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/debug_card_image" />
 
                 <!-- dark overlay with texts -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="#80000000"
-                    android:orientation="vertical"
                     android:gravity="bottom"
+                    android:orientation="vertical"
                     android:padding="12dp">
 
                     <!-- Event name -->
@@ -88,18 +88,18 @@
                         android:layout_height="wrap_content"
                         android:text="@string/sample_event"
                         android:textColor="@android:color/white"
-                        android:textStyle="bold"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
                     <!-- Available period -->
                     <TextView
                         android:id="@+id/eventPeriod"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
                         android:text="@string/sample_period"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp"
-                        android:layout_marginTop="4dp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <!-- delete btn (admin only) -->
@@ -109,20 +109,20 @@
                     android:layout_height="32dp"
                     android:layout_gravity="top|end"
                     android:layout_margin="8dp"
-                    android:padding="4dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_close"
                     android:contentDescription="@string/delete_event"
-                    app:tint="@android:color/white"
-                    android:visibility="gone" />
+                    android:padding="4dp"
+                    android:src="@drawable/ic_close"
+                    android:visibility="gone"
+                    app:tint="@android:color/white" />
 
                 <!-- clickable overlay: NOT accessible element -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:foreground="?attr/selectableItemBackground"
                     android:clickable="false"
                     android:focusable="false"
+                    android:foreground="?attr/selectableItemBackground"
                     android:importantForAccessibility="no" />
 
             </FrameLayout>
@@ -135,8 +135,8 @@
         android:id="@+id/addEventButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
         android:layout_margin="24dp"
         android:contentDescription="@string/add_event"
         app:backgroundTint="@color/purple_500"

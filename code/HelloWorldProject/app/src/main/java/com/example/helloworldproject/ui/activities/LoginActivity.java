@@ -1,5 +1,7 @@
 package com.example.helloworldproject.ui.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -20,21 +22,28 @@ import com.example.helloworldproject.model.UserGroup;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.DeviceId;
 
-/** Create/Update profile in a single screen. */
+/**
+ * Create/Update profile in a single screen.
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etName, etEmail, etPhone;
     private Spinner userGroupSpinner;
     private Button btnSave;
     private ProgressBar progress;
-
     private ProfileRepository repo;
     private String deviceId; // document ID
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, LoginActivity.class);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        boolean skipAutoLogin = getIntent().getBooleanExtra("skip_auto_login", false);
 
         etName = findViewById(R.id.et_name);
         etEmail = findViewById(R.id.et_email);
@@ -52,12 +61,14 @@ public class LoginActivity extends AppCompatActivity {
         repo = new ProfileRepository();
 
         setLoading(true);
-        DeviceId.getOrFetch(this, new DeviceId.DeviceIdCallback() {
-            @Override public void onSuccess(String id) {
+        DeviceId.get(new DeviceId.DeviceIdCallback() {
+            @Override
+            public void onSuccess(String id) {
                 deviceId = id;
                 // Try to load existing profile (for update).
                 repo.loadByDeviceId(deviceId, new ProfileRepository.LoadCallback() {
-                    @Override public void onLoaded(Profile p) {
+                    @Override
+                    public void onLoaded(Profile p) {
                         setLoading(false);
                         if (p != null) {
                             etName.setText(p.getName());
@@ -65,28 +76,45 @@ public class LoginActivity extends AppCompatActivity {
                             etPhone.setText(p.getPhone());
                             userGroupSpinner.setSelection(p.getUserGroup().ordinal());
                             CurrentProfile.init(p);
-                            startActivity(HomeActivity.newIntent(LoginActivity.this));
-                            finish();
+                            if (!skipAutoLogin) {
+                                startActivity(HomeActivity.newIntent(LoginActivity.this));
+                                finish();
+                            }
                             return;
                         }
-                        Toast.makeText(LoginActivity.this, "Failed to load: profile is null", Toast.LENGTH_LONG).show();
+                        Toast.makeText(
+                            LoginActivity.this,
+                            "Failed to load: profile is null",
+                            Toast.LENGTH_LONG
+                        ).show();
                     }
 
-                    @Override public void onNotFound() {
+                    @Override
+                    public void onNotFound() {
                         btnSave.setText("Register");
                         setLoading(false); // new user: keep fields empty
                     }
 
-                    @Override public void onError(Exception e) {
+                    @Override
+                    public void onError(Exception e) {
                         setLoading(false);
-                        Toast.makeText(LoginActivity.this, "Failed to load: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(
+                            LoginActivity.this,
+                            "Failed to get installation id: " + e.getMessage(),
+                            Toast.LENGTH_LONG
+                        ).show();
                     }
                 });
             }
 
-            @Override public void onError(Exception e) {
+            @Override
+            public void onError(Exception e) {
                 setLoading(false);
-                Toast.makeText(LoginActivity.this, "Failed to get device ID: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(
+                    LoginActivity.this,
+                    "Failed to get device ID: " + e.getMessage(),
+                    Toast.LENGTH_LONG
+                ).show();
             }
         });
 
@@ -115,16 +143,22 @@ public class LoginActivity extends AppCompatActivity {
                 )
             );
             repo.saveOrUpdate(p, new ProfileRepository.CompleteCallback() {
-                @Override public void onComplete() {
+                @Override
+                public void onComplete() {
                     setLoading(false);
                     CurrentProfile.init(p);
                     startActivity(HomeActivity.newIntent(LoginActivity.this));
                     finish();
                 }
 
-                @Override public void onError(Exception e) {
+                @Override
+                public void onError(Exception e) {
                     setLoading(false);
-                    Toast.makeText(LoginActivity.this, "Save failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(
+                        LoginActivity.this,
+                        "Save failed: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                    ).show();
                 }
             });
         });
