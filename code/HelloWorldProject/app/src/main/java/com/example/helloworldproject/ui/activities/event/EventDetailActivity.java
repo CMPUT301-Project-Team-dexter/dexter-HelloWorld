@@ -193,11 +193,7 @@ public class EventDetailActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.event_detail_menu, menu);
-        if (
-            CurrentProfile.isOrganizer() &&
-                CurrentProfile.get().getName()
-                    .contentEquals(binding.getEventModel().getCreator())
-        ) {
+        if (CurrentProfile.isOrganizer()) {
             MenuItem qrCodeGen = menu.findItem(R.id.evt_dtl_qr_gen_btn);
             qrCodeGen.setVisible(true);
             MenuItem eventManageItem = menu.findItem(R.id.evt_dtl_manage_btn);
