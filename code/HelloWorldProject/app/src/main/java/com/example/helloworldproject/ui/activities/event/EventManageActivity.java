@@ -45,13 +45,12 @@ public class EventManageActivity extends AppCompatActivity {
             finish();
             return;
         }
-        // TODO: add code to jump
         binding.evtMgrRegisteredEntrants.setOnClickListener(v -> {
-                    startActivity(RegisteredEntrantsActivity.newIntent(
-                            EventManageActivity.this,
-                            givenEventId
-                    ));
-                });
+            startActivity(RegisteredEntrantsActivity.newIntent(
+                EventManageActivity.this,
+                givenEventId
+            ));
+        });
 
         binding.evtMgrChosenEntrants.setOnClickListener(v -> {
             startActivity(ChosenEntrantsActivity.newIntent(

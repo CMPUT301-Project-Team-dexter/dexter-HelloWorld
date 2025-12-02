@@ -8,9 +8,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,7 +49,14 @@ public class RegisteredEntrantsActivity extends AppCompatActivity {
         }
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> finish());
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(
+                v -> getOnBackPressedDispatcher().onBackPressed()
+            );
+        }
 
         View btnExport = findViewById(R.id.btn_export_csv);
         if (btnExport != null) {
@@ -68,34 +75,34 @@ public class RegisteredEntrantsActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("events").document(eventId).collection("invites")
-                .whereEqualTo("status", "ACCEPTED")
-                .get()
-                .addOnSuccessListener(querySnapshots -> {
-                    if (querySnapshots.isEmpty()) {
-                        Toast.makeText(this, "No registered entrants found.", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+            .whereEqualTo("status", "ACCEPTED")
+            .get()
+            .addOnSuccessListener(querySnapshots -> {
+                if (querySnapshots.isEmpty()) {
+                    Toast.makeText(this, "No registered entrants found.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                    for (DocumentSnapshot doc : querySnapshots) {
-                        String userId = doc.getId();
-                        loadProfileForUser(userId);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error loading list: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                for (DocumentSnapshot doc : querySnapshots) {
+                    String userId = doc.getId();
+                    loadProfileForUser(userId);
+                }
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(this, "Error loading list: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
     }
 
     private void loadProfileForUser(String userId) {
         FirebaseFirestore.getInstance().collection("profiles").document(userId).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Profile p = documentSnapshot.toObject(Profile.class);
-                        if (p != null) {
-                            adapter.addEntrant(p);
-                        }
+            .addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    Profile p = documentSnapshot.toObject(Profile.class);
+                    if (p != null) {
+                        adapter.addEntrant(p);
                     }
-                });
+                }
+            });
     }
 
     private void saveToDownloads() {
@@ -112,8 +119,8 @@ public class RegisteredEntrantsActivity extends AppCompatActivity {
             String safeEmail = p.getEmail() != null ? p.getEmail() : "";
             String safePhone = p.getPhone() != null ? p.getPhone() : "";
             csvContent.append(safeName).append(",")
-                    .append(safeEmail).append(",")
-                    .append(safePhone).append("\n");
+                .append(safeEmail).append(",")
+                .append(safePhone).append("\n");
         }
 
         try {
