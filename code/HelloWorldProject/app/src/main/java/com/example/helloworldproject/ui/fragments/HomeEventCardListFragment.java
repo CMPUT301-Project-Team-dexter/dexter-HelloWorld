@@ -54,11 +54,10 @@ public class HomeEventCardListFragment extends Fragment {
             }
         }
     );
-
+    private final ActivityResultLauncher<Intent> eventLauncher = getEventLauncher();
     FragHomeEventListBinding binding;
     ArrayList<Event> eventListBackEnd = new ArrayList<>();
     private EventCardAdapter adapter;
-    private final ActivityResultLauncher<Intent> eventLauncher = getEventLauncher();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
