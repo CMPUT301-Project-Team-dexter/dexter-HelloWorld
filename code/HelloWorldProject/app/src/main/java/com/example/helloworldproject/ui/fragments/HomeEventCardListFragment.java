@@ -1,5 +1,7 @@
 package com.example.helloworldproject.ui.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +32,6 @@ import com.example.helloworldproject.ui.activities.event.EventQRCodeScanActivity
 import com.example.helloworldproject.ui.utils.EventCardAdapter;
 import com.example.helloworldproject.util.CurrentProfile;
 import com.example.helloworldproject.util.EventCache;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -57,6 +58,7 @@ public class HomeEventCardListFragment extends Fragment {
     FragHomeEventListBinding binding;
     ArrayList<Event> eventListBackEnd = new ArrayList<>();
     private EventCardAdapter adapter;
+    private final ActivityResultLauncher<Intent> eventLauncher = getEventLauncher();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -68,8 +70,7 @@ public class HomeEventCardListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
-        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(binding.toolbar);
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
@@ -140,7 +141,9 @@ public class HomeEventCardListFragment extends Fragment {
         binding.eventListView.setOnItemClickListener((parent, view1, position, id) -> {
             Event e = adapter.getItem(position);
             if (e != null) {
-                startActivity(EventDetailActivity.newIntent(requireActivity(), e.getId()));
+                eventLauncher.launch(
+                    EventDetailActivity.newIntent(requireContext(), e.getId())
+                );
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -155,7 +158,9 @@ public class HomeEventCardListFragment extends Fragment {
         if (CurrentProfile.isOrganizer()) {
             binding.addEventFab.setVisibility(View.VISIBLE);
             binding.addEventFab.setOnClickListener(v ->
-                startActivity(EventEditingActivity.newIntent(getContext(), null))
+                eventLauncher.launch(
+                    EventEditingActivity.newIntent(getContext(), null)
+                )
             );
         } else {
             binding.addEventFab.setVisibility(View.GONE);
@@ -181,8 +186,6 @@ public class HomeEventCardListFragment extends Fragment {
     }
 
     private void refreshEventList() {
-        // TODO: add a loading spinner here?
-        adapter.clear();
         if (CurrentProfile.isOrganizer()) {
             loadEventsForOrganizer();
         } else if (CurrentProfile.isEntrant()) {
@@ -232,6 +235,17 @@ public class HomeEventCardListFragment extends Fragment {
                         "Failed to load events: " + e.getMessage(),
                         Toast.LENGTH_LONG
                     ).show();
+                }
+            }
+        );
+    }
+
+    private ActivityResultLauncher<Intent> getEventLauncher() {
+        return registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    refreshEventList();
                 }
             }
         );
