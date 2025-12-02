@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.example.helloworldproject.R;
 import com.example.helloworldproject.databinding.ItemEventCardBinding;
 import com.example.helloworldproject.model.Event;
+import com.example.helloworldproject.util.CurrentProfile;
 
 import java.util.List;
 
@@ -44,6 +46,22 @@ public class EventCardAdapter extends ArrayAdapter<Event> {
         if (item == null) {
             throw new IllegalStateException("Event at position " + position + " is null");
         }
+
+        // Sets the waiting list status capacity
+        TextView waitingSpotsText = cardView.findViewById(R.id.evt_dtl_wait_list_view);
+        if (CurrentProfile.isOrganizer()) {
+            int waitCapacity = item.getPlannedSampleSize() != null ? item.getPlannedSampleSize() : 0;
+            int enrolled = item.getEnrolledCount();
+            int available = Math.max(0, waitCapacity - enrolled);
+
+            waitingSpotsText.setText("Waiting List: " + enrolled + "/" + waitCapacity);
+            waitingSpotsText.setVisibility(View.VISIBLE);
+        } else {
+            waitingSpotsText.setVisibility(View.GONE);
+        }
+
+
+
         cardBinding.eventName.setText(item.getTitle());
         String imgUrl = item.getImgUrl();
         Glide.with(getContext())

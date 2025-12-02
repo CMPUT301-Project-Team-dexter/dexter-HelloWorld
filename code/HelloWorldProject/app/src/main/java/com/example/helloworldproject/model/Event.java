@@ -54,6 +54,9 @@ public class Event extends BaseObservable {
 
     private Boolean imgUrlEnable;
 
+    private Integer enrolledCount;
+    private Integer waitingCount;
+
     public Event() {
     }
 
@@ -73,12 +76,12 @@ public class Event extends BaseObservable {
         this.registrationCloseAt = other.registrationCloseAt;
         this.eventStartAt = other.eventStartAt;
         this.eventEndAt = other.eventEndAt;
-        this.capacity = other.capacity;
+        this.capacity = other.capacity; // event capacity
         this.selectionMethod = other.selectionMethod;
         this.seedPolicy = other.seedPolicy;
         this.duplicatePolicy = other.duplicatePolicy;
         this.geoRequired = other.geoRequired;
-        this.plannedSampleSize = other.plannedSampleSize;
+        this.plannedSampleSize = other.plannedSampleSize; // waiting list capacity
         if (other.interests == null) {
             this.interests = null;
         } else {
@@ -89,6 +92,8 @@ public class Event extends BaseObservable {
         this.imgUrl = other.imgUrl;
         this.imgUrlEnable = other.imgUrlEnable;
         this.qrCodeBitmap = null;
+        this.enrolledCount = 0;
+        this.waitingCount = 0;
     }
 
     public String getId() {
@@ -240,6 +245,25 @@ public class Event extends BaseObservable {
         return imgUrlEnable;
     }
 
+    @Bindable
+    public Integer getEnrolledCount() {
+        return enrolledCount == null ? 0 : enrolledCount;
+    }
+
+    public void setEnrolledCount(Integer enrolledCount) {
+        this.enrolledCount = enrolledCount;
+        notifyPropertyChanged(BR.enrolledCount);
+    }
+
+    @Bindable
+    public Integer getWaitingCount() {
+        return waitingCount == null ? 0 : waitingCount;
+    }
+
+    public void setWaitingCount(Integer waitingCount) {
+        this.waitingCount = waitingCount;
+        notifyPropertyChanged(BR.waitingCount);
+    }
 
     public void setId(String id) {
         this.id = id;
