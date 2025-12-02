@@ -44,12 +44,13 @@ public class EventManageActivity extends AppCompatActivity {
             finish();
             return;
         }
-        // TODO: add code to jump
-        binding.evtMgrChosenEntrants.setOnClickListener(
-            v -> {
-                Toast.makeText(EventManageActivity.this, "for test only: " + givenEventId, Toast.LENGTH_SHORT).show();
-            }
-        );
+        binding.evtMgrRegisteredEntrants.setOnClickListener(v -> {
+            startActivity(RegisteredEntrantsActivity.newIntent(
+                EventManageActivity.this,
+                givenEventId
+            ));
+        });
+
         binding.evtMgrChosenEntrants.setOnClickListener(v -> {
             startActivity(ChosenEntrantsActivity.newIntent(
                 EventManageActivity.this,

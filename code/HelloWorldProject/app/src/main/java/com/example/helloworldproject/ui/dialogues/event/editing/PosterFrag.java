@@ -27,6 +27,7 @@ public class PosterFrag extends DialogFragment {
     private Uri selectedImgUri;
     private ImageView imgView;
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
+
     public PosterFrag() {
     }
 

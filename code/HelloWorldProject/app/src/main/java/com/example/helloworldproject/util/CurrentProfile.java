@@ -1,6 +1,7 @@
 package com.example.helloworldproject.util;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.helloworldproject.model.Profile;
 import com.example.helloworldproject.model.UserGroup;
@@ -19,20 +20,20 @@ public class CurrentProfile {
         currentUser = p;
     }
 
-    @NonNull
+    @Nullable
     public static Profile get() {
         return currentUser;
     }
 
     public static boolean isOrganizer() {
-        return currentUser.getUserGroup() == UserGroup.ORGANIZER;
+        return currentUser != null && currentUser.getUserGroup() == UserGroup.ORGANIZER;
     }
 
     public static boolean isAdmin() {
-        return currentUser.getUserGroup() == UserGroup.ADMIN;
+        return currentUser != null && currentUser.getUserGroup() == UserGroup.ADMIN;
     }
 
     public static boolean isEntrant() {
-        return currentUser.getUserGroup() == UserGroup.ENTRANT;
+        return currentUser != null && currentUser.getUserGroup() == UserGroup.ENTRANT;
     }
 }

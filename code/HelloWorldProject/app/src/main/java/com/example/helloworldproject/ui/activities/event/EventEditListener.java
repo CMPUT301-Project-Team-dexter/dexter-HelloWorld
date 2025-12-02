@@ -2,6 +2,8 @@ package com.example.helloworldproject.ui.activities.event;
 
 import android.net.Uri;
 
+import java.util.List;
+
 public interface EventEditListener {
     void updateTitle(String newTitle);
 
@@ -20,6 +22,8 @@ public interface EventEditListener {
     void updateWaitingListCapacity(int newCapacity);
 
     void updateDetail(String newDetail);
+
+    void updateTags(List<String> newTags);
 
     void updateImgUri(Uri uri);
 

@@ -25,6 +25,7 @@ import java.util.List;
 public class FilterBottomSheetFragment extends BottomSheetDialogFragment {
     private final FilterListener listener;
     private long selectedDate = 0;
+
     public FilterBottomSheetFragment(FilterListener listener) {
         this.listener = listener;
     }

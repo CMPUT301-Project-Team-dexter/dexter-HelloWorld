@@ -20,6 +20,7 @@ public class AllImagesFragmentAdapter extends RecyclerView.Adapter<AllImagesFrag
     private final Context context;
     private final ArrayList<Event> events;
     private final OnImageClickListener clickListener;
+
     public AllImagesFragmentAdapter(Context context,
                                     ArrayList<Event> events,
                                     OnImageClickListener clickListener) {
