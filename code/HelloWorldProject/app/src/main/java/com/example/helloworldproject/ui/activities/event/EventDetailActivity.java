@@ -119,6 +119,8 @@ public class EventDetailActivity extends AppCompatActivity {
             .error(R.drawable.placeholder)
             .into(binding.evtDtlPosterImage);
 
+
+
         if (CurrentProfile.isOrganizer()) {
             binding.evtDtlOrgEditBtn.setOnClickListener(v -> {
                 editingLauncher.launch(
@@ -129,6 +131,26 @@ public class EventDetailActivity extends AppCompatActivity {
             });
             binding.evtDtlOrgEditBtn.setVisibility(View.VISIBLE);
             setupOrganizerLottery(e);
+            waitlistCountListener = waitlistRepository.observeCount(
+                givenEventId,
+                new WaitlistRepository.CountListener() {
+                    @Override
+                    public void onCount(int total) {
+                        runOnUiThread(() -> {
+                            binding.getEventModel().setEnrolledCount(total);
+                        });
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        runOnUiThread(() -> Toast.makeText(
+                            EventDetailActivity.this,
+                            "Failed to load waitlist count: " + e.getMessage(),
+                            Toast.LENGTH_LONG
+                        ).show());
+                    }
+                }
+            );
         } else if (CurrentProfile.isAdmin()) {
             binding.evtDtlAdminDeleteBtn.setOnClickListener(v -> {
                 Event event = binding.getEventModel();
@@ -186,6 +208,26 @@ public class EventDetailActivity extends AppCompatActivity {
         } else {
             renderLotteryGuidelines(e);
             setupEntrantButtons(e);
+            waitlistCountListener = waitlistRepository.observeCount(
+                givenEventId,
+                new WaitlistRepository.CountListener() {
+                    @Override
+                    public void onCount(int total) {
+                        runOnUiThread(() -> {
+                            binding.evtDtlWaitListView.setText(total + " entrants on the waiting list");
+                        });
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        runOnUiThread(() -> Toast.makeText(
+                            EventDetailActivity.this,
+                            "Failed to load waitlist count: " + e.getMessage(),
+                            Toast.LENGTH_LONG
+                        ).show());
+                    }
+                }
+            );
             observeInviteStatus();
         }
     }
@@ -306,25 +348,6 @@ public class EventDetailActivity extends AppCompatActivity {
                 }
             );
         });
-
-        waitlistCountListener = waitlistRepository.observeCount(
-            givenEventId,
-            new WaitlistRepository.CountListener() {
-                @Override
-                public void onCount(int total) {
-                    runOnUiThread(() -> binding.evtDtlWaitListView.setText(total + " entrants on the waiting list"));
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    runOnUiThread(() -> Toast.makeText(
-                        EventDetailActivity.this,
-                        "Failed to load waitlist count: " + e.getMessage(),
-                        Toast.LENGTH_LONG
-                    ).show());
-                }
-            }
-        );
     }
 
     private void updateJoinLeaveVisibility(boolean isInWaitlist, boolean canJoin) {
